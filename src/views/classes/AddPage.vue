@@ -20,29 +20,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useUserStore } from "@/stores/userStore";
-import { addClassesAPI } from "@/api/classes";
+import { useClassesStore } from "@/stores/classesStore";
 import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 
+// classesStore
+const classesStore = useClassesStore();
+// userStore
+const userStore = useUserStore();
 // 路由对象
 const router = useRouter();
-// 用户信息
-const userStore = useUserStore();
-// 表单数据
-const classes = ref({
-   "annc": "",
-   "creatorUid": "",
-   "info": "",
-   "name": ""
-})
+
+// 解构
+const { classes } = storeToRefs(classesStore);
 
 
 // 提交表单
 async function submit() {
    classes.value.creatorUid = userStore.userInfo?.id as string;
-   let classesResult = await addClassesAPI(classes.value);
+   let classesResult = await classesStore.addClassesHandler(classes.value);
    // console.log(classesResult);
    if (classesResult.code == 20000) {
       // 添加成功
