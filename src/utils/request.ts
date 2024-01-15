@@ -18,7 +18,7 @@ service.interceptors.request.use(config => {
 
 // 响应拦截
 service.interceptors.response.use(res => {
-   console.log(res.config.url, res.data);
+   console.log("响应拦截："+res.config.url, res.data);
    if (res.data.code != 20000) {
       message.error(res.data.message)
    }

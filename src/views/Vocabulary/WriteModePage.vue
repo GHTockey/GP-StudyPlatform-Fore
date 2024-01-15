@@ -164,7 +164,7 @@ function checkAnswer(userAnswer: string, targetAnswer: string, strength: number 
    });
    console.log("目标的中文数量：", tarZhNum);
    console.log("用户答案与目标答案相似的中文数量：", similarVal);
-   console.log("相似度：", similarVal / tarZhNum);
+   console.log("相似度：", similarVal / tarZhNum, "阈值：", strength); 
    console.log("匹配的中文：", zhs);
 
    // 相似度

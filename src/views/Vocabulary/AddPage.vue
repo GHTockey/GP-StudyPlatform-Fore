@@ -41,12 +41,11 @@ import { ref } from 'vue';
 import { useUserStore } from "@/stores/userStore";
 import type { Vocabulary } from "@/types/word";
 import { addVocabularyAPI } from "@/api/word";
+import { imageUplAPI } from "@/api/other";
 import { message } from 'ant-design-vue';
 import { useRouter } from "vue-router";
 import { UploadOutlined } from '@ant-design/icons-vue';
-import { imageUplAPI } from "@/api/other";
 import type { UploadRequestOption } from 'ant-design-vue/es/vc-upload/interface';
-import axios from "axios";
 
 const userStore = useUserStore();
 const router = useRouter();
