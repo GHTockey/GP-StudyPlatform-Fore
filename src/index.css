@@ -1,0 +1,24 @@
+/* tailwindcss基础配置 */
+@tailwind base;
+/* tailwindcss组件配置 */
+@tailwind components;
+/* tailwindcss工具配置 */
+@tailwind utilities;
+
+
+/* 封装tailwindcss类名 */
+@layer components {
+
+}
+
+@layer base {
+   /* 重置默认样式 */
+   html, body, #app {
+      height: 100%;
+   }
+   /* 解决Ant Design Icon图标垂直居中问题 */
+   svg {
+      vertical-align: initial !important;
+   }
+
+}
