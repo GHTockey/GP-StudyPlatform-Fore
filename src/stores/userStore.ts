@@ -1,4 +1,4 @@
-import type { UserInfo } from "@/types/user";
+import type { User } from "@/types/user";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -9,14 +9,15 @@ import { ref } from "vue";
 
 export const useUserStore = defineStore("userStore", () => {
    // state
-   const userInfo = ref<UserInfo>();
+   const userInfo = ref<User>();
    const token = ref<string>();
 
    // actions
-   function setUserInfo(userInfoVo: UserInfo, tokenVo: string) {
+   function setUserInfo(userInfoVo: User, tokenVo: string) {
       userInfo.value = userInfoVo;
       token.value = tokenVo;
-   }
+   };
+   //
 
 
    // getters

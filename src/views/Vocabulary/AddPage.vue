@@ -39,8 +39,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from "@/stores/userStore";
-import type { Vocabulary } from "@/types/word";
-import { addVocabularyAPI } from "@/api/word";
+import type { Vocabulary } from "@/types/vocabulary";
+import { addVocabularyAPI } from "@/api/vocabulary";
 import { imageUplAPI } from "@/api/other";
 import { message } from 'ant-design-vue';
 import { useRouter } from "vue-router";
@@ -103,4 +103,4 @@ function beforeUpload(file: File) {
    }
    return isJpgOrPng && isLt2M;
 };
-</script>
+</script>@/api/voc@/types/vocabulary

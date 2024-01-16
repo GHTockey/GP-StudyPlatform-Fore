@@ -1,5 +1,5 @@
 <template>
-   <div class="layout-container">
+   <div class="layout-container pt-[60px]">
       <!-- 导航栏 -->
       <NavBar />
 

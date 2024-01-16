@@ -11,3 +11,8 @@ export function addClassesAPI(classes: Classes) {
 export function getClassesAPI(id: string) {
    return request<Classes>("/classes-service/classes/" + id, "GET");
 };
+
+/* 搜索班级API */
+export function searchClassesAPI(keyword: string) {
+   return request<Classes[]>("/classes-service/classes/search/" + keyword, "GET");
+};

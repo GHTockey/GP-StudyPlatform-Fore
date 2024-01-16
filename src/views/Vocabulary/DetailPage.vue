@@ -91,14 +91,14 @@ import icon, {
 } from "@ant-design/icons-vue";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import { useWordStore } from "@/stores/wordStore";
+import { useVocabularyStore } from "@/stores/vocabularyStore";
 import { storeToRefs } from "pinia";
 
 const route = useRoute();
-const wordStore = useWordStore();
+const vocabularyStore = useVocabularyStore();
 // 词集数据
-const { vocabularyData } = storeToRefs(wordStore);
-const { getVocabularyData } = wordStore;
+const { vocabularyData } = storeToRefs(vocabularyStore);
+const { getVocabularyData } = vocabularyStore;
 
 // 卡片是否翻转
 const isFlip = ref(false);
@@ -467,4 +467,4 @@ function execPrevOrNext(opr: 'prev' | 'next', card: HTMLDivElement) {
       padding-top: 50px;
    }
 }
-</style>
+</style>@/stores/vocabularyStore

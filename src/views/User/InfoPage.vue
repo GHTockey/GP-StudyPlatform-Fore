@@ -25,16 +25,16 @@
 
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
-import { getVocabularyListByUidAPI } from "@/api/word";
+import { getVocabularyListByUidAPI } from "@/api/vocabulary";
 import { getUserInfoById } from "@/api/user";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import type { VocabularyData } from "@/types/word";
-import type { UserInfo } from "@/types/user";
+import type { VocabularyData } from "@/types/vocabulary";
+import type { User } from "@/types/user";
 
 const route = useRoute();
 const vocabularyList = ref<VocabularyData[]>();
-const userInfo = ref<UserInfo>();
+const userInfo = ref<User>();
 const userStore = useUserStore();
 
 // 编辑弹框
@@ -65,4 +65,4 @@ async function getVocabularyList() {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less"></style>@/api/voc@/types/vocabulary

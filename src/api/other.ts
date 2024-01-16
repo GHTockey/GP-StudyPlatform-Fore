@@ -1,7 +1,7 @@
 import { request } from "@/utils/request";
 import type { AxiosProgressEvent } from "axios";
 
-// 图片上传
+/* 图片上传API */
 export function imageUplAPI(imgFile: FormData, uploadHandler?: (p: AxiosProgressEvent) => void) {
-   return request<string>("image-upload-service/image/upload", "POST", imgFile, uploadHandler);
+   return request<string>("other-service/image/upload", "POST", imgFile, uploadHandler);
 };

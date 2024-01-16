@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import { getVocabularyAPI } from "@/api/word";
-import type { VocabularyData } from "@/types/word";
+import { getVocabularyAPI } from "@/api/vocabulary";
+import type { VocabularyData } from "@/types/vocabulary";
 import { ref } from "vue";
 
-export const useWordStore = defineStore("wordStore", () => {
+export const useVocabularyStore = defineStore("vocabularyStore", () => {
    // 词集数据
    const vocabularyData = ref<VocabularyData>({
       "authorId": "",

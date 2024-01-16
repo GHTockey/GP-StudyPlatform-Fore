@@ -11,9 +11,9 @@
 
       <div class="recent">
          <a-row :gutter="[10, 10]">
-            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(item, i) in [1, 2, 3]" :key="i">
+            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(item, i) in 50" :key="i">
                <div @click="$router.push('/detail/11111')">
-                  <p>富婆捕获计划{{ i + 1 }}</p>
+                  <p>小黑子捕获计划{{ i + 1 }}</p>
                   <p>233 个词条</p>
                   <span>2022.03.26</span>
                   <div>

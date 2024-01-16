@@ -25,18 +25,18 @@
 </template>
 
 <script setup lang="ts">
-import { useWordStore } from "@/stores/wordStore";
-import type { Word } from "@/types/word";
+import { useVocabularyStore } from "@/stores/vocabularyStore";
+import type { Word } from "@/types/vocabulary";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import lodash from "lodash";
 import { message } from "ant-design-vue";
 
-const wordStore = useWordStore();
+const vocabularyStore = useVocabularyStore();
 const route = useRoute();
 
-const { vocabularyData } = storeToRefs(wordStore);
+const { vocabularyData } = storeToRefs(vocabularyStore);
 // 模式 false常规(选项和答案类似，中文可以类似，英文必须完全匹配  如：我是一个kaiwen 答案可以是: 我是kaiwen)  true严格(选项和答案完全一致)
 const mode = ref<boolean>(false);
 // 当前学习的词语
@@ -51,7 +51,7 @@ const forgetWords = ref<Word[]>([]);
 // let tempTargetAnswer = ref<string>('文峰年费ing发发发');
 
 
-wordStore.getVocabularyData(route.params.vid as string);
+vocabularyStore.getVocabularyData(route.params.vid as string);
 
 
 // 学习 随机获取一个词语
@@ -174,4 +174,4 @@ function checkAnswer(userAnswer: string, targetAnswer: string, strength: number 
 };
 </script>
 
-<style lang="less"></style>
+<style lang="less"></style>@/stores/vocabularyStore@/types/vocabulary

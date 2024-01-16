@@ -17,17 +17,17 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { useWordStore } from "@/stores/wordStore";
+import { useVocabularyStore } from "@/stores/vocabularyStore";
 import { storeToRefs } from "pinia";
-import type { Word } from "@/types/word";
+import type { Word } from "@/types/vocabulary";
 import { ref, onMounted } from "vue";
 import lodash from "lodash";
 import { message } from "ant-design-vue";
 
 const route = useRoute();
-const wordStore = useWordStore();
+const vocabularyStore = useVocabularyStore();
 // 词集数据
-const { vocabularyData } = storeToRefs(wordStore);
+const { vocabularyData } = storeToRefs(vocabularyStore);
 // 当前词语
 const currentWord = ref<Word>();
 // 已经学习的词语
@@ -37,7 +37,7 @@ const options = ref<string[]>([]);
 
 
 // 获取词集数据
-wordStore.getVocabularyData(route.params.vid as string);
+vocabularyStore.getVocabularyData(route.params.vid as string);
 // 临时 页面加载完毕后随机获取一个词语
 setTimeout(() => {
    getRandomWord();
@@ -127,4 +127,4 @@ function generateOptions() {
 };
 </script>
 
-<style lang="less"></style>
+<style lang="less"></style>@/stores/vocabularyStore@/types/vocabulary

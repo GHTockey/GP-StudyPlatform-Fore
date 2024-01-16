@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Word } from "@/types/word";
+import type { Word } from "@/types/vocabulary";
 import {
    DeleteOutlined,
    MenuOutlined
@@ -173,3 +173,4 @@ function addNewWord() {
    }
 }
 </style>
+@/types/vocabulary

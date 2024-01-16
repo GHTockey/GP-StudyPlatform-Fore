@@ -1,4 +1,4 @@
-import type { Vocabulary, VocabularyData } from "@/types/word";
+import type { Vocabulary, VocabularyData } from "@/types/vocabulary";
 import { request } from "@/utils/request";
 
 
@@ -16,3 +16,8 @@ export function getVocabularyAPI(id: string) {
 export function getVocabularyListByUidAPI(uid: string) {
    return request<VocabularyData[]>(`/vocabulary-service/vocabulary/list/${uid}`, "GET");
 };
+
+/* 搜索词集API */
+export function searchVocabularyAPI(keyword: string) {
+   return request<Vocabulary[]>("/vocabulary-service/vocabulary/search/" + keyword, "GET");
+}
