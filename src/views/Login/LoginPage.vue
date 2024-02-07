@@ -1,38 +1,70 @@
 <template>
-  <div class="login-container h-[100%] 
-              grid place-items-center 
-              ">
-    <!-- bg-gradient-to-tl from-[#89f7fe] to-[#66a6ff] -->
-    <!-- 登录框 -->
-    <div class="w-[760px] h-[500px] shadow-tce-shadow rounded-xl flex bg-slate-800 text-white">
+  <div class="login-container h-[100%] grid place-items-center 
+              bg-gradient-to-tl from-[#89f7fe] to-[#66a6ff]">
+    <!-- 登录框体 -->
+    <div class="w-[730px] h-[500px] shadow-tce-shadow rounded-xl flex 
+              text-white relative overflow-hidden bg-slate-800">
+      <!-- 模糊背景 -->
+      <div class="absolute w-full h-full
+       bg-[url(@/assets/img/理解.png)] bg-no-repeat
+       bg-[length:380px] bg-[200px] blur-[70px]"></div>
       <!-- 图片 -->
-      <div class="flex-1 border border-green-500">图片</div>
+      <div class="flex-1 p-2" :class="isRegister ? 'toRight' : 'toRight-back'">
+        <div class="w-full h-full rounded-lg relative bg-[#fff]">
+          <img src="@/assets/img/理解.png" class="absolute 
+            top-1/2 -translate-y-1/2 scale-110" />
+        </div>
+      </div>
       <!-- 表单 -->
-      <div class=" w-[330px] flex flex-wrap content-center p-5">
+      <div :class="isRegister ? 'toLeft' : 'toLeft-back pt-20'"
+        class="w-[350px] flex flex-wrap content-center p-5 z-10 relative">
+        <span class="absolute left-1/2 -translate-x-1/2 top-[50px]">LOGO ICON</span>
+        <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来，{{ formState.username }}</p>
+        <p v-else class="font-bold text-2xl w-[100%]">Hi！新朋友，{{ formState.username }}</p>
 
-        <p class="font-bold text-2xl w-[100%]">Login</p>
-
-        <AForm :model="formState" layout="vertical" class="w-[100%] text-color" autocomplete="off" @finish="onFinish">
-          <AFormItem style="color: aliceblue;" label="用户" name="username"
-            :rules="[{ message: '请输入您的用户名!', required: true }]">
-            <AInput v-model:value="formState.username" />
+        <AForm :model="formState" class="w-[100%] mt-5" autocomplete="off" @finish="onFinish">
+          <AFormItem name="username" :rules="[{ message: '请输入您的用户名!', required: true }]">
+            <input placeholder="用户名" v-model="formState.username" type="text"
+              class="input input-bordered w-full max-w-xs" />
           </AFormItem>
 
-          <AFormItem label="密码" name="password" :rules="[{ message: '请输入您的密码!', required: true }]">
-            <AInputPassword v-model:value="formState.password" />
+          <AFormItem name="password" :rules="[{ message: '请输入您的密码!', required: true }]">
+            <input placeholder="密码" v-model="formState.password" type="password"
+              class="input input-bordered w-full max-w-xs" />
           </AFormItem>
 
           <AFormItem>
-            <button class="submit-btn rounded-xl w-[80px]">登录</button>
+            <a-button :loading="loading" type="primary" html-type="submit" class="btn submit-btn w-full rounded-lg">{{
+              isRegister ? "注册" : "登录" }}</a-button>
           </AFormItem>
         </AForm>
+        <!-- OAuth 登录 -->
+        <template v-if="!isRegister">
+          <span class="w-full text-right">
+            <span class="text-xs hover:text-blue-400 cursor-pointer" @click="isRegister = !isRegister">注册账号</span>
+          </span>
+          <div class="divider text-white w-full">社交登录</div>
+          <div class="flex justify-center gap-1">
+            <a-button type="primary" class="btn social-btn rounded-lg">
+              😋QQ
+            </a-button>
+            <a-button type="primary" class="btn social-btn rounded-lg">
+              😋QQ
+            </a-button>
+          </div>
+        </template>
+        <template v-else>
+          <span class="text-xs w-full text-right">
+            <span class="hover:text-blue-500 cursor-pointer" @click="isRegister = !isRegister">已有账号？</span>
+          </span>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { login as loginAPI } from "@/api/user";
 import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
@@ -45,13 +77,19 @@ const formState = reactive({
   username: "admin",
   password: "114514",
 });
+// 登录 loading
+const loading = ref(false);
+// 是否注册
+const isRegister = ref(false);
 
 const onFinish = async (loginUser: { username: string, password: string }) => {
+  loading.value = true;
   let loginResult = await loginAPI(loginUser);
   if (loginResult.code === 20000) {
     userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
     localStorage.setItem("token", loginResult.other.token); // 保存token
     message.success("登录成功"); // 提示登录成功
+    loading.value = false;
     // 如果有 returnUrl 参数则跳转到 returnUrl 参数指定的页面
     if (route.query.returnUrl) {
       router.push(route.query.returnUrl as string);
@@ -66,10 +104,6 @@ const onFinish = async (loginUser: { username: string, password: string }) => {
 </script>
 
 <style lang="less" scoped>
-.text-color>div>div>label {
-  color: aliceblue;
-}
-
 /* CSS */
 .submit-btn {
   align-items: center;
@@ -111,5 +145,62 @@ const onFinish = async (loginUser: { username: string, password: string }) => {
 
 .button-21:focus:not(:active) {
   box-shadow: rgba(40, 170, 255, 0.25) 0 0 0 .125em;
+}
+
+.toRight {
+  animation: to-right .3s forwards;
+}
+
+.toRight-back {
+  animation: to-right-back .3s forwards;
+}
+
+@keyframes to-right {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(350px);
+  }
+}
+
+@keyframes to-right-back {
+  0% {
+    transform: translateX(350px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+.toLeft {
+  animation: to-left .3s forwards;
+}
+
+.toLeft-back {
+  animation: to-left-back .3s forwards;
+}
+
+@keyframes to-left {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-380px);
+  }
+}
+
+@keyframes to-left-back {
+  0% {
+    transform: translateX(-380px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 </style>

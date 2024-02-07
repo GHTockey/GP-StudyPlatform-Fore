@@ -31,6 +31,8 @@ import { ref } from "vue";
 import { useRoute } from "vue-router";
 import type { VocabularyData } from "@/types/vocabulary";
 import type { User } from "@/types/user";
+import { message } from "ant-design-vue";
+import router from "@/router";
 
 const route = useRoute();
 const vocabularyList = ref<VocabularyData[]>();
@@ -50,10 +52,10 @@ async function editSubmit() {
 
 async function getVocabularyList() {
    // 获取指定用户信息
-   if (route.query.id) {
-      let userInfoRes = await getUserInfoById(<string>route.query.id);
+   if (route.params.id) {
+      let userInfoRes = await getUserInfoById(<string>route.params.id);
       userInfo.value = userInfoRes.data;
-      let vocListRes = await getVocabularyListByUidAPI(<string>route.query.id);
+      let vocListRes = await getVocabularyListByUidAPI(<string>route.params.id);
       vocabularyList.value = vocListRes.data;
       // 获取当前用户信息
    } else if (userStore.userInfo && userStore.userInfo) {
@@ -61,6 +63,10 @@ async function getVocabularyList() {
       userInfo.value = userInfoRes.data;
       let vocListRes = await getVocabularyListByUidAPI(userStore.userInfo.id);
       vocabularyList.value = vocListRes.data;
+   } else {
+      console.log(route);
+      message.error("未登录");
+      router.push("/");
    }
 }
 </script>

@@ -14,13 +14,30 @@
             <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                <div class="w-10 rounded-full">
                   <!-- 头像 -->
-                  <a-avatar class="cursor-pointer" size="large">USER</a-avatar>
+                  <a-avatar :src="userInfo?.avatar" class="cursor-pointer" size="large">USER</a-avatar>
                </div>
             </div>
             <ul tabindex="0"
                class="mt-3 z-[1] p-2 shadow menu menu-md dropdown-content font-semibold bg-base-100 rounded-box w-36">
-               <li><a><UserOutlined class="text-lg" />个人中心</a></li>
-               <li><a><LogoutOutlined class="text-lg" />退出登录</a></li>
+               <template v-if=userInfo>
+                  <li @click="$router.push('/user')">
+                     <a>
+                        <UserOutlined class="text-lg" />个人中心
+                     </a>
+                  </li>
+                  <li @click="logout">
+                     <a>
+                        <LogoutOutlined class="text-lg" />退出登录
+                     </a>
+                  </li>
+               </template>
+               <template v-else>
+                  <li @click="$router.push('/login')">
+                     <a>
+                        <LoginOutlined class="text-lg" />前往登录
+                     </a>
+                  </li>
+               </template>
             </ul>
          </div>
       </div>
@@ -60,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { UserOutlined,LogoutOutlined } from "@ant-design/icons-vue";
+import { UserOutlined, LogoutOutlined, LoginOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
 import { onMounted, ref } from "vue";
 import lodash from "lodash";
@@ -70,8 +87,11 @@ import { searchVocabularyAPI } from "@/api/vocabulary";
 import type { User } from "@/types/user";
 import type { Classes } from "@/types/classes";
 import type { Vocabulary } from "@/types/vocabulary";
+import { storeToRefs } from "pinia";
+import router from "@/router";
 
 const userStore = useUserStore();
+const { userInfo } = storeToRefs(userStore);
 // 搜索弹框组件
 const searchDialog = ref<HTMLDialogElement | null>(null);
 // 搜索关键词
@@ -103,6 +123,11 @@ async function searchHandler(e: Event) {
    searchUserResult.value = (await searchUserAPI(searchKey.value)).data;
    // 班级搜索
    searchClassesResult.value = (await searchClassesAPI(searchKey.value)).data;
+}
+// 退出登录
+function logout() {
+   userStore.delUser();
+   router.push("/login");
 }
 </script>
 

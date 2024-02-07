@@ -21,7 +21,8 @@ const router = createRouter({
         // 用户
         {
           path: '/user', children: [
-            { path: '', name: '用户详情', component: () => import("@/views/user/InfoPage.vue") },
+            { path: '', name: '用户详情(自己)', component: () => import("@/views/user/InfoPage.vue") },
+            { path: ':id', name: '用户详情', component: () => import("@/views/user/InfoPage.vue") },
           ]
         },
         // 班级
