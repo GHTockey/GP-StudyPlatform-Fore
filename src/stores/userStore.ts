@@ -17,6 +17,10 @@ export const useUserStore = defineStore("userStore", () => {
       userInfo.value = userInfoVo;
       token.value = tokenVo;
    };
+   function delUser(){
+      userInfo.value = undefined;
+      token.value = undefined;
+   }
    //
 
 
@@ -27,5 +31,6 @@ export const useUserStore = defineStore("userStore", () => {
       userInfo,
       token,
       setUserInfo,
+      delUser,
    }
 }, { persist: true });

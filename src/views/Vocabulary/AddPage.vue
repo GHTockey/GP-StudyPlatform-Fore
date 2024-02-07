@@ -103,4 +103,4 @@ function beforeUpload(file: File) {
    }
    return isJpgOrPng && isLt2M;
 };
-</script>@/api/voc@/types/vocabulary
+</script>

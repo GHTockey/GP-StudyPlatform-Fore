@@ -35,9 +35,10 @@
 import { reactive } from "vue";
 import { login as loginAPI } from "@/api/user";
 import { message } from "ant-design-vue/es";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 
+const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
 const formState = reactive({
@@ -51,7 +52,12 @@ const onFinish = async (loginUser: { username: string, password: string }) => {
     userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
     localStorage.setItem("token", loginResult.other.token); // 保存token
     message.success("登录成功"); // 提示登录成功
-    router.push("/"); // 跳转到首页
+    // 如果有 returnUrl 参数则跳转到 returnUrl 参数指定的页面
+    if (route.query.returnUrl) {
+      router.push(route.query.returnUrl as string);
+    } else {
+      router.push("/"); // 跳转到首页
+    }
   } else {
     // 提示登录失败
     message.error(loginResult.message);

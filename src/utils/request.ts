@@ -1,6 +1,8 @@
 import type { Method, AxiosProgressEvent } from "axios";
 import axios from "axios";
 import { message } from 'ant-design-vue';
+import { useUserStore } from "@/stores/userStore";
+import router from "@/router";
 
 let baseURL: string = "http://localhost:10010";
 const service = axios.create({
@@ -26,17 +28,21 @@ service.interceptors.response.use(res => {
    // 业务逻辑成功，返回响应数据，作为 axios 成功的结果
    return res.data
 }, err => {
-   // if (err.response.status === 401) {
-   //    const userStore = useUserStore();
-   //    // 删除用户信息
-   //    userStore.delUser()
-   //    // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
-   //    router.push({
-   //       path: '/login',
-   //       query: { returnUrl: router.currentRoute.value.fullPath }
-   //    })
-   // }
-   return Promise.reject(err)
+   if (err.response.status == 401) {
+      // console.log("token失效，重新登录");
+      message.error("认证已过期，重新登录")
+      const userStore = useUserStore();
+      // 删除用户信息
+      userStore.delUser()
+      // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
+      router.push({
+         path: '/login',
+         query: { returnUrl: router.currentRoute.value.fullPath }
+      })
+      // console.log(router);
+      // router.push('/login');
+   }
+   // return Promise.reject(err)
 });
 
 type BaseResult<T> = {

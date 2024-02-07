@@ -20,4 +20,4 @@ export function getUserInfoById(uid: string) {
 /* 搜索用户API */
 export function searchUserAPI(keyword: string) {
    return request<User[]>("/user-service/user/search/" + keyword, "GET");
-}
+};
