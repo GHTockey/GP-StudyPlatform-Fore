@@ -8,6 +8,10 @@
 
 /* 封装tailwindcss类名 */
 @layer components {
+   /* 用户信息页头像样式 */
+   .my-user-avatar {
+      @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-full ring-offset-base-100 ring-offset-2;
+   }
 
 }
 

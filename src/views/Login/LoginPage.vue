@@ -5,13 +5,12 @@
     <div class="w-[730px] h-[500px] shadow-tce-shadow rounded-xl flex 
               text-white relative overflow-hidden bg-slate-800">
       <!-- 模糊背景 -->
-      <div class="absolute w-full h-full
-       bg-[url(@/assets/img/理解.png)] bg-no-repeat
-       bg-[length:380px] bg-[200px] blur-[70px]"></div>
+      <div class="absolute w-full h-full bg-no-repeat
+       bg-[length:500px] bg-[100px] blur-[70px]" :style="`background-image: url(src/assets/img/${imgName});`"></div>
       <!-- 图片 -->
       <div class="flex-1 p-2" :class="isRegister ? 'toRight' : 'toRight-back'">
         <div class="w-full h-full rounded-lg relative bg-[#fff]">
-          <img src="@/assets/img/理解.png" class="absolute 
+          <img :src="`src/assets/img/${imgName}`" class="absolute 
             top-1/2 -translate-y-1/2 scale-110" />
         </div>
       </div>
@@ -64,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import { login as loginAPI } from "@/api/user";
 import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
@@ -81,26 +80,39 @@ const formState = reactive({
 const loading = ref(false);
 // 是否注册
 const isRegister = ref(false);
+// 显示的图片
+const imgName = ref("读书.png")
+
 
 const onFinish = async (loginUser: { username: string, password: string }) => {
   loading.value = true;
-  let loginResult = await loginAPI(loginUser);
-  if (loginResult.code === 20000) {
-    userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
-    localStorage.setItem("token", loginResult.other.token); // 保存token
-    message.success("登录成功"); // 提示登录成功
+  if(isRegister.value) {
+    message.warning("todo 注册功能待开发");
     loading.value = false;
-    // 如果有 returnUrl 参数则跳转到 returnUrl 参数指定的页面
-    if (route.query.returnUrl) {
-      router.push(route.query.returnUrl as string);
-    } else {
-      router.push("/"); // 跳转到首页
-    }
   } else {
-    // 提示登录失败
-    message.error(loginResult.message);
+    let loginResult = await loginAPI(loginUser);
+    loading.value = false;
+    if (loginResult.code === 20000) {
+      userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
+      localStorage.setItem("token", loginResult.other.token); // 保存token
+      message.success("登录成功"); // 提示登录成功
+      // 如果有 returnUrl 参数则跳转到 returnUrl 参数指定的页面
+      if (route.query.returnUrl) {
+        router.push(route.query.returnUrl as string);
+      } else {
+        router.push("/"); // 跳转到首页
+      }
+    } else {
+      // 提示登录失败
+      message.error(loginResult.message);
+    }
   }
 };
+
+watch(isRegister, () => {
+  imgName.value = isRegister.value ? "工作.png" : "读书.png";
+  // console.log(imgName.value);
+})
 </script>
 
 <style lang="less" scoped>

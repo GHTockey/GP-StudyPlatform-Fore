@@ -1,19 +1,70 @@
 <template>
-   <div class="userinfo-container">
-      <div class="avatar block">
-         <div class="w-24 rounded">
-            {{ userInfo?.avatar }}
-            <!-- <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" /> -->
+   <div class="userinfo-container m-auto
+               lg:w-[80%] md:w-[85%]">
+      <!-- 头像名称box -->
+      <div class="h-[230px] flex justify-between items-center pl-10 relative">
+         <!-- 文字信息 -->
+         <div class="text-gray-500">
+            <!-- 用户名 -->
+            <p class="font-bold text-4xl text-gray-900">{{ userInfo?.username }}</p>
+            <!-- ID -->
+            <p class="font-semibold text-sm -mt-1">#{{ userInfo?.id }}</p>
+            <!-- 邮箱 -->
+            <p class="m-[8px_0]">
+               <MailOutlined class="mr-[5px]" /> {{ userInfo?.email }}
+            </p>
+            <!-- 注册时间 -->
+            <p class="m-[8px_0]">
+               <FieldTimeOutlined class="mr-[8px]" />2022年10月1日加入
+            </p>
+         </div>
+         <!-- 头像 -->
+         <div class="w-[280px] relative">
+            <img :src="userInfo?.avatar" alt="头像模糊" class=" size-[200px] blur-[40px] my-user-avatar">
+            <img :src="userInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring"
+               :class="(userInfo?.sex == '1' ? 'ring-blue-500' : (userInfo?.sex == '0' ? 'ring-pink-500' : 'ring-white'))">
+         </div>
+         <!-- 按钮 -->
+         <div class="absolute bottom-0">
+            <a-space>
+               <button class="btn btn-success text-white btn-sm">私信</button>
+               <button class="btn btn-success text-white btn-sm">私信</button>
+               <button class="btn btn-success text-white btn-sm">私信</button>
+            </a-space>
          </div>
       </div>
-      <span>ID: {{ userInfo?.id }}</span> |
-      <span>用户名: {{ userInfo?.username }}</span> |
-      <span>邮箱: {{ userInfo?.email }}</span>
 
-      <h3>发布的词集</h3>
-      <div v-for="item in vocabularyList" :key="item.id" class="border-[2px] border-sky-400 rounded-md border-double">
-         <h4>{{ item.title + "--" + item.count }}</h4>
-         {{ item }}
+      <div class="p-10">
+         <div class="divider divider-start font-semibold">词集列表</div>
+         <div v-for="item in vocabularyList" :key="item.id" class="bg-base-200 hover:bg-base-300
+                        mb-2 cursor-pointer rounded-2xl p-5 h-[100px]
+                        relative flex  justify-between items-center">
+            <!-- 封面 -->
+            <img :src="item.cover" alt="封面" class="absolute top-1/2 -translate-y-1/2 w-[120px] h-[80%]
+             left-[-20px] rounded-lg border-[5px] border-neutral-content" />
+            <div class="ml-24">
+               <!-- 标题 -->
+               <p class="text-lg font-[600]">{{ item.title }}</p>
+               <!-- 时间 -->
+               <p class="text-sm">{{ item.desc }}</p>
+            </div>
+            <!-- 中间内容 -->
+            <div>
+               <p>
+                  <IconFont type="icon-icon-test" /> {{ item.count }}
+               </p>
+               <p>
+                  <IconFont type="icon-shijian" /> {{ item.createTime }}
+               </p>
+            </div>
+            <!-- 结尾操作 -->
+            <div>
+               <p>
+                  <RightOutlined />
+               </p>
+            </div>
+         </div>
+         <a-empty v-if="!vocabularyList?.length" />
       </div>
    </div>
 
@@ -33,6 +84,8 @@ import type { VocabularyData } from "@/types/vocabulary";
 import type { User } from "@/types/user";
 import { message } from "ant-design-vue";
 import router from "@/router";
+import { MailOutlined, FieldTimeOutlined, RightOutlined } from "@ant-design/icons-vue";
+import IconFont from "@/utils/iconFont";
 
 const route = useRoute();
 const vocabularyList = ref<VocabularyData[]>();
@@ -41,6 +94,7 @@ const userStore = useUserStore();
 
 // 编辑弹框
 const editVisible = ref(false);
+
 
 getVocabularyList();
 
@@ -71,4 +125,4 @@ async function getVocabularyList() {
 }
 </script>
 
-<style lang="less"></style>@/api/voc@/types/vocabulary
+<style lang="less"></style>

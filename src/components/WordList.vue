@@ -50,7 +50,6 @@ import {
    DeleteOutlined,
    MenuOutlined
 } from "@ant-design/icons-vue";
-import { defineProps } from "vue";
 import Draggable from "vuedraggable";
 
 // const props = defineProps<{

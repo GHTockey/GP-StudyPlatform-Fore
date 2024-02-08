@@ -4,4 +4,5 @@ export type User = {
    // password: string,
    avatar: string,
    email: string,
+   sex: string,
 }
