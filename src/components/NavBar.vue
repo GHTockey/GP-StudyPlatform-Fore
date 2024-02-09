@@ -7,16 +7,33 @@
          <div class="form-control">
             <!-- 搜索按钮 -->
             <div class="tooltip tooltip-bottom" data-tip="搜索">
-               <a-button type="primary" size="large" shape="circle" ghost @click="searchDialog?.showModal()">🔍</a-button>
+               <button class="btn btn-circle btn-sm" @click="searchDialog?.showModal()">
+                  <IconFont type="icon-sousu" />
+               </button>
+            </div>
+         </div>
+         <div class="form-control">
+            <!-- 控制台按钮 -->
+            <div class="tooltip tooltip-bottom" data-tip="中制台">
+               <button class="btn btn-circle btn-sm" @click="centerConsoleShow = true">
+                  <IconFont type="icon-zhongduankongzhi" />
+               </button>
             </div>
          </div>
          <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-               <div class="w-10 rounded-full">
-                  <!-- 头像 -->
-                  <a-avatar :src="userInfo?.avatar" class="cursor-pointer" size="large">USER</a-avatar>
+               <!-- 头像 -->
+               <div v-if="userInfo" class="avatar online">
+                  <div class="w-[40px] rounded-full">
+                     <img :src="userInfo?.avatar" />
+                  </div>
+               </div>
+               <div v-else class="w-10 rounded-full">
+                  <!-- 未登录头像 -->
+                  <a-avatar class="cursor-pointer" size="large">LOGIN</a-avatar>
                </div>
             </div>
+            <!-- 头像菜单 -->
             <ul tabindex="0"
                class="mt-3 z-[1] p-2 shadow menu menu-md dropdown-content font-semibold bg-base-100 rounded-box w-36">
                <template v-if=userInfo>
@@ -52,7 +69,7 @@
          <h3 class="font-bold text-lg">SEARCH</h3>
          <div class="mt-5">
             <input type="text" placeholder="输入" class="input input-bordered w-full"
-               :oninput="lodash.debounce(searchHandler, 300)" />
+               :oninput="lodash?.debounce(searchHandler, 300)" />
 
             <ul class="bg-slate-400 mt-2">
                <li class="font-bold" v-show="searchVocabularyResult?.length">来自词集</li>
@@ -74,13 +91,50 @@
          </div>
       </div>
    </dialog>
+   <!-- 中控台抽屉 -->
+   <a-drawer :placement="'top'" :closable="false" v-model:open="centerConsoleShow" height="300px" class="rounded-b-lg"
+      :body-style="{ padding: 0 }">
+      <div class="h-full flex justify-center items-center gap-3 bg-base-100 p-7">
+         <div class="w-[300px] h-full bg-base-200 rounded-lg">
+            123
+         </div>
+         <!-- 昼夜切换按钮 -->
+         <div class="size-[100px] relative btn p-0">
+            <label class="swap swap-rotate size-full">
+               <!-- 这个隐藏的复选框控制状态 -->
+               <input type="checkbox" class="theme-controller" value="dark" :checked="isDark" @change="themeChange" />
+               <!--太阳图标 -->
+               <!-- <IconFont type="icon-Sunny" class="swap-on fill-current size-[50px]" /> -->
+               <span class="swap-on fill-current text-[2.5rem]">🌞</span>
+               <!-- 月亮图标 -->
+               <span class="swap-off fill-current text-[2.5rem]">🌚</span>
+            </label>
+            <p>主题切换</p>
+         </div>
+         <!-- 新增词集按钮 -->
+         <div class="size-[100px] relative btn p-0">
+            <!--图标 -->
+            <span class="my-center-console-icon">📖</span>
+            <p>新增词集</p>
+         </div>
+         <!-- 加入班级按钮 -->
+         <div class="size-[100px] relative btn p-0">
+            <span class="my-center-console-icon">🏫</span>
+            <p>加入班级</p>
+         </div>
+         <!-- 我的消息按钮 -->
+         <div class="size-[100px] relative btn p-0">
+            <span class="my-center-console-icon">✉️</span>
+            <p>我的消息</p>
+         </div>
+      </div>
+   </a-drawer>
 </template>
 
 <script setup lang="ts">
 import { UserOutlined, LogoutOutlined, LoginOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
-import { onMounted, ref } from "vue";
-import lodash from "lodash";
+import { onMounted, ref, watch } from "vue";
 import { searchClassesAPI } from "@/api/classes";
 import { searchUserAPI } from "@/api/user";
 import { searchVocabularyAPI } from "@/api/vocabulary";
@@ -89,6 +143,11 @@ import type { Classes } from "@/types/classes";
 import type { Vocabulary } from "@/types/vocabulary";
 import { storeToRefs } from "pinia";
 import router from "@/router";
+import lodash from "lodash";
+import IconFont from "@/utils/iconFont";
+
+
+
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -102,10 +161,16 @@ const searchVocabularyResult = ref<Vocabulary[]>();
 const searchUserResult = ref<User[]>();
 // 班级搜索结果
 const searchClassesResult = ref<Classes[]>();
+// 中控台显示
+const centerConsoleShow = ref(true);
+// 主题
+const isDark = ref<boolean>(false);
+isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
 
 // onMounted(() => {
 //    searchDialog.value?.showModal();
 // })
+
 
 // 执行搜索
 async function searchHandler(e: Event) {
@@ -129,6 +194,12 @@ function logout() {
    userStore.delUser();
    router.push("/login");
 }
+// 主题切换事件
+function themeChange(e: Event) {
+   let checkEl = e.target as HTMLInputElement;
+   // console.log(checkEl.checked);
+   localStorage.setItem("isDark", String(checkEl.checked))
+}
 </script>
 
-<style lang="less"></style>
+<style lang="less" scoped></style>

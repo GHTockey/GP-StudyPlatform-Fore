@@ -22,21 +22,26 @@ module.exports = {
   daisyui: {
     // styled: false, // 是否启用 daisyUI 样式 (默认为 true)
 
-    themes: ["light", "dark", "cupcake", "aqua", "nord"], // 主题列表
-    darkTheme: "light", // 指定暗夜主题(默认为 dark)
-    // themes: [
-    //   {
-    //     mytheme: {
-    //       primary: "#282828",
-    //       secondary: "#f6d860",
-    //       accent: "#37cdbe",
-    //       neutral: "#3d4451",
-    //       'base-100': "#ffffff",
-    //     }
-    //   },
-    //   "dark",
-    //   "cupcake"
-    // ]
+    // themes: ["light", "dark", "cupcake", "aqua", "nord"], // 主题列表
+    // darkTheme: "xxx", // 指定暗夜主题(默认为 dark)
+    // 默认主题在 HTML 文件中配置，没有配置则根随操作系统主题
+    themes: [
+      {
+        mytheme: {
+          "primary": "#1677ff",
+          "secondary": "#c084fc",
+          "accent": "#2dd4bf",
+          "neutral": "#6b7280",
+          "base-100": "#ffffff",
+          "info": "#0e7490",
+          "success": "#22c55e",
+          "warning": "#f59e0b",
+          "error": "#e11d48",
+        },
+      },
+      "dark",
+      "cupcake"
+    ],
   }
 }
 

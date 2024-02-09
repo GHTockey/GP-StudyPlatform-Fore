@@ -8,8 +8,9 @@
     //     borderRadius:20,
     //   },
     // }
-  }" />
-  <RouterView />
+  }">
+    <RouterView />
+  </a-config-provider>
 </template>
 
 
@@ -20,7 +21,8 @@ import zhCN from "ant-design-vue/es/locale/zh_CN";
 // antd 日期选择器
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
-dayjs.locale("zh-cn");
+// dayjs.locale("zh-cn");
+dayjs.locale("zh_CN")
 
 const myColorPrimary = "#a991f7";
 

@@ -12,6 +12,14 @@
    .my-user-avatar {
       @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  rounded-full ring-offset-base-100 ring-offset-2;
    }
+   /* 中控台按钮文本样式 */
+   .my-center-console-btn {
+      @apply absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full w-full text-center font-semibold;
+   }
+   /* 中控台按钮图标样式 */
+   .my-center-console-icon {
+      @apply text-[2.5rem] size-full flex items-center justify-center;
+   }
 
 }
 
