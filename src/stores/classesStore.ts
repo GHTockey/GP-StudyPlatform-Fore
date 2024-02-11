@@ -1,7 +1,7 @@
 import type { Classes } from "@/types/classes";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { addClassesAPI, getClassesAPI } from "@/api/classes";
+import { ClassesAPI } from "@/api/classes";
 
 export const useClassesStore = defineStore("classesStore", () => {
    // 班级
@@ -18,12 +18,12 @@ export const useClassesStore = defineStore("classesStore", () => {
 
    /* 添加班级Handler */
    async function addClassesHandler(classes: Classes) {
-      let result = await addClassesAPI(classes);
+      let result = await ClassesAPI.addClassesAPI(classes);
       return result
    }
    /* 获取班级Handler */
    async function getClassesHandler(id: string) {
-      let result = await getClassesAPI(id);
+      let result = await ClassesAPI.getClassesAPI(id);
       classes.value = result.data;
    }
 

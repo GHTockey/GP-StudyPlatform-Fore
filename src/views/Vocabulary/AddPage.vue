@@ -40,8 +40,8 @@
 import { ref } from 'vue';
 import { useUserStore } from "@/stores/userStore";
 import type { Vocabulary } from "@/types/vocabulary";
-import { addVocabularyAPI } from "@/api/vocabulary";
-import { imageUplAPI } from "@/api/other";
+import { VocabularyAPI } from "@/api/vocabulary";
+import { OtherAPI } from "@/api/other";
 import { message } from 'ant-design-vue';
 import { useRouter } from "vue-router";
 import { UploadOutlined } from '@ant-design/icons-vue';
@@ -67,7 +67,7 @@ const progress = ref(0);
 // 提交表单
 async function submitForm() {
    console.log(vocabulary.value);
-   let res = await addVocabularyAPI(vocabulary.value);
+   let res = await VocabularyAPI.addVocabulary(vocabulary.value);
    if (res.code == 20000) {
       message.success(res.message);
       router.push(`/vocabulary/${res.data.vid}`);
@@ -78,7 +78,7 @@ async function coverUpl(file: UploadRequestOption) {
    // console.log(file);
    const formData = new FormData();
    formData.append('file', file.file);
-   let uplResult = await imageUplAPI(formData, (p) => {
+   let uplResult = await OtherAPI.imageUpl(formData, (p) => {
       if (!p.total) return;
       progress.value = p.loaded / p.total * 100;
       console.log(progress);

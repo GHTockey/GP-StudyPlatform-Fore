@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { getVocabularyAPI } from "@/api/vocabulary";
+import { VocabularyAPI } from "@/api/vocabulary";
 import type { VocabularyData } from "@/types/vocabulary";
 import { ref } from "vue";
 
@@ -27,7 +27,7 @@ export const useVocabularyStore = defineStore("vocabularyStore", () => {
    // 获取词集数据
    async function getVocabularyData(vid: string) {
       // console.log(route.params.id);
-      let res = await getVocabularyAPI(vid);
+      let res = await VocabularyAPI.getVocabulary(vid);
       vocabularyData.value = res.data;
    };
 

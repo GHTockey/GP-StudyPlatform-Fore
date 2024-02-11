@@ -92,8 +92,8 @@
       </div>
    </dialog>
    <!-- 中控台抽屉 -->
-   <a-drawer :placement="'top'" forceRender :closable="false" v-model:open="centerConsoleShow" height="300px" class="rounded-b-lg"
-      :body-style="{ padding: 0 }">
+   <a-drawer :placement="'top'" forceRender :closable="false" v-model:open="centerConsoleShow" height="300px"
+      class="rounded-b-lg" :body-style="{ padding: 0 }">
       <div class="h-full flex justify-center items-center gap-3 bg-base-100 p-7">
          <div class="w-[300px] h-full bg-base-200 rounded-lg">
             123
@@ -135,9 +135,9 @@
 import { UserOutlined, LogoutOutlined, LoginOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
 import { ref } from "vue";
-import { searchClassesAPI } from "@/api/classes";
-import { searchUserAPI } from "@/api/user";
-import { searchVocabularyAPI } from "@/api/vocabulary";
+import { ClassesAPI } from "@/api/classes";
+import { UserAPI } from "@/api/user";
+import { VocabularyAPI } from "@/api/vocabulary";
 import type { User } from "@/types/user";
 import type { Classes } from "@/types/classes";
 import type { Vocabulary } from "@/types/vocabulary";
@@ -147,6 +147,7 @@ import lodash from "lodash";
 import IconFont from "@/utils/iconFont";
 import { useWindowScroll } from "@vueuse/core";
 
+// vueuse 获取滚动位置
 const { y } = useWindowScroll();
 
 const userStore = useUserStore();
@@ -181,11 +182,11 @@ async function searchHandler(e: Event) {
    // 如果搜索关键词为空，不进行搜索
    if (!searchKey.value) return;
    // 词集搜索
-   searchVocabularyResult.value = (await searchVocabularyAPI(searchKey.value)).data;
+   searchVocabularyResult.value = (await VocabularyAPI.searchVocabulary(searchKey.value)).data;
    // 用户搜索
-   searchUserResult.value = (await searchUserAPI(searchKey.value)).data;
+   searchUserResult.value = (await UserAPI.searchUserAPI(searchKey.value)).data;
    // 班级搜索
-   searchClassesResult.value = (await searchClassesAPI(searchKey.value)).data;
+   searchClassesResult.value = (await ClassesAPI.searchClassesAPI(searchKey.value)).data;
 }
 // 退出登录
 function logout() {

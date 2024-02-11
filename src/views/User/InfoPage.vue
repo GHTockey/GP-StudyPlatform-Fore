@@ -160,9 +160,9 @@
 
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
-import { getVocabularyListByUidAPI } from "@/api/vocabulary";
-import { getUserInfoById } from "@/api/user";
-import { ref, h } from "vue";
+import { VocabularyAPI } from "@/api/vocabulary";
+import { UserAPI } from "@/api/user";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 import type { VocabularyData } from "@/types/vocabulary";
 import type { User } from "@/types/user";
@@ -172,7 +172,6 @@ import { MailOutlined, FieldTimeOutlined, RightOutlined } from "@ant-design/icon
 import IconFont from "@/utils/iconFont";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { OtherAPI } from "@/api/other";
-import { UserAPI } from "@/api/user";
 import { MyUtils } from "@/utils";
 
 const route = useRoute();
@@ -195,21 +194,15 @@ const editUserInfo = ref<User>({
 });
 // editUserInfoForm 实例
 const editUserInfoFormEl = ref<FormExpose | null>(null);
+// 上传进度
 const progress = ref(0);
 
 
 
 getVocabularyList();
-if (route.params.id == userInfo.value?.id) {
-   isSelf.value = true;
-} else {
-   isSelf.value = false;
-}
 
 
-function ttt (){
-   MyUtils.toast();
-}
+
 // 编辑弹框 【选择上传头像事件】
 async function handleAvatarChange(e: Event) {
    let file = (<HTMLInputElement>e.target).files?.[0] as File;
@@ -219,7 +212,7 @@ async function handleAvatarChange(e: Event) {
    if (!isLt2M) return message.error('头像必须小于2MB!');
    let formData = new FormData();
    formData.append('file', file);
-   let result = await OtherAPI.imageUplAPI(formData, (p) => {
+   let result = await OtherAPI.imageUpl(formData, (p) => {
       progress.value = Math.floor(p.progress! * 100)
       // console.log(progress.value);
    });
@@ -262,23 +255,32 @@ async function getVocabularyList() {
    vocabularyListLoading.value = true;
    // 获取指定用户信息
    if (route.params.id) {
-      let userInfoRes = await getUserInfoById(<string>route.params.id);
+      let userInfoRes = await UserAPI.getUserInfoById(<string>route.params.id);
       userInfo.value = userInfoRes.data;
-      let vocListRes = await getVocabularyListByUidAPI(<string>route.params.id);
+      let vocListRes = await VocabularyAPI.getVocabularyListByUid(<string>route.params.id);
       vocabularyList.value = vocListRes.data;
-      // 获取当前用户信息
+      // 使用当前登录用户的信息
    } else if (userStore.userInfo) {
-      let userInfoRes = await getUserInfoById(userStore.userInfo.id);
+      let userInfoRes = await UserAPI.getUserInfoById(userStore.userInfo.id);
       userInfo.value = userInfoRes.data;
-      let vocListRes = await getVocabularyListByUidAPI(userStore.userInfo.id);
+      // userInfo.value = userStore.userInfo; // 注意这里的数据是响应式
+      // userInfo.value = JSON.parse(JSON.stringify(userStore.userInfo));
+      let vocListRes = await VocabularyAPI.getVocabularyListByUid(userStore.userInfo.id);
       vocabularyList.value = vocListRes.data;
+      isSelf.value = true; // 走的是当前登录的用户，就是自己
+      userStore.userInfo = JSON.parse(JSON.stringify(userInfo.value));
    } else {
-      console.log(route);
+      // console.log(route);
       message.error("未登录");
       router.push("/");
    }
-   vocabularyListLoading.value = false;
-   editUserInfo.value = JSON.parse(JSON.stringify(userInfo.value));
+   vocabularyListLoading.value = false; // 加载完成 隐藏骨架屏
+   editUserInfo.value = JSON.parse(JSON.stringify(userInfo.value)); // 编辑用户信息回显
+   // console.log(route.params, userInfo.value);
+   // 判断是否是自己
+   if (route.params?.id == userInfo.value?.id) {
+      isSelf.value = true;
+   }
 }
 </script>
 

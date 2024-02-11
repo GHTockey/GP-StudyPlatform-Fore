@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
-import { login as loginAPI } from "@/api/user";
+import { UserAPI } from "@/api/user";
 import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
@@ -86,11 +86,11 @@ const imgName = ref("读书.png")
 
 const onFinish = async (loginUser: { username: string, password: string }) => {
   loading.value = true;
-  if(isRegister.value) {
+  if (isRegister.value) {
     message.warning("todo 注册功能待开发");
     loading.value = false;
   } else {
-    let loginResult = await loginAPI(loginUser);
+    let loginResult = await UserAPI.login(loginUser.username, loginUser.password);
     loading.value = false;
     if (loginResult.code === 20000) {
       userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
