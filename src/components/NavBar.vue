@@ -1,7 +1,7 @@
 <template>
-   <div class="navbar bg-base-100">
+   <div class="navbar fixed top-0 left-0 z-50 transition-all duration-300" :class="y > 100 ? 'glass' : ''">
       <div class="flex-1">
-         <a class="btn btn-ghost text-xl">LOGO ICON</a>
+         <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a>
       </div>
       <div class="flex-none gap-2">
          <div class="form-control">
@@ -73,17 +73,17 @@
 
             <ul class="bg-slate-400 mt-2">
                <li class="font-bold" v-show="searchVocabularyResult?.length">来自词集</li>
-               <li class="hover:bg-blue-500" v-for="voc in searchVocabularyResult">{{ voc }}</li>
+               <li class="hover:bg-blue-500" v-for=" voc  in  searchVocabularyResult ">{{ voc }}</li>
             </ul>
 
             <ul class="bg-slate-400 mt-2">
                <li class="font-bold" v-show="searchUserResult?.length">来自用户</li>
-               <li class="hover:bg-blue-500" v-for="user in searchUserResult">{{ user }}</li>
+               <li class="hover:bg-blue-500" v-for=" user  in  searchUserResult ">{{ user }}</li>
             </ul>
 
             <ul class="bg-slate-400 mt-2">
                <li class="font-bold" v-show="searchClassesResult?.length">来自班级</li>
-               <li class="hover:bg-blue-500" v-for="classes in searchClassesResult">{{ classes }}</li>
+               <li class="hover:bg-blue-500" v-for=" classes  in  searchClassesResult ">{{ classes }}</li>
             </ul>
             <p class="text-center text-gray-500"
                v-show="!searchVocabularyResult?.length && !searchUserResult?.length && !searchClassesResult?.length && searchKey">
@@ -92,7 +92,7 @@
       </div>
    </dialog>
    <!-- 中控台抽屉 -->
-   <a-drawer :placement="'top'" :closable="false" v-model:open="centerConsoleShow" height="300px" class="rounded-b-lg"
+   <a-drawer :placement="'top'" forceRender :closable="false" v-model:open="centerConsoleShow" height="300px" class="rounded-b-lg"
       :body-style="{ padding: 0 }">
       <div class="h-full flex justify-center items-center gap-3 bg-base-100 p-7">
          <div class="w-[300px] h-full bg-base-200 rounded-lg">
@@ -112,7 +112,7 @@
             <p>主题切换</p>
          </div>
          <!-- 新增词集按钮 -->
-         <div class="size-[100px] relative btn p-0">
+         <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false">
             <!--图标 -->
             <span class="my-center-console-icon">📖</span>
             <p>新增词集</p>
@@ -134,7 +134,7 @@
 <script setup lang="ts">
 import { UserOutlined, LogoutOutlined, LoginOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 import { searchClassesAPI } from "@/api/classes";
 import { searchUserAPI } from "@/api/user";
 import { searchVocabularyAPI } from "@/api/vocabulary";
@@ -145,9 +145,9 @@ import { storeToRefs } from "pinia";
 import router from "@/router";
 import lodash from "lodash";
 import IconFont from "@/utils/iconFont";
+import { useWindowScroll } from "@vueuse/core";
 
-
-
+const { y } = useWindowScroll();
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
@@ -162,14 +162,12 @@ const searchUserResult = ref<User[]>();
 // 班级搜索结果
 const searchClassesResult = ref<Classes[]>();
 // 中控台显示
-const centerConsoleShow = ref(true);
+const centerConsoleShow = ref(false);
 // 主题
 const isDark = ref<boolean>(false);
 isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
+// console.log(isDark.value);
 
-// onMounted(() => {
-//    searchDialog.value?.showModal();
-// })
 
 
 // 执行搜索
