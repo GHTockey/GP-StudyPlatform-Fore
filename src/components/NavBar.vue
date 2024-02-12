@@ -62,30 +62,116 @@
 
    <!-- 搜索弹框 -->
    <dialog id="searchDialog" class="modal" ref="searchDialog">
-      <div class="modal-box">
+      <div class="modal-box transition-all duration-300 ">
          <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
          </form>
-         <h3 class="font-bold text-lg">SEARCH</h3>
+         <h3 class="font-bold text-lg">搜索</h3>
          <div class="mt-5">
-            <input type="text" placeholder="输入" class="input input-bordered w-full"
+            <input type="text" placeholder="输入关键词" class="input input-bordered w-full"
                :oninput="lodash?.debounce(searchHandler, 300)" />
+            <!-- 用户搜索结果 -->
+            <Transition name="list">
+               <ul class="mt-5" v-show="searchUserResult?.length">
+                  <div class="divider font-semibold">🧑‍🚀来自用户</div>
+                  <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
+                     v-for=" user in searchUserResult" @click="$router.push(`/user/${user.id}`); searchOptionClick()">
+                     <div class="h-14 flex relative">
+                        <!-- 头像 -->
+                        <div class="avatar online p-1 shadow-base-content">
+                           <div class="rounded-lg">
+                              <img :src="user.avatar" />
+                           </div>
+                        </div>
+                        <!-- 用户名 -->
+                        <div class="ml-4">
+                           <p class="font-semibold mt-1">{{ user.username }}</p>
+                           <span class="text-sm text-gray-500">#{{ user.id }}</span>
+                        </div>
+                        <!-- 图标 -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                           <RightOutlined />
+                        </div>
+                     </div>
+                  </li>
+               </ul>
+            </Transition>
+            <!-- 词集搜索结果 -->
+            <Transition name="list">
+               <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length">
+                  <div class="divider font-semibold">📖来自词集</div>
+                  <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
+                     v-for=" voc in searchVocabularyResult ">
+                     <div class="h-14 flex relative">
+                        <!-- 标题-描述 -->
+                        <div class="border-gray-500 w-44 pl-3 flex flex-wrap items-center self-center">
+                           <p class="font-semibold truncate w-full">{{ voc.title }}</p>
+                           <p class="text-xs text-gray-500 truncate">{{ voc.desc }}</p>
+                        </div>
+                        <!-- 时间-作者-数量 -->
+                        <div class="w-52 text-gray-500 text-sm flex flex-wrap items-center self-center">
+                           <p class="w-full">
+                              <IconFont type="icon-shijian" /> {{ voc.updateTime.slice(0, 10) }}
+                           </p>
+                           <div class="flex gap-2">
+                              <!-- 数量 -->
+                              <p>
+                                 <IconFont type="icon-icon-test" /> {{ voc.count }}
+                              </p>
+                              <!-- 学习用户数 -->
+                              <p>
+                                 <IconFont type="icon-zongyonghushu" /> {{ 10 }}
+                              </p>
+                              <!-- 作者 -->
+                              <p>
+                                 <IconFont type="icon-hezuozuozhe" /> {{ voc.authorId }}
+                              </p>
+                           </div>
+                        </div>
+                        <!-- 图标 -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                           <RightOutlined />
+                        </div>
+                     </div>
+                  </li>
+               </ul>
+            </Transition>
 
-            <ul class="bg-slate-400 mt-2">
-               <li class="font-bold" v-show="searchVocabularyResult?.length">来自词集</li>
-               <li class="hover:bg-blue-500" v-for=" voc  in  searchVocabularyResult ">{{ voc }}</li>
-            </ul>
-
-            <ul class="bg-slate-400 mt-2">
-               <li class="font-bold" v-show="searchUserResult?.length">来自用户</li>
-               <li class="hover:bg-blue-500" v-for=" user  in  searchUserResult ">{{ user }}</li>
-            </ul>
-
-            <ul class="bg-slate-400 mt-2">
-               <li class="font-bold" v-show="searchClassesResult?.length">来自班级</li>
-               <li class="hover:bg-blue-500" v-for=" classes  in  searchClassesResult ">{{ classes }}</li>
-            </ul>
-            <p class="text-center text-gray-500"
+            <Transition name="list">
+               <ul class="bg-base-100 mt-5" v-show="searchClassesResult?.length">
+                  <div class="divider font-semibold">🏫来自班级</div>
+                  <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
+                     v-for=" classes  in  searchClassesResult ">
+                     <div class="h-14 flex relative pl-2">
+                        <!-- 班级图标 -->
+                        <div class="flex justify-center items-center">
+                           <IconFont type="icon-banjixinxi" class="text-[3rem] text-gray-500" />
+                        </div>
+                        <!-- 班级信息 -->
+                        <div class="border-gray-500 w-44 pl-3 flex flex-wrap items-center self-center">
+                           <p class="font-semibold truncate w-full">{{ classes.name }}</p>
+                           <p class="text-xs text-gray-500 truncate">{{ classes.info }}</p>
+                        </div>
+                        <!-- 作者-人数 -->
+                        <div class="flex gap-4 items-center text-gray-500">
+                           <!-- 作者 -->
+                           <p>
+                              <IconFont type="icon-hezuozuozhe" /> {{ classes.creatorUid }}
+                           </p>
+                           <!-- 数量 -->
+                           <p>
+                              <IconFont type="icon-zongyonghushu" /> {{ classes.userList.length }}
+                           </p>
+                        </div>
+                        <!-- 箭头图标 -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                           <RightOutlined />
+                        </div>
+                     </div>
+                  </li>
+               </ul>
+            </Transition>
+            <p class="text-center text-gray-500 p-10"
                v-show="!searchVocabularyResult?.length && !searchUserResult?.length && !searchClassesResult?.length && searchKey">
                没有数据</p>
          </div>
@@ -132,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-import { UserOutlined, LogoutOutlined, LoginOutlined } from "@ant-design/icons-vue";
+import { UserOutlined, LogoutOutlined, LoginOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
 import { ref } from "vue";
 import { ClassesAPI } from "@/api/classes";
@@ -140,7 +226,7 @@ import { UserAPI } from "@/api/user";
 import { VocabularyAPI } from "@/api/vocabulary";
 import type { User } from "@/types/user";
 import type { Classes } from "@/types/classes";
-import type { Vocabulary } from "@/types/vocabulary";
+import type { Vocabulary, VocabularyVo } from "@/types/vocabulary";
 import { storeToRefs } from "pinia";
 import router from "@/router";
 import lodash from "lodash";
@@ -171,6 +257,18 @@ isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
 
 
 
+// 搜索框选项点击
+function searchOptionClick() {
+   searchDialog.value?.close(); // 关闭弹框
+   searchKey.value = ""; // 清空搜索关键词
+   // 因为没有进行数据双向绑定，所以需要手动清空输入框 (双向绑定会使节流不生效)
+   let inputEl = window.document.querySelector("#searchDialog input") as HTMLInputElement;
+   inputEl.value = "";
+   // 清空搜索结果
+   searchClassesResult.value = [];
+   searchUserResult.value = [];
+   searchVocabularyResult.value = [];
+}
 // 执行搜索
 async function searchHandler(e: Event) {
    // 清空搜索结果
@@ -184,9 +282,9 @@ async function searchHandler(e: Event) {
    // 词集搜索
    searchVocabularyResult.value = (await VocabularyAPI.searchVocabulary(searchKey.value)).data;
    // 用户搜索
-   searchUserResult.value = (await UserAPI.searchUserAPI(searchKey.value)).data;
+   searchUserResult.value = (await UserAPI.searchUser(searchKey.value)).data;
    // 班级搜索
-   searchClassesResult.value = (await ClassesAPI.searchClassesAPI(searchKey.value)).data;
+   searchClassesResult.value = (await ClassesAPI.searchClasses(searchKey.value)).data;
 }
 // 退出登录
 function logout() {
@@ -201,4 +299,18 @@ function themeChange(e: Event) {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.list-enter-active {
+   transition: all 0.5s ease;
+}
+
+.list-leave-active {
+   transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+   opacity: 0;
+   transform: translateY(100px);
+}
+</style>

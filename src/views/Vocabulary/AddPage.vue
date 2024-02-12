@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from "@/stores/userStore";
-import type { Vocabulary } from "@/types/vocabulary";
+import type { VocabularyVo } from "@/types/vocabulary";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { OtherAPI } from "@/api/other";
 import { message } from 'ant-design-vue';
@@ -51,7 +51,7 @@ const userStore = useUserStore();
 const router = useRouter();
 
 // const flag = ref(false);
-const vocabulary = ref<Vocabulary>({
+const vocabulary = ref<VocabularyVo>({
    "authorId": userStore.userInfo?.id,
    "desc": "",
    "title": "",

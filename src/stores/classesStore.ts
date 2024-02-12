@@ -18,12 +18,12 @@ export const useClassesStore = defineStore("classesStore", () => {
 
    /* 添加班级Handler */
    async function addClassesHandler(classes: Classes) {
-      let result = await ClassesAPI.addClassesAPI(classes);
+      let result = await ClassesAPI.addClasses(classes);
       return result
    }
    /* 获取班级Handler */
    async function getClassesHandler(id: string) {
-      let result = await ClassesAPI.getClassesAPI(id);
+      let result = await ClassesAPI.getClasses(id);
       classes.value = result.data;
    }
 

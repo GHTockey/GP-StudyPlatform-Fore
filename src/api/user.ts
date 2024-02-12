@@ -24,7 +24,7 @@ export class UserAPI {
       return request<User>(`/user-service/user/${uid}`, "GET");
    };
    /* 搜索用户API */
-   static searchUserAPI(keyword: string) {
+   static searchUser(keyword: string) {
       return request<User[]>("/user-service/user/search/" + keyword, "GET");
    };
 }

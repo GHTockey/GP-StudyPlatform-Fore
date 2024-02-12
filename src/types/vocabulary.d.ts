@@ -1,5 +1,5 @@
 // 添加时的词集
-export type Vocabulary = {
+export type VocabularyVo = {
    authorId: string | undefined,
    desc: string,
    title: string,
@@ -7,7 +7,7 @@ export type Vocabulary = {
    wordsList: Word[]
 }
 // 词集详情
-export type VocabularyData = {
+export type Vocabulary = {
    id: number,
    title: string,
    desc: string,

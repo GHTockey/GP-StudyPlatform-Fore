@@ -5,12 +5,12 @@
          <!-- 文字信息 -->
          <div class="text-gray-500">
             <!-- 用户名 -->
-            <p class="font-bold text-4xl text-base-content">{{ userInfo?.username }}</p>
+            <p class="font-bold text-4xl text-base-content">{{ currentUserInfo?.username }}</p>
             <!-- ID -->
-            <p class="font-semibold text-sm -mt-1">#{{ userInfo?.id }}</p>
+            <p class="font-semibold text-sm -mt-1">#{{ currentUserInfo?.id }}</p>
             <!-- 邮箱 -->
             <p class="m-[8px_0]">
-               <MailOutlined class="mr-[5px]" /> {{ userInfo?.email }}
+               <MailOutlined class="mr-[5px]" /> {{ currentUserInfo?.email }}
             </p>
             <!-- 注册时间 -->
             <p class="m-[8px_0]">
@@ -19,10 +19,11 @@
          </div>
          <!-- 头像 -->
          <div class="w-[280px] relative">
-            <img :src="userInfo?.avatar" alt="头像模糊" class=" size-[200px] blur-[40px] my-user-avatar">
+            <img :src="currentUserInfo?.avatar" alt="头像模糊" class=" size-[200px] blur-[40px] my-user-avatar">
             <!-- <img :src="userInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring"
                :class="(userInfo?.sex == '1' ? 'ring-blue-500' : (userInfo?.sex == '0' ? 'ring-pink-500' : 'ring-white'))"> -->
-            <img :src="userInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring" :class="'ring-white'">
+            <img :src="currentUserInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring"
+               :class="'ring-white'">
          </div>
          <!-- 按钮 -->
          <div class="absolute bottom-0">
@@ -50,8 +51,8 @@
                         relative flex  justify-between items-center transition-all">
             <!-- 封面 -->
             <img :src="item.cover" alt="封面" class="absolute top-1/2 -translate-y-1/2 w-[120px] h-[80%]
-             left-[-20px] rounded-lg border-[5px] border-base-100 shadow-lg shadow-gray-400" />
-            <div class="ml-24 max-w-[230px]">
+             left-[-20px] rounded-lg border-[5px] border-base-100 shadow-lg shadow-base-300" />
+            <div class="ml-24 w-[230px]">
                <!-- 标题 -->
                <p class="text-lg font-[600]">{{ item.title }}</p>
                <!-- 描述 -->
@@ -162,12 +163,12 @@
 import { useUserStore } from "@/stores/userStore";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { UserAPI } from "@/api/user";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import type { VocabularyData } from "@/types/vocabulary";
+import router from "@/router";
+import type { Vocabulary } from "@/types/vocabulary";
 import type { User } from "@/types/user";
 import { message } from "ant-design-vue";
-import router from "@/router";
 import { MailOutlined, FieldTimeOutlined, RightOutlined } from "@ant-design/icons-vue";
 import IconFont from "@/utils/iconFont";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
@@ -175,8 +176,8 @@ import { OtherAPI } from "@/api/other";
 import { MyUtils } from "@/utils";
 
 const route = useRoute();
-const vocabularyList = ref<VocabularyData[]>();
-const userInfo = ref<User>();
+const vocabularyList = ref<Vocabulary[]>();
+const currentUserInfo = ref<User>();
 const userStore = useUserStore();
 
 
@@ -199,7 +200,7 @@ const progress = ref(0);
 
 
 
-getVocabularyList();
+getUserInfoAndVocabularyList();
 
 
 
@@ -225,7 +226,7 @@ async function handleAvatarChange(e: Event) {
 }
 // 编辑弹框 【打开】
 function openEditModal() {
-   editUserInfo.value = JSON.parse(JSON.stringify(userInfo.value));
+   editUserInfo.value = JSON.parse(JSON.stringify(currentUserInfo.value));
    let editModal = window.document.querySelector('#editModal') as HTMLDialogElement;
    editModal.showModal();
 };
@@ -238,7 +239,7 @@ async function editSubmit() {
          message.success('修改成功');
          // 关闭EditModal();
          (<HTMLDialogElement>window.document.querySelector('#editModal')).close();
-         getVocabularyList();
+         getUserInfoAndVocabularyList();
       } else {
          message.error('修改失败');
       }
@@ -251,37 +252,45 @@ async function delVocabulary(id: number) {
    message.error("删除词集" + id);
 };
 // 获取词集列表
-async function getVocabularyList() {
-   vocabularyListLoading.value = true;
+async function getUserInfoAndVocabularyList() {
+   vocabularyListLoading.value = true; // 显示骨架屏
    // 获取指定用户信息
    if (route.params.id) {
       let userInfoRes = await UserAPI.getUserInfoById(<string>route.params.id);
-      userInfo.value = userInfoRes.data;
+      currentUserInfo.value = userInfoRes.data;
       let vocListRes = await VocabularyAPI.getVocabularyListByUid(<string>route.params.id);
       vocabularyList.value = vocListRes.data;
+      isSelf.value = false;
       // 使用当前登录用户的信息
    } else if (userStore.userInfo) {
       let userInfoRes = await UserAPI.getUserInfoById(userStore.userInfo.id);
-      userInfo.value = userInfoRes.data;
+      currentUserInfo.value = userInfoRes.data;
       // userInfo.value = userStore.userInfo; // 注意这里的数据是响应式
       // userInfo.value = JSON.parse(JSON.stringify(userStore.userInfo));
       let vocListRes = await VocabularyAPI.getVocabularyListByUid(userStore.userInfo.id);
       vocabularyList.value = vocListRes.data;
       isSelf.value = true; // 走的是当前登录的用户，就是自己
-      userStore.userInfo = JSON.parse(JSON.stringify(userInfo.value));
+      userStore.userInfo = JSON.parse(JSON.stringify(currentUserInfo.value));
    } else {
       // console.log(route);
       message.error("未登录");
       router.push("/");
    }
    vocabularyListLoading.value = false; // 加载完成 隐藏骨架屏
-   editUserInfo.value = JSON.parse(JSON.stringify(userInfo.value)); // 编辑用户信息回显
-   // console.log(route.params, userInfo.value);
+   editUserInfo.value = JSON.parse(JSON.stringify(currentUserInfo.value)); // 编辑用户信息回显
+   console.log(route.params, userStore.userInfo);
    // 判断是否是自己
-   if (route.params?.id == userInfo.value?.id) {
+   if (route.params?.id == userStore.userInfo?.id) {
       isSelf.value = true;
+      console.log(2);
    }
 }
+
+// 
+watch(() => route.params, () => {
+   // vue中多个路由对应同一个组件，页面切换不刷新问题
+   getUserInfoAndVocabularyList();
+})
 </script>
 
 <style lang="less"></style>
