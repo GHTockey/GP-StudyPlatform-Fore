@@ -1,5 +1,5 @@
 <template>
-   <div class="userinfo-container m-auto lg:w-[80%] md:w-[85%]">
+   <div class="userinfo-container my-type-center">
       <!-- 头像名称box -->
       <div class="h-[230px] flex justify-between items-center pl-10 relative">
          <!-- 文字信息 -->
@@ -14,7 +14,7 @@
             </p>
             <!-- 注册时间 -->
             <p class="m-[8px_0]">
-               <FieldTimeOutlined class="mr-[8px]" />2022年10月1日加入
+               <FieldTimeOutlined class="mr-[8px]" />2022年10月1日加入 todo
             </p>
          </div>
          <!-- 头像 -->
@@ -156,7 +156,6 @@
          </div>
       </div>
    </dialog>
-   <component :is="null" />
 </template>
 
 <script setup lang="ts">

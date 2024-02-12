@@ -1,5 +1,5 @@
 <template>
-   <div class="navbar fixed top-0 left-0 z-50 transition-all duration-300" :class="y > 100 ? 'glass' : ''">
+   <div class="navbar fixed top-0 left-0 z-50 transition-all duration-300" :class="y > 50 ? 'glass' : ''">
       <div class="flex-1">
          <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a>
       </div>
@@ -101,6 +101,7 @@
                <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length">
                   <div class="divider font-semibold">📖来自词集</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
+                     @click="$router.push(`/vocabulary/${voc.id}`); searchOptionClick()"
                      v-for=" voc in searchVocabularyResult ">
                      <div class="h-14 flex relative">
                         <!-- 标题-描述 -->
@@ -136,11 +137,12 @@
                   </li>
                </ul>
             </Transition>
-
+            <!-- 班级搜索结果 -->
             <Transition name="list">
                <ul class="bg-base-100 mt-5" v-show="searchClassesResult?.length">
                   <div class="divider font-semibold">🏫来自班级</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
+                     @click="$router.push(`/classes/${classes.id}`); searchOptionClick()"
                      v-for=" classes  in  searchClassesResult ">
                      <div class="h-14 flex relative pl-2">
                         <!-- 班级图标 -->
@@ -171,6 +173,7 @@
                   </li>
                </ul>
             </Transition>
+
             <p class="text-center text-gray-500 p-10"
                v-show="!searchVocabularyResult?.length && !searchUserResult?.length && !searchClassesResult?.length && searchKey">
                没有数据</p>

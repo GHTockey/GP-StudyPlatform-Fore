@@ -20,6 +20,10 @@
    .my-center-console-icon {
       @apply text-[2.5rem] size-full flex items-center justify-center;
    }
+   /* 自定义版心 */
+   .my-type-center {
+      @apply m-auto lg:w-[80%] md:w-[85%];
+   }
 
 }
 
