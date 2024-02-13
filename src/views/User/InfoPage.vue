@@ -172,7 +172,6 @@ import { MailOutlined, FieldTimeOutlined, RightOutlined } from "@ant-design/icon
 import IconFont from "@/utils/iconFont";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { OtherAPI } from "@/api/other";
-import { MyUtils } from "@/utils";
 
 const route = useRoute();
 const vocabularyList = ref<Vocabulary[]>();

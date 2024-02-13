@@ -112,7 +112,7 @@
                         <!-- 时间-作者-数量 -->
                         <div class="w-52 text-gray-500 text-sm flex flex-wrap items-center self-center">
                            <p class="w-full">
-                              <IconFont type="icon-shijian" /> {{ voc.updateTime.slice(0, 10) }}
+                              <IconFont type="icon-shijian" /> {{ voc.createTime?.slice(0, 10) }}
                            </p>
                            <div class="flex gap-2">
                               <!-- 数量 -->
@@ -121,11 +121,11 @@
                               </p>
                               <!-- 学习用户数 -->
                               <p>
-                                 <IconFont type="icon-zongyonghushu" /> {{ 10 }}
+                                 <IconFont type="icon-zongyonghushu" /> {{ voc.userList.length }}
                               </p>
                               <!-- 作者 -->
                               <p>
-                                 <IconFont type="icon-hezuozuozhe" /> {{ voc.authorId }}
+                                 <IconFont type="icon-hezuozuozhe" /> {{ voc.author.username }}
                               </p>
                            </div>
                         </div>
@@ -158,7 +158,7 @@
                         <div class="flex gap-4 items-center text-gray-500">
                            <!-- 作者 -->
                            <p>
-                              <IconFont type="icon-hezuozuozhe" /> {{ classes.creatorUid }}
+                              <IconFont type="icon-hezuozuozhe" /> {{ classes.creator?.username }}
                            </p>
                            <!-- 数量 -->
                            <p>

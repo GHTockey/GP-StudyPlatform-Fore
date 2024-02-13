@@ -1,3 +1,5 @@
+import type { User } from "./user"
+
 // 添加时的词集
 export type VocabularyVo = {
    authorId: string | undefined,
@@ -6,7 +8,7 @@ export type VocabularyVo = {
    cover: string,
    wordsList: Word[]
 }
-// 词集详情
+// 词集
 export type Vocabulary = {
    id: number,
    title: string,
@@ -16,7 +18,10 @@ export type Vocabulary = {
    authorId: string,
    createTime: string,
    updateTime: string,
-   wordsList: [] | Word[]
+   // 关联
+   wordsList: [] | Word[],
+   author: User,
+   userList: [] | User[],
 }
 // 词语
 export type Word = {
