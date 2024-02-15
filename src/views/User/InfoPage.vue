@@ -120,7 +120,7 @@
                      <span class="label-text">用户名</span>
                   </div>
                   <input type="text" v-model="editUserInfo.username"
-                     class="input text-base-content input-sm input-bordered w-full" />
+                     class="my-form-input-sm" />
                </label>
             </a-form-item>
             <a-form-item>
@@ -129,7 +129,7 @@
                      <span class="label-text">邮箱</span>
                   </div>
                   <input type="text" v-model="editUserInfo.email" disabled
-                     class="input text-base-content input-sm input-bordered w-full" />
+                     class="my-form-input-sm" />
                </label>
             </a-form-item>
             <a-form-item name="sex" :rules="{ required: true, message: '请选择性别' }">

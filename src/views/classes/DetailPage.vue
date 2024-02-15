@@ -25,96 +25,151 @@
             </div>
          </div>
          <div class="flex items-center gap-4">
-            <button class="btn btn-sm btn-error">解散</button>
-            <button class="btn btn-sm btn-primary">管理</button>
-            <button class="btn btn-sm btn-secondary">编辑</button>
             <button class="btn btn-sm btn-accent">加入</button>
+            <button class="btn btn-sm btn-success">聊天室</button>
+            <button class="btn btn-sm btn-secondary" @click="controlsTabEdit">编辑</button>
+            <button class="btn btn-sm btn-error" @click="showConfirm = true">解散</button>
          </div>
       </div>
       <!-- 选项卡切换 -->
-      <div role="tablist" class="tabs tabs-boxed w-1/2 transition-all rounded-b-none bg-base-200"
+      <div role="tablist" class="tabs tabs-boxed w-1/2 transition-all rounded-b-none bg-base-200 font-bold"
          @click="tabSelectHandler($event)">
          <a role="tab" data-key="1" class="tab transition-all" :class="{ 'tab-active': tabValue == '1' }">成员</a>
          <a role="tab" data-key="2" class="tab transition-all" :class="{ 'tab-active': tabValue == '2' }">词集</a>
       </div>
-      <div class="bg-base-200 flex justify-between rounded-lg rounded-tl-none">
+      <!-- 选项卡内容 -->
+      <div class="bg-base-200 flex justify-between rounded-lg rounded-tl-none overflow-hidden">
          <!-- 成员 -->
-         <div class="p-2 w-full" v-show="tabValue == '1'">
-            <ul class="">
-               <li class="border-[2px] border-base-300 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
-                  v-for=" user in classes.userList">
-                  <div class="h-14 flex relative">
-                     <!-- 头像 -->
-                     <div class="avatar p-1 shadow-base-content">
-                        <div class="rounded-lg">
-                           <img :src="user.avatar" />
-                        </div>
-                     </div>
-                     <!-- 用户名 -->
-                     <div class="ml-2">
-                        <p class="font-semibold mt-1">{{ user.username }}</p>
-                        <span class="text-sm text-gray-500">#{{ user.id }}</span>
-                     </div>
-                     <!-- 图标 -->
-                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <RightOutlined />
-                     </div>
-                  </div>
-               </li>
-            </ul>
-         </div>
-         <!-- 词集 -->
          <Transition appear>
-            <div v-show="tabValue == '2'" class="w-full p-2">
-               <ul class="flex flex-wrap justify-between">
-                  <li v-for="(voc, index) in vocList" :key="index" 
-                        class="flex h-[180px] md:h-[300px] overflow-hidden transition-all duration-300 mb-[10px] bg-base-300 rounded-xl
-                        xl:w-[calc((100%-20px)/3)]
-                        md:flex-wrap md:w-[calc((100%-10px)/2)] 
-                        w-full 
-                  ">
-                     <!-- 背景图 -->
-                     <div class=" w-[45%] md:h-[60%] md:w-full bg-cover bg-center
-                        " :style="{ backgroundImage: `url(${voc.cover})` }">
-                     </div>
-                     <!-- 内容 -->
-                     <div class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
-                        <p class="w-full font-[600] text-base-content cursor-pointer hover:text-primary transition-all"
-                           @click="$router.push(`/vocabulary/${voc.id}`)">{{ voc.title }}</p>
-                        <p class="w-full text-sm mb-4">{{ voc.desc }}</p>
-                        <!-- 底部信息 -->
-                        <div class="w-full absolute bottom-2 left-0 p-[0_20px] flex justify-between items-end">
-                           <!-- 数量/人数 -->
-                           <div class="text-sm">
-                              <span class="mr-3">
-                                 <IconFont type="icon-icon-test" /> {{ voc.count }}
-                              </span>
-                              <span>
-                                 <IconFont type="icon-zongyonghushu" /> {{ voc.userList.length }}
-                              </span>
-                           </div>
-                           <!-- 日期 -->
-                           <div class="text-sm">
-                              <p class="text-center">
-                                 <IconFont type="icon-shijian" /> {{ voc.createTime.slice(0, 10) }}
-                              </p>
+            <div v-show="tabValue == '1'" class="p-2 w-full flex min-h-96">
+               <ul class="flex-1">
+                  <li class="border-[2px] border-base-300 hover:bg-base-300 rounded-lg mb-1"
+                     v-for=" user in classes.userList">
+                     <div class="h-14 flex relative">
+                        <!-- 头像 -->
+                        <div class="avatar p-1 shadow-base-content">
+                           <div class="rounded-lg">
+                              <img :src="user.avatar" />
                            </div>
                         </div>
-                        <!-- 头像 -->
-                        <div class="absolute  right-5 md:-top-4">
-                           <div class="avatar flex items-center rounded-full ring ring-base-200">
-                              <div class="w-8 rounded-full">
-                                 <img :src="voc.author.avatar" />
-                              </div>
-                              <!-- <span class="ml-2">34654833</span> -->
+                        <!-- 用户名 -->
+                        <div class="ml-2 flex flex-wrap content-center">
+                           <p class="font-semibold mt-1 w-full">{{ user.username }}</p>
+                           <span class="text-xs text-gray-500 italic">#{{ user.id }}</span>
+                        </div>
+                        <!-- 图标 -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                           <div class="btn btn-xs btn-error">
+                              <IconFont type="icon-yichuyonghu" />
                            </div>
+                           <!-- <RightOutlined /> -->
                         </div>
                      </div>
                   </li>
                </ul>
+               <!-- 公告 -->
+               <div class="lg:w-[300px] md:w-[230px] transition-all ml-2 border-2 border-gray-400">
+                  {{ classes.annc }}
+               </div>
+            </div>
+         </Transition>
+         <!-- 词集 -->
+         <Transition appear>
+            <div v-show="tabValue == '2'" class="w-full min-h-96 p-2">
+               <!-- 加载中 骨架屏 -->
+               <div v-if="vocLoading" class="flex flex-wrap justify-between">
+                  <div v-for="(item, index) in 4" :key="index" class="skeleton my-class-info-word"></div>
+               </div>
+               <ul v-else-if="!vocLoading && vocList?.length" class="flex flex-wrap justify-between">
+                  <TransitionGroup appear>
+                     <li v-for="(voc, index) in vocList" :key="index"
+                        class="my-class-info-word flex shadow-md hover:shadow-xl">
+                        <!-- 背景图 -->
+                        <div class=" w-[45%] md:h-[60%] md:w-full bg-cover bg-center
+                              " :style="{ backgroundImage: `url(${voc.cover})` }">
+                        </div>
+                        <!-- 内容 -->
+                        <div class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
+                           <p class="w-full font-[600] text-base-content cursor-pointer hover:text-primary transition-all"
+                              @click="$router.push(`/vocabulary/${voc.id}`)">{{ voc.title }}</p>
+                           <p class="w-full text-sm mb-4">{{ voc.desc }}</p>
+                           <!-- 底部信息 -->
+                           <div class="w-full absolute bottom-2 left-0 p-[0_20px] flex justify-between items-end">
+                              <!-- 数量/人数 -->
+                              <div class="text-sm">
+                                 <span class="mr-3">
+                                    <IconFont type="icon-icon-test" /> {{ voc.count }}
+                                 </span>
+                                 <span>
+                                    <IconFont type="icon-zongyonghushu" /> {{ voc.userList.length }}
+                                 </span>
+                              </div>
+                              <!-- 日期 -->
+                              <div class="text-sm">
+                                 <p class="text-center">
+                                    <IconFont type="icon-shijian" /> {{ voc.createTime.slice(0, 10) }}
+                                 </p>
+                              </div>
+                           </div>
+                           <!-- 头像 -->
+                           <div class="absolute  right-5 md:-top-4">
+                              <div class="avatar flex items-center rounded-full ring ring-base-200">
+                                 <div class="w-8 rounded-full">
+                                    <img :src="voc.author.avatar" />
+                                 </div>
+                                 <!-- <span class="ml-2">34654833</span> -->
+                              </div>
+                           </div>
+                        </div>
+                     </li>
+                  </TransitionGroup>
+               </ul>
+               <!-- 空数据 -->
+               <a-empty v-else class="mt-20 text-gray-400" />
             </div>
          </Transition>
       </div>
+
+      <!-- 编辑弹框 -->
+      <dialog id="editClassesEl" class="modal">
+         <div class="modal-box">
+            <h3 class="font-bold text-lg mb-5">编辑班级信息</h3>
+            <div>
+               <a-form :model="editClasses" ref="editClassesRef">
+                  <a-form-item name="name" :rules="{ required: true, message: '请输入班级名称' }">
+                     <label class="form-control w-full">
+                        <div class="label"><span class="label-text">名称</span></div>
+                        <input type="text" v-model="editClasses.name" class="my-form-input-sm" />
+                     </label>
+                  </a-form-item>
+                  <a-form-item name="info">
+                     <label class="form-control w-full">
+                        <div class="label"><span class="label-text">描述</span></div>
+                        <!-- <input type="text" class="my-form-input-sm" /> -->
+                        <textarea v-model="editClasses.info"
+                           class="textarea textarea-xs textarea-bordered text-base-content"></textarea>
+                     </label>
+                  </a-form-item>
+                  <a-form-item name="annc">
+                     <label class="form-control w-full">
+                        <div class="label"><span class="label-text">公告</span></div>
+                        <textarea v-model="editClasses.annc"
+                           class="textarea textarea-xs textarea-bordered text-base-content"></textarea>
+                     </label>
+                  </a-form-item>
+               </a-form>
+            </div>
+            <div class="modal-action">
+               <form method="dialog">
+                  <!-- if there is a button in form, it will close the modal -->
+                  <button class="btn">取消</button>
+               </form>
+               <button class="btn btn-primary" @click="editClassesHandler">确定</button>
+            </div>
+         </div>
+      </dialog>
+      <!-- 确定弹框 -->
+      <WarnModal v-model:open="showConfirm" title="操作确定" content="您确定将班级解散吗？该操作不可撤销！" @ok="delClassesConfirmHandler" />
    </div>
 </template>
 
@@ -127,15 +182,21 @@ import type { Classes } from "@/types/classes";
 import { useUserStore } from "@/stores/userStore";
 import IconFont from "@/utils/iconFont";
 import type { Vocabulary } from "@/types/vocabulary";
+import type { FormExpose } from "ant-design-vue/es/form/Form";
+import { message } from "ant-design-vue";
+import WarnModal from "@/components/warnModal.vue";
+import router from "@/router";
 
 
 const userStore = useUserStore();
 // 路由对象
 const route = useRoute();
 // 选项卡的选择
-const tabValue = ref('2');
-// 是否是自己的
+const tabValue = ref('1');
+// 是否是自己创建的
 const isSelf = ref(false);
+// 自己是否是成员
+const isMember = ref(false)
 // 班级数据
 const classes = ref<Classes>({
    id: "",
@@ -153,54 +214,102 @@ const classes = ref<Classes>({
    }
 })
 // 班级成员的词集列表
-const vocList = ref<Vocabulary[]>([]);
+const vocList = ref<Vocabulary[] | null>(null);
+// 获取词集时 loading
+const vocLoading = ref(false);
+// 当前编辑的班级数据
+const editClasses = ref<Classes>({
+   id: "",
+   annc: "",
+   creatorUid: "",
+   info: "",
+   name: "",
+   userList: [],
+   creator: {
+      id: "",
+      username: "",
+      avatar: "",
+      email: "",
+      sex: ""
+   }
+})
+// 组件 form 实例 (用于表单校验)
+const editClassesRef = ref<FormExpose | null>(null);
+// 是否显示确认框
+const showConfirm = ref(false);
 
-// 获取数据
+
+
 getClasses()
-getVocListByClassesUser()
 
+
+
+// 操作栏 【确认框确认】
+async function delClassesConfirmHandler() {
+   let result = await ClassesAPI.deleteClasses(classes.value.id);
+   if (result.code == 20000) {
+      message.success(result.message);
+      router.back();
+   }
+}
+// 操作栏 【编辑按钮】
+function controlsTabEdit() {
+   editClasses.value = JSON.parse(JSON.stringify(classes.value));
+   delete editClasses.value.userList;
+   let editClassesEl = document.querySelector("#editClassesEl") as HTMLDialogElement;
+   editClassesEl.showModal();
+}
+// 编辑弹框 【确定按钮】
+async function editClassesHandler() {
+   try {
+      await editClassesRef.value?.validate()
+      let result = await ClassesAPI.updateClasses(editClasses.value);
+      if (result.code == 20000) {
+         message.success(result.message);
+         getClasses();
+      }
+      let editClassesEl = document.querySelector("#editClassesEl") as HTMLDialogElement;
+      if (editClassesEl) {
+         editClassesEl.close()
+      }
+   } catch (error) {
+      console.log('表单验证失败');
+   }
+}
 // 选项卡选择 handler
 function tabSelectHandler(e: Event) {
    let element = e.target as HTMLElement;
    if (element.tagName == 'A') {
       // console.log(element.getAttribute("data-key"));
       tabValue.value = element.getAttribute("data-key")!;
+
+      if (tabValue.value == '2') {
+         getVocListByClassesUser();
+      }
    }
 }
 // 获取班级数据
 async function getClasses() {
    let result = await ClassesAPI.getClasses(route.params.id as string)
    classes.value = result.data
+   // 是否是自己的班级
    if (classes.value.creator.id == userStore.userInfo?.id) isSelf.value = true;
+   // 是否是成员
+   if (classes.value.userList?.find(user => user.id == userStore.userInfo?.id)) isMember.value = true;
 }
 // 根据班级ID获取所有成员的词集列表
 async function getVocListByClassesUser() {
-   if (!vocList.value.length) {
+   if (vocList.value == null) {
+      vocLoading.value = true;
       let result = await ClassesAPI.getVocListByClassesUser(route.params.id as string)
       vocList.value = result.data;
+      vocLoading.value = false;
    }
 }
 </script>
 
-<style lang="less">
+<style>
 .gradation {
    background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
-}
-
-
-.v-enter-active {
-   animation: el-enter 0.3s;
-}
-
-@keyframes el-enter {
-   0% {
-      transform: translateY(20px);
-      opacity: 0;
-   }
-
-   100% {
-      transform: translateY(0);
-      opacity: 1;
-   }
 }
 </style>

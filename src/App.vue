@@ -27,3 +27,40 @@ dayjs.locale("zh_CN")
 const myColorPrimary = "#a991f7";
 
 </script>
+
+<style>
+/* 元素进场动画 */
+.v-enter-active {
+  animation: el-enter 0.3s;
+}
+
+/* .v-leave-active {
+  animation: el-leave 0.3s;
+} */
+
+@keyframes el-enter {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes el-leave {
+  0% {
+    width: 100%;
+    /* transform: translateY(0); */
+    opacity: 1;
+  }
+
+  100% {
+    width: 0;
+    /* transform: translateY(20px); */
+    opacity: 0;
+  }
+}
+</style>

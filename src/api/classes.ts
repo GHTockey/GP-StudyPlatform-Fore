@@ -13,6 +13,14 @@ export class ClassesAPI {
    static getClasses(id: string) {
       return request<Classes>("/classes-service/classes/" + id, "GET");
    };
+   /* 删除班级 API */
+   static deleteClasses(id: string) {
+      return request(`/classes-service/classes/${id}`, 'DELETE')
+   };
+   /* 修改班级 API */
+   static updateClasses(classes: Classes) {
+      return request('/classes-service/classes', 'PUT', classes)
+   };
 
    /* 搜索班级API */
    static searchClasses(keyword: string) {

@@ -2,8 +2,8 @@
    <div class="layout-container pt-16">
       <!-- 导航栏 -->
       <NavBar />
-
-      <RouterView />
+      <!-- 路由视图 -->
+      <RouterView :key="$route.fullPath" />
    </div>
 </template>
 

@@ -24,6 +24,15 @@
    .my-type-center {
       @apply m-auto lg:w-[80%] md:w-[85%];
    }
+   /* 班级信息页 词集的响应式布局样式 */
+   .my-class-info-word {
+      @apply w-full mb-[10px] overflow-hidden transition-all duration-300 bg-base-300 rounded-xl
+      xl:w-[calc((100%-20px)/3)] h-[180px] md:h-[300px] md:flex-wrap md:w-[calc((100%-10px)/2)];
+   }
+   /* 表单输入框 小 */
+   .my-form-input-sm {
+      @apply input text-base-content input-sm input-bordered w-full;
+   }
 
 }
 

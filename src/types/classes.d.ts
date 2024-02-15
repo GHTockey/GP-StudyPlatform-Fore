@@ -7,6 +7,6 @@ export type Classes = {
    info: string,
    name: string,
 
-   userList: User[],
+   userList?: User[],
    creator: User
 }

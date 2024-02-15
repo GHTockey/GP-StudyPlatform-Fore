@@ -71,7 +71,7 @@
             <input type="text" placeholder="输入关键词" class="input input-bordered w-full"
                :oninput="lodash?.debounce(searchHandler, 300)" />
             <!-- 用户搜索结果 -->
-            <Transition name="list">
+            <Transition>
                <ul class="mt-5" v-show="searchUserResult?.length">
                   <div class="divider font-semibold">🧑‍🚀来自用户</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
@@ -97,9 +97,10 @@
                </ul>
             </Transition>
             <!-- 词集搜索结果 -->
-            <Transition name="list">
+            <Transition>
                <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length">
                   <div class="divider font-semibold">📖来自词集</div>
+                  
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
                      @click="$router.push(`/vocabulary/${voc.id}`); searchOptionClick()"
                      v-for=" voc in searchVocabularyResult ">
@@ -138,7 +139,7 @@
                </ul>
             </Transition>
             <!-- 班级搜索结果 -->
-            <Transition name="list">
+            <Transition>
                <ul class="bg-base-100 mt-5" v-show="searchClassesResult?.length">
                   <div class="divider font-semibold">🏫来自班级</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
@@ -147,10 +148,10 @@
                      <div class="h-14 flex relative pl-2">
                         <!-- 班级图标 -->
                         <div class="flex justify-center items-center">
-                           <IconFont type="icon-banjixinxi" class="text-[3rem] text-gray-500" />
+                           <IconFont type="icon-banjixinxi" class="text-[2.5rem] text-gray-500" />
                         </div>
                         <!-- 班级信息 -->
-                        <div class="border-gray-500 w-44 pl-3 flex flex-wrap items-center self-center">
+                        <div class="border-gray-500 w-40 mr-2 pl-3 flex flex-wrap items-center self-center">
                            <p class="font-semibold truncate w-full">{{ classes.name }}</p>
                            <p class="text-xs text-gray-500 truncate">{{ classes.info }}</p>
                         </div>
