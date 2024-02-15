@@ -10,3 +10,8 @@ export type Classes = {
    userList?: User[],
    creator: User
 }
+
+export type ClassesUser = {
+   uid: string
+   cid: string
+}

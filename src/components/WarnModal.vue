@@ -1,6 +1,6 @@
 <template>
    <!-- 确定弹框 -->
-   <dialog id="warnModal" class="modal">
+   <dialog :id="id" class="modal">
       <div class="modal-box">
          <h3 class="font-bold text-lg text-red-500">{{ title }}</h3>
          <p class="py-4">
@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 const props = withDefaults(defineProps<{
+   id: string
    title?: string
    content?: string
    open?: boolean
@@ -34,12 +35,12 @@ const emit = defineEmits<{
    (e: 'update:open', open: boolean): void
 }>()
 
-// 关闭弹框
+// 弹框
 function modalControls(p: boolean) {
    if (p) {
-      (<HTMLDialogElement | null>document.querySelector('#warnModal'))?.showModal()
+      (<HTMLDialogElement | null>document.querySelector(`#${props.id}`))?.showModal()
    } else {
-      (<HTMLDialogElement | null>document.querySelector('#warnModal'))?.close();
+      (<HTMLDialogElement | null>document.querySelector(`#${props.id}`))?.close();
    }
 }
 

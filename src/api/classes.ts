@@ -1,4 +1,4 @@
-import type { Classes } from "@/types/classes";
+import type { Classes, ClassesUser } from "@/types/classes";
 import type { Vocabulary } from "@/types/vocabulary";
 import { request } from "@/utils/request";
 
@@ -30,5 +30,14 @@ export class ClassesAPI {
    /*根据班级ID获取所有成员的词集列表 API */
    static getVocListByClassesUser(cid: string) {
       return request<Vocabulary[]>(`/classes-service/classes/user/voc/list/${cid}`)
+   };
+
+   /* 用户加入班级 API */
+   static joinClasses(classesUser: ClassesUser) {
+      return request<string>("/classes-service/classes/user/push", "POST", classesUser)
+   };
+   /* 用户退出班级 API */
+   static quitClasses(classesUser: ClassesUser) {
+      return request<string>("/classes-service/classes/user/remove", "POST", classesUser)
    };
 }

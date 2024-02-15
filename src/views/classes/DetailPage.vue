@@ -25,10 +25,13 @@
             </div>
          </div>
          <div class="flex items-center gap-4">
-            <button class="btn btn-sm btn-accent">加入</button>
-            <button class="btn btn-sm btn-success">聊天室</button>
-            <button class="btn btn-sm btn-secondary" @click="controlsTabEdit">编辑</button>
-            <button class="btn btn-sm btn-error" @click="showConfirm = true">解散</button>
+            <button v-if="isMember" class="btn btn-sm btn-success">聊天室</button>
+            <button v-if="isMember && !isSelf" class="btn btn-sm btn-error" @click="showQuitConfirm = true">退出</button>
+            <button v-if="!isMember && !isSelf" class="btn btn-sm btn-accent" @click="joinClasses">加入</button>
+            <template v-if="isSelf">
+               <button class="btn btn-sm btn-secondary" @click="controlsTabEdit">编辑</button>
+               <button class="btn btn-sm btn-error" @click="showConfirm = true">解散</button>
+            </template>
          </div>
       </div>
       <!-- 选项卡切换 -->
@@ -59,7 +62,8 @@
                         </div>
                         <!-- 图标 -->
                         <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                           <div class="btn btn-xs btn-error">
+                           <div v-if="isSelf && user.id != userStore.userInfo?.id" class="btn btn-xs btn-error"
+                              @click="listRemoveMember(user)">
                               <IconFont type="icon-yichuyonghu" />
                            </div>
                            <!-- <RightOutlined /> -->
@@ -124,7 +128,7 @@
                      </li>
                   </TransitionGroup>
                </ul>
-               <!-- 空数据 -->
+               <!-- 空数据状态 -->
                <a-empty v-else class="mt-20 text-gray-400" />
             </div>
          </Transition>
@@ -168,8 +172,14 @@
             </div>
          </div>
       </dialog>
-      <!-- 确定弹框 -->
-      <WarnModal v-model:open="showConfirm" title="操作确定" content="您确定将班级解散吗？该操作不可撤销！" @ok="delClassesConfirmHandler" />
+      <!-- 删除班级 确认弹框 -->
+      <WarnModal id="delClasses" v-model:open="showConfirm" title="操作确定" content="您确定将班级解散吗？该操作不可撤销！"
+         @ok="delClassesConfirmHandler" />
+      <!-- 移除成员 确认弹框 -->
+      <WarnModal id="removeMember" v-model:open="showRemoveMemberConfirm" :content="`您确定要移除 ${currentUser?.username} 吗？`"
+         @ok="removeMemberConfirmHandler" />
+      <!-- 用户退出出 确认弹框 -->
+      <WarnModal id="quitClasses" v-model:open="showQuitConfirm" title="操作确定" content="您确定要退出该班级吗？" @ok="quitClasses" />
    </div>
 </template>
 
@@ -186,6 +196,7 @@ import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { message } from "ant-design-vue";
 import WarnModal from "@/components/warnModal.vue";
 import router from "@/router";
+import type { User } from "@/types/user";
 
 
 const userStore = useUserStore();
@@ -233,10 +244,22 @@ const editClasses = ref<Classes>({
       sex: ""
    }
 })
+// 当前选中的用户
+const currentUser = ref<User>({
+   id: "",
+   username: "",
+   avatar: "",
+   email: "",
+   sex: ""
+});
 // 组件 form 实例 (用于表单校验)
 const editClassesRef = ref<FormExpose | null>(null);
-// 是否显示确认框
+// 是否显示确认框 【解散班级】
 const showConfirm = ref(false);
+// 是否显示确认框 【移除成员】
+const showRemoveMemberConfirm = ref(false);
+// 是否显示确认框 【退出班级】
+const showQuitConfirm = ref(false);
 
 
 
@@ -244,12 +267,53 @@ getClasses()
 
 
 
-// 操作栏 【确认框确认】
+// 用户退出班级 【确认框确认】
+async function quitClasses() {
+   let result = await ClassesAPI.quitClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
+   if (result.code == 20000) {
+      message.success("已退出班级");
+      getClasses();
+      getVocListByClassesUser(true);
+      showQuitConfirm.value = false;
+   } else {
+      message.error(result.message);
+   }
+}
+// 用户加入班级
+async function joinClasses() {
+   let result = await ClassesAPI.joinClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
+   if (result.code == 20000) {
+      message.success(result.message);
+      getClasses();
+      getVocListByClassesUser(true);
+   } else {
+      message.error(result.message);
+   }
+}
+// 移除成员弹框 【确认】
+async function removeMemberConfirmHandler() {
+   // console.log({ uid: currentUser.value?.id, cid: classes.value.id });
+   let result = await ClassesAPI.quitClasses({ uid: currentUser.value.id, cid: classes.value.id });
+   if (result.code == 20000) {
+      message.success(result.message);
+      getClasses();
+      getVocListByClassesUser(true);
+      showRemoveMemberConfirm.value = false;
+   } else {
+      message.error(result.message);
+   }
+}
+// 成员列表 【移除按钮】
+function listRemoveMember(u: User) {
+   showRemoveMemberConfirm.value = true
+   currentUser.value = u;
+}
+// 删除班级 【确认框确认】
 async function delClassesConfirmHandler() {
    let result = await ClassesAPI.deleteClasses(classes.value.id);
    if (result.code == 20000) {
-      message.success(result.message);
-      router.back();
+      message.success("解散成功");
+      router.push("/user")
    }
 }
 // 操作栏 【编辑按钮】
@@ -290,6 +354,9 @@ function tabSelectHandler(e: Event) {
 }
 // 获取班级数据
 async function getClasses() {
+   isMember.value = false;
+   isSelf.value = false;
+   console.log(123);
    let result = await ClassesAPI.getClasses(route.params.id as string)
    classes.value = result.data
    // 是否是自己的班级
@@ -298,8 +365,8 @@ async function getClasses() {
    if (classes.value.userList?.find(user => user.id == userStore.userInfo?.id)) isMember.value = true;
 }
 // 根据班级ID获取所有成员的词集列表
-async function getVocListByClassesUser() {
-   if (vocList.value == null) {
+async function getVocListByClassesUser(force?: boolean) {
+   if (vocList.value == null || force) {
       vocLoading.value = true;
       let result = await ClassesAPI.getVocListByClassesUser(route.params.id as string)
       vocList.value = result.data;
