@@ -87,9 +87,6 @@
                      <IconFont type="icon-shanchu" />
                   </button>
                </template>
-               <p>
-                  <RightOutlined />
-               </p>
             </div>
          </div>
          <!-- 空数据状态 -->
@@ -172,10 +169,11 @@ import router from "@/router";
 import type { Vocabulary } from "@/types/vocabulary";
 import type { User } from "@/types/user";
 import { message } from "ant-design-vue";
-import { MailOutlined, FieldTimeOutlined, RightOutlined } from "@ant-design/icons-vue";
+import { MailOutlined, FieldTimeOutlined } from "@ant-design/icons-vue";
 import IconFont from "@/utils/iconFont";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { OtherAPI } from "@/api/other";
+import { MyUtils } from "@/utils";
 
 const route = useRoute();
 const vocabularyList = ref<Vocabulary[]>();
@@ -251,7 +249,9 @@ async function editSubmit() {
 };
 // 删除词集
 async function delVocabulary(id: number) {
-   message.error("删除词集" + id);
+   MyUtils.modal("操作确认", "您确认要删除词集吗？", () => {
+      MyUtils.alert("操作成功", "success", 2000);
+   })
 };
 // 获取词集列表
 async function getUserInfoAndVocabularyList() {

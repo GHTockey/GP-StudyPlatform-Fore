@@ -3,7 +3,7 @@
    <Transition name="alert">
       <div v-if="open" role="alert" class="alert
       fixed top-[80px] w-auto left-1/2 -translate-x-1/2
-       shadow-lg" :class="typeHandler">
+       shadow-lg overflow-hidden" :class="typeHandler">
          <!-- 图标类型 -->
          <template v-if="type == undefined || type == 'info'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
@@ -32,14 +32,16 @@
                   d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
          </template>
-
+         <!-- 提示文本 -->
          <span>{{ text }}</span>
+         <!-- 进度条 -->
+         <div ref="tceProgressEl" class=" absolute transition-all bg-gray-200/30 h-full"></div>
       </div>
    </Transition>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted, computed } from "vue";
+import { ref, watch, onMounted, onUnmounted, onUpdated, computed } from "vue";
 const props = withDefaults(
    defineProps<{
       text: string
@@ -52,21 +54,36 @@ const props = withDefaults(
    }
 )
 
-console.log(props.type);
 const open = ref(false)
+const tceProgressEl = ref<HTMLElement | null>(null)
 onMounted(() => {
    open.value = true
+   // 关闭
    setTimeout(() => {
       open.value = false
    }, props.time)
-})
-onUnmounted(() => {
-   console.log('销毁');
+
+   setTimeout(() => {
+      // console.log(tceProgressEl2.value);
+      if(tceProgressEl.value) {
+         tceProgressEl.value.style.animation = `tceProgress ${props.time}ms linear`
+      }
+   })
 })
 
 const typeHandler = computed(() => {
    if (props.type) {
-      return `alert-${props.type}`
+      // return `alert-${props.type}`
+      switch (props.type) {
+         case "success":
+            return "alert-success"
+         case "error":
+            return "alert-error"
+         case "warning":
+            return "alert-warning"
+         case "info":
+            return "alert-info"
+      }
    }
    return ''
 })
@@ -103,4 +120,15 @@ const typeHandler = computed(() => {
       top: 0;
       opacity: 0;
    }
-}</style>
+}
+
+@keyframes tceProgress {
+   0% {
+      width: 0;
+   }
+
+   100% {
+      width: 100%;
+   }
+}
+</style>

@@ -1,5 +1,6 @@
 import { h, render, ref } from "vue";
 import Alert from "@/components/MyAlert.vue";
+import Modal from "@/components/MyModal.vue";
 
 export class MyUtils {
    static alert(text: string, type?: "success" | "error" | "warning" | "info", time: number = 3000) {
@@ -12,10 +13,29 @@ export class MyUtils {
       let tempDiv = document.createElement('div')
       document.body.appendChild(tempDiv)
       render(alertEl, tempDiv) // 将虚拟dom渲染到真实dom中
+      // 清除真实dom
       setTimeout(() => {
-         // console.log('close');
          tempDiv.remove()
       }, time + 300) // 300 是为了给过渡时间
-
+   }
+   static modal(title: string, content: string, ok: () => void) {
+      let modelVNode = h(Modal, {
+         title,
+         content,
+         onClose: () => {
+            setTimeout(() => {
+               tempDiv.remove()
+            }, 300) // 300 是为了给过渡时间
+         },
+         onOk: () => {
+            ok()
+            setTimeout(() => {
+               tempDiv.remove()
+            }, 300)
+         }
+      })
+      let tempDiv = document.createElement('div')
+      document.body.appendChild(tempDiv)
+      render(modelVNode, tempDiv)
    }
 }

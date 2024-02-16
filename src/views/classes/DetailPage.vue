@@ -26,11 +26,13 @@
          </div>
          <div class="flex items-center gap-4">
             <button v-if="isMember" class="btn btn-sm btn-success">聊天室</button>
-            <button v-if="isMember && !isSelf" class="btn btn-sm btn-error" @click="showQuitConfirm = true">退出</button>
+            <button v-if="isMember && !isSelf" class="btn btn-sm btn-error"
+               @click="MyUtils.modal('操作确认', '您确定要退出该班级吗？', quitClasses)">退出</button>
             <button v-if="!isMember && !isSelf" class="btn btn-sm btn-accent" @click="joinClasses">加入</button>
             <template v-if="isSelf">
                <button class="btn btn-sm btn-secondary" @click="controlsTabEdit">编辑</button>
-               <button class="btn btn-sm btn-error" @click="showConfirm = true">解散</button>
+               <button class="btn btn-sm btn-error"
+                  @click="MyUtils.modal('操作确认', '您确定将班级解散吗？该操作不可撤销！', delClassesConfirmHandler)">解散</button>
             </template>
          </div>
       </div>
@@ -172,21 +174,12 @@
             </div>
          </div>
       </dialog>
-      <!-- 删除班级 确认弹框 -->
-      <WarnModal id="delClasses" v-model:open="showConfirm" title="操作确定" content="您确定将班级解散吗？该操作不可撤销！"
-         @ok="delClassesConfirmHandler" />
-      <!-- 移除成员 确认弹框 -->
-      <WarnModal id="removeMember" v-model:open="showRemoveMemberConfirm" :content="`您确定要移除 ${currentUser?.username} 吗？`"
-         @ok="removeMemberConfirmHandler" />
-      <!-- 用户退出出 确认弹框 -->
-      <WarnModal id="quitClasses" v-model:open="showQuitConfirm" title="操作确定" content="您确定要退出该班级吗？" @ok="quitClasses" />
    </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { ref } from "vue";
-import { RightOutlined } from "@ant-design/icons-vue";
 import { ClassesAPI } from "@/api/classes";
 import type { Classes } from "@/types/classes";
 import { useUserStore } from "@/stores/userStore";
@@ -194,10 +187,8 @@ import IconFont from "@/utils/iconFont";
 import type { Vocabulary } from "@/types/vocabulary";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { message } from "ant-design-vue";
-import WarnModal from "@/components/WarnModal.vue";
 import router from "@/router";
 import type { User } from "@/types/user";
-import MyAlertCom from "@/components/MyAlert.vue";
 import { MyUtils } from "@/utils";
 
 
@@ -273,12 +264,12 @@ getClasses()
 async function quitClasses() {
    let result = await ClassesAPI.quitClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
    if (result.code == 20000) {
-      message.success("已退出班级");
+      MyUtils.alert("退出成功", "success");
       getClasses();
       getVocListByClassesUser(true);
       showQuitConfirm.value = false;
    } else {
-      message.error(result.message);
+      MyUtils.alert(result.message, 'error');
    }
 }
 // 用户加入班级
@@ -297,18 +288,20 @@ async function removeMemberConfirmHandler() {
    // console.log({ uid: currentUser.value?.id, cid: classes.value.id });
    let result = await ClassesAPI.quitClasses({ uid: currentUser.value.id, cid: classes.value.id });
    if (result.code == 20000) {
-      message.success(result.message);
+      // message.success(result.message);
+      MyUtils.alert(result.message, 'success')
       getClasses();
       getVocListByClassesUser(true);
       showRemoveMemberConfirm.value = false;
    } else {
-      message.error(result.message);
+      // message.error(result.message);
+      MyUtils.alert(result.message, 'error')
    }
 }
 // 成员列表 【移除按钮】
 function listRemoveMember(u: User) {
-   showRemoveMemberConfirm.value = true
    currentUser.value = u;
+   MyUtils.modal('操作确认', `您确定要移除 ${currentUser.value.username} 吗？`, removeMemberConfirmHandler)
 }
 // 删除班级 【确认框确认】
 async function delClassesConfirmHandler() {
