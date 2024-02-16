@@ -163,7 +163,7 @@
                            </p>
                            <!-- 数量 -->
                            <p>
-                              <IconFont type="icon-zongyonghushu" /> {{ classes.userList.length }}
+                              <IconFont type="icon-zongyonghushu" /> {{ classes.userList?.length }}
                            </p>
                         </div>
                         <!-- 箭头图标 -->
@@ -201,16 +201,16 @@
             </label>
             <p>主题切换</p>
          </div>
-         <!-- 新增词集按钮 -->
+         <!-- 发布词集按钮 -->
          <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false">
             <!--图标 -->
             <span class="my-center-console-icon">📖</span>
-            <p>新增词集</p>
+            <p>发布词集</p>
          </div>
-         <!-- 加入班级按钮 -->
+         <!-- 创建班级按钮 -->
          <div class="size-[100px] relative btn p-0">
             <span class="my-center-console-icon">🏫</span>
-            <p>加入班级</p>
+            <p>创建班级</p>
          </div>
          <!-- 我的消息按钮 -->
          <div class="size-[100px] relative btn p-0">

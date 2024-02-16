@@ -1,3 +1,5 @@
+import type { Classes } from "./classes"
+
 export type User = {
    id: string,
    username: string,
@@ -5,4 +7,6 @@ export type User = {
    avatar: string,
    email: string,
    sex: string,
+
+   classes?: Classes
 }

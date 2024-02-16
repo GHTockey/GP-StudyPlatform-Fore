@@ -16,6 +16,11 @@
             <p class="m-[8px_0]">
                <FieldTimeOutlined class="mr-[8px]" />2022年10月1日加入 todo
             </p>
+            <!-- 班级 -->
+            <p class="hover:text-blue-500 cursor-pointer my-2"
+               @click="currentUserInfo?.classes ? $router.push('/classes/' + currentUserInfo.classes.id) : null">
+               <IconFont type="icon-banjixinxi" /> {{ currentUserInfo?.classes?.name || '无' }}
+            </p>
          </div>
          <!-- 头像 -->
          <div class="w-[280px] relative">
@@ -26,7 +31,7 @@
                :class="'ring-white'">
          </div>
          <!-- 按钮 -->
-         <div class="absolute bottom-0">
+         <div class="absolute -bottom-3">
             <a-space>
                <template v-if="isSelf">
                   <button class="btn btn-info text-white btn-sm" @click="openEditModal">
@@ -40,8 +45,9 @@
          </div>
       </div>
 
+      <!-- 词集列表 -->
       <div class="p-10">
-         <div class="divider divider-start font-semibold text-lg">词集列表</div>
+         <div class="divider divider-start font-semibold text-lg">词集</div>
          <!-- 骨架屏 -->
          <div v-if="vocabularyListLoading" v-for="item in 3" :key="item"
             class="skeleton bg-base-200 w-full h-[100px] mb-2"></div>
@@ -86,8 +92,8 @@
                </p>
             </div>
          </div>
-         <!-- 没有数据 -->
-         <a-empty v-if="!vocabularyList?.length" />
+         <!-- 空数据状态 -->
+         <a-empty v-if="!vocabularyList?.length" class="mt-20 text-gray-400" />
       </div>
    </div>
 
@@ -119,8 +125,7 @@
                   <div class="label">
                      <span class="label-text">用户名</span>
                   </div>
-                  <input type="text" v-model="editUserInfo.username"
-                     class="my-form-input-sm" />
+                  <input type="text" v-model="editUserInfo.username" class="my-form-input-sm" />
                </label>
             </a-form-item>
             <a-form-item>
@@ -128,8 +133,7 @@
                   <div class="label">
                      <span class="label-text">邮箱</span>
                   </div>
-                  <input type="text" v-model="editUserInfo.email" disabled
-                     class="my-form-input-sm" />
+                  <input type="text" v-model="editUserInfo.email" disabled class="my-form-input-sm" />
                </label>
             </a-form-item>
             <a-form-item name="sex" :rules="{ required: true, message: '请选择性别' }">

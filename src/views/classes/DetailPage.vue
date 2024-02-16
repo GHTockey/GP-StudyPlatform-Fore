@@ -72,8 +72,8 @@
                   </li>
                </ul>
                <!-- 公告 -->
-               <div class="lg:w-[300px] md:w-[230px] transition-all ml-2 border-2 border-gray-400">
-                  {{ classes.annc }}
+               <div class="lg:w-[300px] w-[180px] sm:w-[230px] transition-all ml-2 border-2 border-gray-400">
+                  公告{{ classes.annc }}
                </div>
             </div>
          </Transition>
@@ -194,9 +194,11 @@ import IconFont from "@/utils/iconFont";
 import type { Vocabulary } from "@/types/vocabulary";
 import type { FormExpose } from "ant-design-vue/es/form/Form";
 import { message } from "ant-design-vue";
-import WarnModal from "@/components/warnModal.vue";
+import WarnModal from "@/components/WarnModal.vue";
 import router from "@/router";
 import type { User } from "@/types/user";
+import MyAlertCom from "@/components/MyAlert.vue";
+import { MyUtils } from "@/utils";
 
 
 const userStore = useUserStore();
@@ -283,11 +285,11 @@ async function quitClasses() {
 async function joinClasses() {
    let result = await ClassesAPI.joinClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
    if (result.code == 20000) {
-      message.success(result.message);
+      MyUtils.alert(result.message, 'success')
       getClasses();
       getVocListByClassesUser(true);
    } else {
-      message.error(result.message);
+      MyUtils.alert(result.message, 'error')
    }
 }
 // 移除成员弹框 【确认】
@@ -356,7 +358,6 @@ function tabSelectHandler(e: Event) {
 async function getClasses() {
    isMember.value = false;
    isSelf.value = false;
-   console.log(123);
    let result = await ClassesAPI.getClasses(route.params.id as string)
    classes.value = result.data
    // 是否是自己的班级

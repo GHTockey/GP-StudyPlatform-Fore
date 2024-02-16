@@ -44,19 +44,20 @@ function modalControls(p: boolean) {
    }
 }
 
-onMounted(() => {
+onMounted(() => { // 在这个生命周期才能获取到弹框元素
    if (props.open) {
       modalControls(true)
    }
 })
 
 watch(() => props.open, () => {
+   // console.log(888,props.open);
    if (props.open) {
       modalControls(true)
    } else {
       modalControls(false)
    }
-})
+},{immediate:true})
 </script>
 
 <style></style>
