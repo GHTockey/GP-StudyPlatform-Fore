@@ -10,7 +10,7 @@ export type VocabularyVo = {
 }
 // 词集
 export type Vocabulary = {
-   id: number,
+   id: string,
    title: string,
    desc: string,
    cover: string,
@@ -19,14 +19,14 @@ export type Vocabulary = {
    createTime: string,
    updateTime: string,
    // 关联
-   wordsList: [] | Word[],
-   author: User,
-   userList: [] | User[],
+   wordsList?: Word[],
+   author?: User,
+   userList?: [] | User[],
 }
 // 词语
 export type Word = {
    definition: string,
    word: string,
-   id: number,
-   vid: number | null
+   id: string | null,
+   vid: string | null
 }

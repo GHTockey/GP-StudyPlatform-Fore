@@ -19,7 +19,7 @@
             <!-- 班级 -->
             <p class="hover:text-blue-500 cursor-pointer my-2"
                @click="currentUserInfo?.classes ? $router.push('/classes/' + currentUserInfo.classes.id) : null">
-               <IconFont type="icon-banjixinxi" /> {{ currentUserInfo?.classes?.name || '无' }}
+               <IconFont type="icon-banjixinxi" />&nbsp; {{ currentUserInfo?.classes?.name || '无' }}
             </p>
          </div>
          <!-- 头像 -->
@@ -236,23 +236,32 @@ async function editSubmit() {
       await editUserInfoFormEl.value?.validate()
       let result = await UserAPI.editUser(editUserInfo.value);
       if (result.code == 20000) {
-         message.success('修改成功');
+         MyUtils.alert("操作成功", "success");
          // 关闭EditModal();
          (<HTMLDialogElement>window.document.querySelector('#editModal')).close();
          getUserInfoAndVocabularyList();
       } else {
-         message.error('修改失败');
+         MyUtils.alert("操作失败", "error");
       }
    } catch (error) {
       console.log('表单验证失败', error);
    }
 };
-// 删除词集
-async function delVocabulary(id: number) {
-   MyUtils.modal("操作确认", "您确认要删除词集吗？", () => {
-      MyUtils.alert("操作成功", "success", 2000);
-   })
+// 删除词集 【按钮】
+async function delVocabulary(id: string) {
+   let voc = vocabularyList.value?.find(v => v.id == id);
+   MyUtils.modal("操作确认", `您确认要删除词集 ${voc?.title} 吗？`, () => delVocabularyConfirm(id))
 };
+// 删除词集 【确认】
+async function delVocabularyConfirm(id: string) {
+   let result = await VocabularyAPI.delVocbulary(id);
+   if (result.code == 20000) {
+      MyUtils.alert("操作成功", "success");
+      getUserInfoAndVocabularyList();
+   } else {
+      MyUtils.alert("操作失败", "error");
+   }
+}
 // 获取词集列表
 async function getUserInfoAndVocabularyList() {
    vocabularyListLoading.value = true; // 显示骨架屏
@@ -280,7 +289,6 @@ async function getUserInfoAndVocabularyList() {
    }
    vocabularyListLoading.value = false; // 加载完成 隐藏骨架屏
    editUserInfo.value = JSON.parse(JSON.stringify(currentUserInfo.value)); // 编辑用户信息回显
-   console.log(route.params, userStore.userInfo);
    // 判断是否是自己
    if (route.params?.id == userStore.userInfo?.id) {
       isSelf.value = true;

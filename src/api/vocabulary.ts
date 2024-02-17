@@ -1,10 +1,10 @@
-import type { VocabularyVo, Vocabulary } from "@/types/vocabulary";
+import type { VocabularyVo, Vocabulary, Word } from "@/types/vocabulary";
 import { request } from "@/utils/request";
 
 
 export class VocabularyAPI {
    /* 添加词集API */
-   static addVocabulary(vocbulary: VocabularyVo) {
+   static addVocabulary(vocbulary: Vocabulary) {
       return request<{ vid: number }>("/vocabulary-service/vocabulary", "POST", vocbulary);
    };
 
@@ -21,5 +21,21 @@ export class VocabularyAPI {
    /* 搜索词集API */
    static searchVocabulary(keyword: string) {
       return request<Vocabulary[]>("/vocabulary-service/vocabulary/search/" + keyword, "GET");
+   }
+
+   /* 删除词集API */
+   static delVocbulary(id: string) {
+      return request<string>(`/vocabulary-service/vocabulary/${id}`, "DELETE")
+   }
+
+
+   // word service
+   /* 新增新的词语 API */
+   static addNewWord(words: Word) {
+      return request<{ id: string }>("/vocabulary-service/words", "POST", words)
+   };
+   /* 删除词语 API */
+   static delWordsById(id: string) {
+      return request<string>(`/vocabulary-service/words/${id}`, "DELETE")
    }
 }

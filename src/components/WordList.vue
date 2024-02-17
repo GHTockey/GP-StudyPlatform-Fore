@@ -36,7 +36,6 @@
                         <a-divider orientation="right">词语</a-divider>
                      </a-col>
                   </a-row>
-
                </template>
             </Draggable>
          </div>
@@ -172,4 +171,3 @@ function addNewWord() {
    }
 }
 </style>
-@/types/vocabulary

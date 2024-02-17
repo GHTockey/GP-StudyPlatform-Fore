@@ -33,6 +33,14 @@
    .my-form-input-sm {
       @apply input text-base-content input-sm input-bordered w-full;
    }
+   /* 词语列表项 编辑时的样式 */
+   .my-word-item-edit {
+      @apply flex-1 relative border-b-2 border-gray-500 mb-2
+      before:absolute
+      before:-bottom-5
+      before:font-bold
+      before:text-[10px]
+   }
 
 }
 
