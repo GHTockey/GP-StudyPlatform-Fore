@@ -107,7 +107,7 @@
           <div class="relative mt-8 border-gray-500/50 border-2 flex-1 min-h-[300px] max-h-[500px]">
             <p class="absolute -top-7 font-semibold text-sm">文本数据</p>
             <textarea v-model="importData" @input="importHandler"
-              class="size-full resize-none bg-transparent focus:outline-none" placeholder="词语1  定义1"></textarea>
+              class="size-full min-h-[300px] bg-transparent resize-none  focus:outline-none" placeholder="词语1  定义1"></textarea>
           </div>
           <!-- 预览位置 -->
           <div class="relative mt-8 flex-1 min-h-[300px] max-h-[500px] overflow-auto">

@@ -30,7 +30,6 @@ const router = createRouter({
         {
           path: '/classes', children: [
             { path: ':id', name: '班级详情页', component: () => import("@/views/classes/DetailPage.vue") },
-            { path: 'add', name: '添加班级页', component: () => import("@/views/classes/AddPage.vue") }
           ]
         },
       ]

@@ -1,4 +1,5 @@
 <template>
+   <!-- 导航栏 -->
    <div class="navbar fixed top-0 left-0 z-50 transition-all duration-300" :class="y > 50 ? 'glass' : ''">
       <div class="flex-1">
          <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a>
@@ -100,7 +101,7 @@
             <Transition>
                <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length">
                   <div class="divider font-semibold">📖来自词集</div>
-                  
+
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
                      @click="$router.push(`/vocabulary/${voc.id}`); searchOptionClick()"
                      v-for=" voc in searchVocabularyResult ">
@@ -122,11 +123,11 @@
                               </p>
                               <!-- 学习用户数 -->
                               <p>
-                                 <IconFont type="icon-zongyonghushu" /> {{ voc.userList.length }}
+                                 <IconFont type="icon-zongyonghushu" /> {{ voc.userList?.length || 0 }}
                               </p>
                               <!-- 作者 -->
                               <p>
-                                 <IconFont type="icon-hezuozuozhe" /> {{ voc.author.username }}
+                                 <IconFont type="icon-hezuozuozhe" /> {{ voc.author?.username || null }}
                               </p>
                            </div>
                         </div>
@@ -208,7 +209,7 @@
             <p>发布词集</p>
          </div>
          <!-- 创建班级按钮 -->
-         <div class="size-[100px] relative btn p-0">
+         <div onclick="document.querySelector('#createClassDialog').showModal() " class="size-[100px] relative btn p-0">
             <span class="my-center-console-icon">🏫</span>
             <p>创建班级</p>
          </div>
@@ -219,6 +220,23 @@
          </div>
       </div>
    </a-drawer>
+   <!-- 创建班级弹框 -->
+   <dialog id="createClassDialog" class="modal">
+      <div class="modal-box transition-all duration-300 ">
+         <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+         </form>
+         <h3 class="font-bold text-lg">创建班级</h3>
+         <p class="text-sm font-bold">与同学分享词集与在线交流</p>
+         <div class="mt-5">
+            <input v-model="createClassForm.name" type="text" placeholder="输入班级名称" class="input input-bordered w-full" />
+            <input v-model="createClassForm.info" type="text" placeholder="输入班级描述"
+               class="input input-bordered w-full mt-5" />
+            <button @click="createClassSubmit" class="btn btn-primary mt-5 w-full">创建</button>
+            {{ createClassForm }}
+         </div>
+      </div>
+   </dialog>
 </template>
 
 <script setup lang="ts">
@@ -230,12 +248,13 @@ import { UserAPI } from "@/api/user";
 import { VocabularyAPI } from "@/api/vocabulary";
 import type { User } from "@/types/user";
 import type { Classes } from "@/types/classes";
-import type { Vocabulary, VocabularyVo } from "@/types/vocabulary";
+import type { Vocabulary } from "@/types/vocabulary";
 import { storeToRefs } from "pinia";
 import router from "@/router";
 import lodash from "lodash";
 import IconFont from "@/utils/iconFont";
 import { useWindowScroll } from "@vueuse/core";
+import { MyUtils } from "@/utils";
 
 // vueuse 获取滚动位置
 const { y } = useWindowScroll();
@@ -258,9 +277,34 @@ const centerConsoleShow = ref(false);
 const isDark = ref<boolean>(false);
 isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
 // console.log(isDark.value);
+// 班级创建表单
+const createClassForm = ref<Classes>({
+   id: null,
+   annc: "",
+   creatorUid: userStore.userInfo!.id,
+   info: "",
+   name: ""
+});
 
 
 
+
+// 创建班级 【提交】
+async function createClassSubmit() {
+   let createClassDialog = window.document.querySelector("#createClassDialog") as HTMLDialogElement;
+   centerConsoleShow.value = false;
+   createClassDialog.close();
+   if (createClassForm.value.name == "") {
+      return MyUtils.alert("班级名称不能为空", "error");
+   }
+   let res = await ClassesAPI.addClasses(createClassForm.value);
+   if (res.code === 20000) {
+      MyUtils.alert(res.message, "success");
+      router.push(`/classes/${res.other.id}`);
+   } else {
+      MyUtils.alert(res.message, "error");
+   }
+}
 // 搜索框选项点击
 function searchOptionClick() {
    searchDialog.value?.close(); // 关闭弹框

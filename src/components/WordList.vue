@@ -68,7 +68,7 @@ function addNewWord() {
    props.wordData.unshift({
       definition: "",
       word: "",
-      id: 0,
+      id: null,
       vid: null
    });
 }

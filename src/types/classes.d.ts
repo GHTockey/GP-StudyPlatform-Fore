@@ -1,14 +1,14 @@
 import type { User } from "./user"
 
 export type Classes = {
-   id: string,
+   id: string|null,
    annc: string,
    creatorUid: string,
    info: string,
    name: string,
 
    userList?: User[],
-   creator: User
+   creator?: User
 }
 
 export type ClassesUser = {

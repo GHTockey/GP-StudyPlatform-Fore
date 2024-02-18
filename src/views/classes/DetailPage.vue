@@ -305,9 +305,9 @@ function listRemoveMember(u: User) {
 }
 // 删除班级 【确认框确认】
 async function delClassesConfirmHandler() {
-   let result = await ClassesAPI.deleteClasses(classes.value.id);
+   let result = await ClassesAPI.deleteClasses(classes.value.id!);
    if (result.code == 20000) {
-      message.success("解散成功");
+      MyUtils.alert('操作成功', 'success');
       router.push("/user")
    }
 }

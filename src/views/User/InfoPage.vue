@@ -90,7 +90,7 @@
             </div>
          </div>
          <!-- 空数据状态 -->
-         <a-empty v-if="!vocabularyList?.length" class="mt-20 text-gray-400" />
+         <a-empty v-if="!vocabularyList?.length && vocabularyListLoading == false" class="mt-20 text-gray-400" />
       </div>
    </div>
 

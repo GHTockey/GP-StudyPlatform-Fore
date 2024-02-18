@@ -4,7 +4,7 @@ import { message } from 'ant-design-vue';
 import { useUserStore } from "@/stores/userStore";
 import router from "@/router";
 
-let baseURL: string = "http://localhost:10010";
+let baseURL: string = "http://192.168.0.108:10010";
 const service = axios.create({
    baseURL,
 });
@@ -20,7 +20,7 @@ service.interceptors.request.use(config => {
 
 // 响应拦截
 service.interceptors.response.use(res => {
-   console.log("响应拦截："+res.config.url, res.data);
+   console.log("响应拦截：" + res.config.url, res.data);
    if (res.data.code != 20000) {
       message.error(res.data.message)
    }

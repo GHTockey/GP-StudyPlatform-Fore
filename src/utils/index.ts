@@ -11,6 +11,7 @@ export class MyUtils {
       })
 
       let tempDiv = document.createElement('div')
+      // tempDiv.style.zIndex = '100000';
       document.body.appendChild(tempDiv)
       render(alertEl, tempDiv) // 将虚拟dom渲染到真实dom中
       // 清除真实dom

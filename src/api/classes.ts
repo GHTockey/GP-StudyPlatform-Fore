@@ -6,7 +6,7 @@ import { request } from "@/utils/request";
 export class ClassesAPI {
    /* 添加班级API */
    static addClasses(classes: Classes) {
-      return request<null>("/classes-service/classes", "POST", classes);
+      return request<string>("/classes-service/classes", "POST", classes);
    };
 
    /* 获取班级API */
