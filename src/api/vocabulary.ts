@@ -28,6 +28,11 @@ export class VocabularyAPI {
       return request<string>(`/vocabulary-service/vocabulary/${id}`, "DELETE")
    }
 
+   /* 修改词集API */
+   static updVocabulary(vocabulary: Vocabulary) {
+      return request<string>("/vocabulary-service/vocabulary", "PUT", vocabulary)
+   }
+
 
    // word service
    /* 新增新的词语 API */

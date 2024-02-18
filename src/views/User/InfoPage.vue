@@ -72,14 +72,14 @@
                </p>
                <!-- 时间 -->
                <p>
-                  <IconFont type="icon-shijian" /> {{ item.createTime }}
+                  <IconFont type="icon-shijian" /> {{ item.createTime.slice(0, 10) }}
                </p>
             </div>
             <!-- 结尾操作 -->
             <div class="gap-2 flex items-center">
                <template v-if="isSelf">
                   <!-- 编辑 -->
-                  <button class="btn btn-sm btn-info">
+                  <button class="btn btn-sm btn-info" @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
                      <IconFont type="icon-xiugai" />
                   </button>
                   <!-- 删除 -->

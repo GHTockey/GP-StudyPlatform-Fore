@@ -13,7 +13,8 @@ const router = createRouter({
         {
           path: '/vocabulary', children: [
             { path: ':id', name: '词集详情', component: () => import("@/views/vocabulary/DetailPage.vue") },
-            { path: 'add', name: '创建词集页', component: () => import("@/views/vocabulary/AddPage.vue") },
+            { path: 'add', name: '创建词集', component: () => import("@/views/vocabulary/AddPage.vue") },
+            { path: 'edit/:id', name: '编辑词集', component: () => import("@/views/vocabulary/AddPage.vue") },
             { path: 'selectMode/:vid', name: '选择模式', component: () => import("@/views/vocabulary/SelectModePage.vue") },
             { path: 'writeMode/:vid', name: '书写模式', component: () => import("@/views/vocabulary/WriteModePage.vue") },
           ]
