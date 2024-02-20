@@ -1,9 +1,12 @@
 <template>
    <div class="userinfo-container my-type-center">
       <!-- 头像名称box -->
-      <div class="h-[230px] flex justify-between items-center pl-10 relative">
+      <div class="h-[400px] sm:h-[300px] flex justify-between items-center sm:pl-10 relative">
          <!-- 文字信息 -->
-         <div class="text-gray-500">
+         <div class="text-gray-500
+          absolute left-1/2 -translate-x-1/2 text-center 
+          w-full sm:w-[500px] top-48 sm:left-5 sm:text-left sm:transform-none
+          sm:top-20">
             <!-- 用户名 -->
             <p class="font-bold text-4xl text-base-content">{{ currentUserInfo?.username }}</p>
             <!-- ID -->
@@ -23,15 +26,16 @@
             </p>
          </div>
          <!-- 头像 -->
-         <div class="w-[280px] relative">
-            <img :src="currentUserInfo?.avatar" alt="头像模糊" class=" size-[200px] blur-[40px] my-user-avatar">
+         <div class="size-[120px] sm:size-[200px] absolute top-10 right-1/2 translate-x-1/2 
+         sm:right-10 sm:transform-none">
+            <img :src="currentUserInfo?.avatar" alt="头像模糊" class=" size-full blur-[30px] my-user-avatar">
             <!-- <img :src="userInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring"
                :class="(userInfo?.sex == '1' ? 'ring-blue-500' : (userInfo?.sex == '0' ? 'ring-pink-500' : 'ring-white'))"> -->
-            <img :src="currentUserInfo?.avatar" alt="头像" class="size-[180px] absolute my-user-avatar ring"
+            <img :src="currentUserInfo?.avatar" alt="头像" class="size-full absolute my-user-avatar ring"
                :class="'ring-white'">
          </div>
          <!-- 按钮 -->
-         <div class="absolute -bottom-3">
+         <div class="absolute -bottom-3 right-1/2 translate-x-1/2 sm:left-5 sm:transform-none">
             <a-space>
                <template v-if="isSelf">
                   <button class="btn btn-info text-white btn-sm" @click="openEditModal">
@@ -46,7 +50,7 @@
       </div>
 
       <!-- 词集列表 -->
-      <div class="p-10">
+      <div class="pl-5 mt-10">
          <div class="divider divider-start font-semibold text-lg">词集</div>
          <!-- 骨架屏 -->
          <div v-if="vocabularyListLoading" v-for="item in 3" :key="item"
@@ -58,14 +62,17 @@
             <!-- 封面 -->
             <img :src="item.cover" alt="封面" class="absolute top-1/2 -translate-y-1/2 w-[120px] h-[80%]
              left-[-20px] rounded-lg border-[5px] border-base-100 shadow-lg shadow-base-300" />
-            <div class="ml-24 w-[230px]">
+            <!-- 标题/描述 -->
+            <div class="ml-24 sm:w-[230px] sm:static sm:pl-0
+               absolute left-2 top-3 w-[calc(100%-10rem)] pl-2">
                <!-- 标题 -->
-               <p class="text-lg font-[600]">{{ item.title }}</p>
+               <p class="text-lg font-[600] truncate text-ellipsis">{{ item.title }}</p>
                <!-- 描述 -->
-               <p class="text-xs text-ellipsis h-3/4">{{ item.desc }}</p>
+               <p class="text-xs h-3/4 truncate text-ellipsis">{{ item.desc }}</p>
             </div>
             <!-- 中间内容 -->
-            <div class="text-base-center">
+            <div class="text-gray-500 sm:static sm:pl-0 sm:ml-0 sm:gap-3 sm:w-auto
+               absolute left-2 bottom-3 w-[calc(100%-6rem)] pl-2 ml-24 flex gap-5">
                <!-- 数量 -->
                <p>
                   <IconFont type="icon-icon-test" /> {{ item.count }}
@@ -76,14 +83,15 @@
                </p>
             </div>
             <!-- 结尾操作 -->
-            <div class="gap-2 flex items-center">
+            <div class="gap-2 flex items-center sm:static sm:w-auto sm:flex-nowrap
+               absolute right-2 flex-wrap w-8">
                <template v-if="isSelf">
                   <!-- 编辑 -->
-                  <button class="btn btn-sm btn-info" @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
+                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-info" @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
                      <IconFont type="icon-xiugai" />
                   </button>
                   <!-- 删除 -->
-                  <button class="btn btn-sm btn-error" @click.stop="delVocabulary(item.id)">
+                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-error" @click.stop="delVocabulary(item.id)">
                      <IconFont type="icon-shanchu" />
                   </button>
                </template>

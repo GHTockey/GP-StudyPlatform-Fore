@@ -2,16 +2,16 @@
   <div class="my-type-center relative md:flex md:flex-wrap">
 
     <!-- 标题 -->
-    <h1 class="text-center font-bold text-xl mb-3 w-full h-8">标题</h1>
+    <h1 class="text-center font-bold text-2xl mb-3 w-full h-8 xl:text-left px-5">{{ vocabulary.title }}</h1>
 
     <!--卡片-->
-    <div class="stack size-full md:w-[80%] lg:w-[60%] xl:w-[70%] xl:h-[380px] max-w-[850px]">
+    <div class="stack size-full md:w-[80%] lg:w-[60%] xl:w-[70%] xl:h-[380px] max-w-[850px] z-0">
       <div class="tce-card-box p-2 size-full">
         <!--翻转卡片-->
         <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full" @click="turnCard">
-          <div class="my-card-child">{{ currentWord.word }}</div>
+          <div class="my-card-child">{{ vocabulary.wordsList?.[currentWordIndex].word }}</div>
           <div class="my-card-child size-full absolute top-0">{{
-            currentWord.definition }}</div>
+            vocabulary.wordsList?.[currentWordIndex].definition }}</div>
         </div>
       </div>
       <!--死卡片用于装饰-->
@@ -40,7 +40,9 @@
             <IconFont type="icon-shangyige" />
           </button>
         </div>
-        <div>1/2</div>
+        <div>
+          {{ currentWordIndex + 1 }} / {{ vocabulary.wordsList?.length }}
+        </div>
         <div class="tooltip tooltip-bottom" data-tip="下一张">
           <button @click="togCard('next')" class="btn btn-sm rounded-full">
             <IconFont type="icon-xiayige" />
@@ -69,7 +71,7 @@
       </div>
       <div class="flex items-center gap-4">
         <template v-if="isSelf">
-          <button class="btn btn-sm btn-secondary">编辑</button>
+          <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)" class="btn btn-sm btn-secondary">编辑</button>
           <button class="btn btn-sm btn-error">删除</button>
         </template>
         <template v-else>
@@ -83,29 +85,25 @@
     <div
       class="my-4 flex flex-wrap md:absolute md:right-0 md:top-8 md:w-[20%] md:h-[calc(320px+72px)] lg:w-[40%] xl:w-[300px] xl:h-[calc(385px+72px)]">
       <!--  border-2 border-transparent hover:border-2 hover:border-primary -->
-      <div
-        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
+      <div class="tce-mode-select-btn my-voc-mode-box">
         <div class="tce-bg-gradient1 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">全屏</p>
           <IconFont class="my-voc-mode-icon" type="icon-quanping" />
         </div>
       </div>
-      <div
-        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
+      <div class="tce-mode-select-btn my-voc-mode-box">
         <div class="tce-bg-gradient2 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">选择</p>
           <IconFont class="my-voc-mode-icon" type="icon-gf-select" />
         </div>
       </div>
-      <div
-        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
+      <div class="tce-mode-select-btn my-voc-mode-box">
         <div class="tce-bg-gradient3 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">拼写</p>
           <IconFont class="my-voc-mode-icon" type="icon-kanshipinxie" />
         </div>
       </div>
-      <div
-        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
+      <div class="tce-mode-select-btn my-voc-mode-box">
         <div class="tce-bg-gradient4 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">拼写</p>
           <IconFont class="my-voc-mode-icon" type="icon-peidui" />
@@ -153,10 +151,8 @@ const vocabulary = ref<Vocabulary>({
 const isTurn = ref(false);
 // 卡片实例
 const turnCardRef = ref<HTMLDivElement | null>(null);
-// 当前显示的词条
-const currentWord = ref<Word>({
-  definition: 'define', word: 'word', id: null, vid: null
-});
+// 当前显示的词条索引
+const currentWordIndex = ref(0);
 // 是否是自己的词集
 const isSelf = ref(false);
 
@@ -167,10 +163,14 @@ getVocabularyDetail();
 // 切换卡片 handler
 function togCard(behavior: 'prev' | 'next') {
   // console.log(turnCardRef.value, behavior);
-  if (behavior == 'prev') {
+  isTurn.value = false;
+  turnCardRef.value!.style.transform = 'rotateX(0deg)';
+  if (behavior == 'prev') { // 上一张
     turnCardRef.value!.classList.add('prev');
-  } else {
+    currentWordIndex.value = currentWordIndex.value == 0 ? vocabulary.value.wordsList!.length - 1 : currentWordIndex.value - 1;
+  } else { // 下一张
     turnCardRef.value!.classList.add('next');
+    currentWordIndex.value = currentWordIndex.value == vocabulary.value.wordsList!.length - 1 ? 0 : currentWordIndex.value + 1;
   }
   turnCardRef.value!.addEventListener('animationend', () => {
     turnCardRef.value!.classList.remove('prev', 'next');
@@ -178,14 +178,13 @@ function togCard(behavior: 'prev' | 'next') {
 
 }
 // 翻转卡片 handler
-function turnCard(e: Event) {
-  let target = e.target as HTMLDivElement;
+function turnCard() {
   if (isTurn.value) {
     // 回到正面
-    target!.parentElement!.style.transform = 'rotateX(0deg)';
+    turnCardRef.value!.style.transform = 'rotateX(0deg)';
   } else {
     // 第一次翻转
-    target!.parentElement!.style.transform = 'rotateX(180deg)';
+    turnCardRef.value!.style.transform = 'rotateX(180deg)';
   }
   isTurn.value = !isTurn.value;
 }
@@ -302,9 +301,5 @@ async function getVocabularyDetail() {
       color: white;
     }
   }
-}
-
-* {
-  transition: all .3s;
 }
 </style>

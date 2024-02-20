@@ -36,10 +36,7 @@
    /* 词语列表项 编辑时的样式 */
    .my-word-item-edit {
       @apply flex-1 relative border-b-2 border-gray-500 mb-2
-      before:absolute
-      before:-bottom-5
-      before:font-bold
-      before:text-[10px]
+      before:absolute before:-bottom-5 before:font-bold before:text-[10px];
    }
 
    /* 翻转卡片 边框阴影 */
@@ -49,6 +46,10 @@
    /* 翻转卡片 子元素 词语和定义 */
    .my-card-child {
       @apply h-[300px] xl:h-full bg-base-100 rounded-xl p-2 my-flip-card flex justify-center items-center text-xl;
+   }
+   /* 词集详情 模式选择 item box */
+   .my-voc-mode-box {
+      @apply h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)];
    }
    /* 词集详情 模式选择 item */
    .my-voc-mode-item {

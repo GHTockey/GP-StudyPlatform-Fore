@@ -4,8 +4,8 @@ import { message } from 'ant-design-vue';
 import { useUserStore } from "@/stores/userStore";
 import router from "@/router";
 
-let baseURL: string = "http://localhost:10010";
-// let baseURL: string = "http://192.168.0.108:10010";
+// let baseURL: string = "http://localhost:10010";
+let baseURL: string = "http://192.168.0.108:10010";
 const service = axios.create({
    baseURL,
    timeout: 3000,
