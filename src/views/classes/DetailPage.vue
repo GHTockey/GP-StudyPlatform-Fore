@@ -107,7 +107,7 @@
                                     <IconFont type="icon-icon-test" /> {{ voc.count }}
                                  </span>
                                  <span>
-                                    <IconFont type="icon-zongyonghushu" /> {{ voc.userList.length }}
+                                    <IconFont type="icon-zongyonghushu" /> {{ voc.userList?.length || 0 }}
                                  </span>
                               </div>
                               <!-- 日期 -->
@@ -121,7 +121,7 @@
                            <div class="absolute  right-5 md:-top-4">
                               <div class="avatar flex items-center rounded-full ring ring-base-200">
                                  <div class="w-8 rounded-full">
-                                    <img :src="voc.author.avatar" />
+                                    <img :src="voc.author?.avatar" />
                                  </div>
                                  <!-- <span class="ml-2">34654833</span> -->
                               </div>
@@ -262,7 +262,7 @@ getClasses()
 
 // 用户退出班级 【确认框确认】
 async function quitClasses() {
-   let result = await ClassesAPI.quitClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
+   let result = await ClassesAPI.quitClasses({ uid: userStore.userInfo!.id, cid: classes.value.id! });
    if (result.code == 20000) {
       MyUtils.alert("退出成功", "success");
       getClasses();
@@ -274,7 +274,7 @@ async function quitClasses() {
 }
 // 用户加入班级
 async function joinClasses() {
-   let result = await ClassesAPI.joinClasses({ uid: userStore.userInfo!.id, cid: classes.value.id });
+   let result = await ClassesAPI.joinClasses({ uid: userStore.userInfo!.id, cid: classes.value.id! });
    if (result.code == 20000) {
       MyUtils.alert(result.message, 'success')
       getClasses();
@@ -286,7 +286,7 @@ async function joinClasses() {
 // 移除成员弹框 【确认】
 async function removeMemberConfirmHandler() {
    // console.log({ uid: currentUser.value?.id, cid: classes.value.id });
-   let result = await ClassesAPI.quitClasses({ uid: currentUser.value.id, cid: classes.value.id });
+   let result = await ClassesAPI.quitClasses({ uid: currentUser.value.id, cid: classes.value.id! });
    if (result.code == 20000) {
       // message.success(result.message);
       MyUtils.alert(result.message, 'success')
@@ -354,7 +354,7 @@ async function getClasses() {
    let result = await ClassesAPI.getClasses(route.params.id as string)
    classes.value = result.data
    // 是否是自己的班级
-   if (classes.value.creator.id == userStore.userInfo?.id) isSelf.value = true;
+   if (classes.value.creator!.id == userStore.userInfo?.id) isSelf.value = true;
    // 是否是成员
    if (classes.value.userList?.find(user => user.id == userStore.userInfo?.id)) isMember.value = true;
 }

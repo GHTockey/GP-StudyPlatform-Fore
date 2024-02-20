@@ -1,17 +1,17 @@
 <template>
    <div class="detail-container">
       <!-- 标题 -->
-      <h3>{{ vocabularyData?.title }}</h3>
+<!--      <h3>{{ vocabularyData?.title }}</h3>-->
       <a-row class="top-box">
          <!-- 词卡 -->
          <a-col :span="24" :md="17" :lg="15" :xl="14" class="fa-col">
             <!-- 卡片(翻转效果) -->
             <div :class="isFlip ? 'flip' : 'noFlip'" @click="isFlip = !isFlip;" ref="cardBox">
                <div class="left-card-0">
-                  <p>{{ vocabularyData?.wordsList[currentIndex].definition }}</p>
+                  <p>{{ vocabularyData?.wordsList?.[currentIndex].definition }}</p>
                </div>
                <div class="left-card-1">
-                  <p>{{ vocabularyData?.wordsList[currentIndex].word }}</p>
+                  <p>{{ vocabularyData?.wordsList?.[currentIndex].word }}</p>
                </div>
             </div>
             <!-- 操作栏 -->
@@ -25,7 +25,7 @@
                   <LeftOutlined :style="{ fontSize: '25px', color: '#102079' }" />
                </a-button>
                <!-- 当前的数据项/总数量 -->
-               <span>{{ currentIndex + 1 }}/{{ vocabularyData?.wordsList.length }}</span>
+               <span>{{ currentIndex + 1 }}/{{ vocabularyData?.wordsList?.length }}</span>
                <!-- 下一张 -->
                <a-button type="dashed" shape="circle" size="large" @click="handleNext('next')">
                   <RightOutlined :style="{ fontSize: '25px', color: '#102079' }" />
@@ -146,12 +146,12 @@ function execPrevOrNext(opr: 'prev' | 'next', card: HTMLDivElement) {
    if (opr === "prev" && vocabularyData.value) {
       card.classList.remove("next");
       card.classList.add("prev");
-      currentIndex.value = currentIndex.value === 0 ? vocabularyData.value?.wordsList.length - 1 : currentIndex.value - 1;
+      currentIndex.value = currentIndex.value === 0 ? vocabularyData.value?.wordsList!.length - 1 : currentIndex.value - 1;
       return;
    } else if (opr === "next" && vocabularyData.value) {
       card.classList.remove("prev");
       card.classList.add("next");
-      currentIndex.value = currentIndex.value === vocabularyData.value?.wordsList.length - 1 ? 0 : currentIndex.value + 1;
+      currentIndex.value = currentIndex.value === vocabularyData.value?.wordsList!.length - 1 ? 0 : currentIndex.value + 1;
       return;
    }
 };
@@ -467,4 +467,4 @@ function execPrevOrNext(opr: 'prev' | 'next', card: HTMLDivElement) {
       padding-top: 50px;
    }
 }
-</style>@/stores/vocabularyStore
+</style>
