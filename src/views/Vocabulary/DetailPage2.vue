@@ -1,29 +1,32 @@
 <template>
-  <div class="my-type-center">
-    <h1 class="text-center font-bold text-xl mb-3">标题</h1>
+  <div class="my-type-center relative md:flex md:flex-wrap">
+
+    <!-- 标题 -->
+    <h1 class="text-center font-bold text-xl mb-3 w-full h-8">标题</h1>
 
     <!--卡片-->
-    <div class="stack size-full">
-      <div class="tce-card-box p-2">
+    <div class="stack size-full md:w-[80%] lg:w-[60%] xl:w-[70%] xl:h-[380px] max-w-[850px]">
+      <div class="tce-card-box p-2 size-full">
         <!--翻转卡片-->
-        <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer" @click="turnCard">
+        <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full" @click="turnCard">
           <div class="my-card-child">{{ currentWord.word }}</div>
           <div class="my-card-child size-full absolute top-0">{{
             currentWord.definition }}</div>
         </div>
       </div>
       <!--死卡片用于装饰-->
-      <div v-for="i in 2" class="tce-card-box p-2">
+      <div v-for="i in 2" class="tce-card-box p-2 size-full">
         <!--翻转卡片-->
-        <div class="select-none">
+        <div class="select-none size-full">
           <div class="my-card-child"></div>
           <div class="my-card-child size-full absolute top-0"></div>
         </div>
       </div>
     </div>
 
-    <!--操作栏-->
-    <div class="mt-8 flex justify-between p-2 relative bg-base-200/50 rounded-xl">
+    <!--卡片操作栏-->
+    <div
+      class="mt-8 flex justify-between p-2 border-b-2 border-gray-500 relative md:w-[80%] lg:w-[60%] xl:w-[70%] max-w-[850px]">
       <div>
         <div class="tooltip tooltip-bottom" data-tip="自动">
           <button class="btn btn-sm rounded-full">
@@ -53,28 +56,56 @@
       </div>
     </div>
 
+    <!-- 作者操作栏 -->
+    <div class="m-[18px_0] h-16 w-full bg-base-200 rounded-xl p-[0_18px] flex justify-between">
+      <div class="avatar h-full min-w-[150px] flex items-center">
+        <div class="h-12 rounded-full ring ring-primary/50 ring-offset-base-100 ring-offset-2">
+          <img :src="vocabulary.author?.avatar" />
+        </div>
+        <div class="ml-3 h-full w-[100px] !flex content-center flex-wrap">
+          <p class="font-[600] w-full">{{ vocabulary.author?.username }}</p>
+          <p class="text-gray-500 text-xs">创建者</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <template v-if="isSelf">
+          <button class="btn btn-sm btn-secondary">编辑</button>
+          <button class="btn btn-sm btn-error">删除</button>
+        </template>
+        <template v-else>
+          <button class="btn btn-sm btn-info">学习</button>
+          <button class="btn btn-sm btn-warning">举报</button>
+        </template>
+      </div>
+    </div>
+
     <!-- 模式选择 -->
-    <div class="my-4 flex flex-wrap">
+    <div
+      class="my-4 flex flex-wrap md:absolute md:right-0 md:top-8 md:w-[20%] md:h-[calc(320px+72px)] lg:w-[40%] xl:w-[300px] xl:h-[calc(385px+72px)]">
       <!--  border-2 border-transparent hover:border-2 hover:border-primary -->
-      <div class="tce-mode-select-btn h-[80px] w-[calc((100%)/2)] p-1 cursor-pointer">
+      <div
+        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
         <div class="tce-bg-gradient1 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">全屏</p>
           <IconFont class="my-voc-mode-icon" type="icon-quanping" />
         </div>
       </div>
-      <div class="tce-mode-select-btn h-[80px] w-[calc((100%)/2)] p-1 cursor-pointer">
+      <div
+        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
         <div class="tce-bg-gradient2 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">选择</p>
           <IconFont class="my-voc-mode-icon" type="icon-gf-select" />
         </div>
       </div>
-      <div class="tce-mode-select-btn h-[80px] w-[calc((100%)/2)] p-1 cursor-pointer">
+      <div
+        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
         <div class="tce-bg-gradient3 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">拼写</p>
           <IconFont class="my-voc-mode-icon" type="icon-kanshipinxie" />
         </div>
       </div>
-      <div class="tce-mode-select-btn h-[80px] w-[calc((100%)/2)] p-1 cursor-pointer">
+      <div
+        class="tce-mode-select-btn h-[80px] md:h-[calc(100%/4)] w-[calc((100%)/2)] p-1 cursor-pointer md:w-[calc((100%)/1)]">
         <div class="tce-bg-gradient4 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">拼写</p>
           <IconFont class="my-voc-mode-icon" type="icon-peidui" />
@@ -83,7 +114,8 @@
     </div>
 
     <!-- 词条列表 -->
-    <div class="">
+    <div class="w-full">
+      <div class="divider divider-start font-bold">词条列表</div>
       <div>
         <div v-for="(words, i) in vocabulary.wordsList" :key="i"
           class="bg-base-200/60 rounded-lg mb-2 flex justify-between items-center h-[100px]">
@@ -97,6 +129,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -107,7 +140,9 @@ import { VocabularyAPI } from "@/api/vocabulary";
 import type { Vocabulary, Word } from "@/types/vocabulary";
 import { MyUtils } from "@/utils";
 import IconFont from "@/utils/iconFont"
+import { useUserStore } from "@/stores/userStore";
 
+const userStore = useUserStore();
 const route = useRoute();
 
 // 词集数据
@@ -122,6 +157,8 @@ const turnCardRef = ref<HTMLDivElement | null>(null);
 const currentWord = ref<Word>({
   definition: 'define', word: 'word', id: null, vid: null
 });
+// 是否是自己的词集
+const isSelf = ref(false);
 
 
 getVocabularyDetail();
@@ -155,7 +192,10 @@ function turnCard(e: Event) {
 // 获取词集数据
 async function getVocabularyDetail() {
   let result = await VocabularyAPI.getVocabulary(route.params.id as string);
-  if (result.code == 20000) return vocabulary.value = result.data;
+  if (result.code == 20000) {
+    isSelf.value = result.data.authorId == userStore.userInfo?.id;
+    return vocabulary.value = result.data;
+  }
   MyUtils.alert(result.message, "error")
 }
 </script>
@@ -262,5 +302,9 @@ async function getVocabularyDetail() {
       color: white;
     }
   }
+}
+
+* {
+  transition: all .3s;
 }
 </style>

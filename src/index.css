@@ -22,7 +22,7 @@
    }
    /* 自定义版心 */
    .my-type-center {
-      @apply m-auto lg:w-[80%] md:w-[85%];
+      @apply m-auto lg:w-[80%] md:w-[85%] px-2;
    }
    /* 班级信息页 词集的响应式布局样式 */
    .my-class-info-word {
@@ -48,7 +48,7 @@
    }
    /* 翻转卡片 子元素 词语和定义 */
    .my-card-child {
-      @apply h-[300px] bg-base-100 rounded-xl p-2 my-flip-card flex justify-center items-center text-xl;
+      @apply h-[300px] xl:h-full bg-base-100 rounded-xl p-2 my-flip-card flex justify-center items-center text-xl;
    }
    /* 词集详情 模式选择 item */
    .my-voc-mode-item {
