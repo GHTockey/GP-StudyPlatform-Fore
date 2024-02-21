@@ -233,7 +233,6 @@
             <input v-model="createClassForm.info" type="text" placeholder="输入班级描述"
                class="input input-bordered w-full mt-5" />
             <button @click="createClassSubmit" class="btn btn-primary mt-5 w-full">创建</button>
-            {{ createClassForm }}
          </div>
       </div>
    </dialog>

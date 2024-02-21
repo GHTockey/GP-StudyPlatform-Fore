@@ -28,7 +28,7 @@
             <button v-if="isMember" class="btn btn-sm btn-success">聊天室</button>
             <button v-if="isMember && !isSelf" class="btn btn-sm btn-error"
                @click="MyUtils.modal('操作确认', '您确定要退出该班级吗？', quitClasses)">退出</button>
-            <button v-if="!isMember && !isSelf" class="btn btn-sm btn-accent" @click="joinClasses">加入</button>
+            <button v-if="!isMember" class="btn btn-sm btn-accent" @click="joinClasses">加入</button>
             <template v-if="isSelf">
                <button class="btn btn-sm btn-secondary" @click="controlsTabEdit">编辑</button>
                <button class="btn btn-sm btn-error"

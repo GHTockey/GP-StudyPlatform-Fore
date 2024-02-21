@@ -1,7 +1,7 @@
 <template>
    <div class="userinfo-container my-type-center">
       <!-- 头像名称box -->
-      <div class="h-[400px] sm:h-[300px] flex justify-between items-center sm:pl-10 relative">
+      <div class="my-transition-all h-[400px] sm:h-[300px] flex justify-between items-center sm:pl-10 relative">
          <!-- 文字信息 -->
          <div class="text-gray-500
           absolute left-1/2 -translate-x-1/2 text-center 
@@ -50,7 +50,7 @@
       </div>
 
       <!-- 词集列表 -->
-      <div class="pl-5 mt-10">
+      <div class="my-transition-all pl-5 mt-10">
          <div class="divider divider-start font-semibold text-lg">词集</div>
          <!-- 骨架屏 -->
          <div v-if="vocabularyListLoading" v-for="item in 3" :key="item"
@@ -87,7 +87,8 @@
                absolute right-2 flex-wrap w-8">
                <template v-if="isSelf">
                   <!-- 编辑 -->
-                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-info" @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
+                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-info"
+                     @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
                      <IconFont type="icon-xiugai" />
                   </button>
                   <!-- 删除 -->
@@ -311,4 +312,5 @@ watch(() => route.params, () => {
 })
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>

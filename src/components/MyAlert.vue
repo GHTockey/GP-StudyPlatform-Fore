@@ -3,7 +3,7 @@
    <Transition name="alert">
       <div v-if="open" role="alert" class="alert
       fixed top-[80px] w-auto left-1/2 -translate-x-1/2
-       shadow-lg overflow-hidden" :class="typeHandler">
+       shadow-lg overflow-hidden z-[1000]" :class="typeHandler">
          <!-- 图标类型 -->
          <template v-if="type == undefined || type == 'info'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
@@ -35,7 +35,7 @@
          <!-- 提示文本 -->
          <span>{{ text }}</span>
          <!-- 进度条 -->
-         <div ref="tceProgressEl" class=" absolute transition-all bg-gray-200/30 h-full"></div>
+         <div ref="tceProgressEl" class="absolute left-0 transition-all bg-gray-200/30 h-full"></div>
       </div>
    </Transition>
 </template>
@@ -63,6 +63,7 @@ onMounted(() => {
       open.value = false
    }, props.time)
 
+   // 进度条
    setTimeout(() => {
       // console.log(tceProgressEl2.value);
       if(tceProgressEl.value) {

@@ -13,6 +13,6 @@
 
 <style lang="less" scoped>
 .layout-container {
-   height: auto;
+   height: 100%;
 }
 </style>
