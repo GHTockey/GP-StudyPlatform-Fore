@@ -1,9 +1,10 @@
 <template>
-   <div v-if="!isEnd" class="SelectModePage-container my-type-center max-w-[900px] relative h-full flex flex-col px-2 sm:px-0">
+   <div v-if="!isEnd"
+      class="SelectModePage-container my-type-center max-w-[900px] relative h-full flex flex-col px-2 sm:px-0">
       <!-- 进度条 -->
       <progress class="progress progress-accent my-5 min-h-2" :value="learnedWords.length"
          :max="vocabulary.wordsList?.length"></progress>
-      <!-- SelectModePage -->
+      <!-- card -->
       <div class="flex-1 flex items-center">
          <div class="w-full">
             <!-- 选项卡 -->
@@ -25,14 +26,15 @@
                   </button>
                </div>
                <div class="text-right mt-1">
-                  <button class="btn btn-ghost">忘记了</button>
+                  <button @click="MyUtils.alert('todo')" class="btn btn-ghost">忘记了</button>
                </div>
             </div>
          </div>
       </div>
       <!-- 提示操作栏 -->
       <div class="overflow-y-hidden min-h-[80px]">
-         <div ref="tipRef" style="display: none;" class="size-full bg-base-200 flex justify-between items-center rounded-t-xl">
+         <div ref="tipRef" style="display: none;"
+            class="size-full bg-base-200 flex justify-between items-center rounded-t-xl">
             <!-- <div class="w-20">{{ isCorrect ? '对啦！' : '错啦！' }}</div> -->
             <div class="w-20">
                <img :src="`../../src/assets/img/${isCorrect ? 'ok' : 'error'}-emoji.webp`" alt="">
@@ -74,7 +76,6 @@ import { ref, onMounted } from "vue";
 import lodash from "lodash";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { MyUtils } from "@/utils";
-import confetti from "@/assets/js/canvas-confetti.js";
 
 const route = useRoute();
 // 词集数据
@@ -143,8 +144,6 @@ getVocabulary(route.params.vid as string);
 //    console.log('start');
 //    getRandomWord();
 // })
-
-
 
 // 学习结束再次学习事件
 function reLearn() {
@@ -237,16 +236,13 @@ function getRandomWord() {
       console.log('已经学完了');
       isEnd.value = true;
       learnNum.value++;
-      confetti({
-         particleCount: 100,
-         spread: 100
-      });
+      MyUtils.fire();
       return;
    }
    // console.log(vocabulary.value);
    // 随机获取一个词语进行学习
    let word = vocabulary.value.wordsList![lodash.random(0, vocabulary.value.wordsList!.length - 1)]
-   console.log(word, learnedWords.value?.find(learWord => learWord.id == word.id));
+   // console.log(word, learnedWords.value?.find(learWord => learWord.id == word.id));
    // 检查词语是否学习过 是则重新获取
    if (learnedWords.value?.find(learWord => learWord.id == word.id)) {
       console.log("重复");
@@ -270,14 +266,14 @@ function getRandomWord() {
 };
 // 忘记事件
 function forgetWord() {
-   console.log(lodash.findIndex(vocabulary.value.wordsList, word => word.id == currentWord.value?.id));
+   // console.log(lodash.findIndex(vocabulary.value.wordsList, word => word.id == currentWord.value?.id));
    // 将当前词语放到最后 (先移除再添加至末尾)
    lodash.pullAt(vocabulary.value.wordsList!, lodash.findIndex(vocabulary.value.wordsList, word => word.id == currentWord.value?.id));
    (<Word[]>vocabulary.value.wordsList).push(currentWord.value as Word)
 
    // 从已经学习的词语中删除当前词语
    learnedWords.value = learnedWords.value.filter(learWord => learWord.id != currentWord.value?.id);
-   console.log(vocabulary.value.wordsList);
+   // console.log(vocabulary.value.wordsList);
    getRandomWord();
 };
 // 随机生成四个选项
@@ -339,7 +335,6 @@ async function getVocabulary(vid: string) {
       transform: translateX(5px);
    }
 }
-
 @keyframes tipShow {
    0% {
       transform: translateY(100%);

@@ -1,4 +1,5 @@
 import { h, render, ref } from "vue";
+import confetti from "canvas-confetti";
 import Alert from "@/components/MyAlert.vue";
 import Modal from "@/components/MyModal.vue";
 
@@ -38,5 +39,44 @@ export class MyUtils {
       let tempDiv = document.createElement('div')
       document.body.appendChild(tempDiv)
       render(modelVNode, tempDiv)
+   }
+   // 页面放烟花
+   static fire(duration: number = 3000) {
+      let animationEnd = Date.now() + duration; // 当前时间+持续时间
+      let defaults = { // 粒子配置
+         startVelocity: 30, // 粒子爆炸速度
+         spread: 360, // 粒子扩散角度
+         ticks: 60, // 粒子数量
+         zIndex: 0, // 粒子层级
+         shapes: [ // 粒子形状
+            confetti.shapeFromText({ text: '😅' }),
+            confetti.shapeFromText({ text: '⭐' }),
+            confetti.shapeFromText({ text: '❤️' }),
+            confetti.shapeFromText({ text: '💚' }),
+            confetti.shapeFromText({ text: '6️⃣' }),
+         ],
+         scalar: 2, // 粒子大小
+      };
+      // 创建粒子
+      function randomInRange(min: number, max: number) {
+         return Math.random() * (max - min) + min;
+      }
+      let interval = setInterval(function () {
+         let timeLeft = animationEnd - Date.now();
+         if (timeLeft <= 0) {
+            return clearInterval(interval);
+         }
+         let particleCount = 50 * (timeLeft / duration);
+         confetti({
+            ...defaults,
+            particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+         });
+         confetti({
+            ...defaults,
+            particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+         });
+      }, 150); // 爆炸间隔
    }
 }

@@ -50,14 +50,14 @@
       </div>
 
       <!-- 词集列表 -->
-      <div class="my-transition-all pl-5 mt-10">
+      <div class="my-transition-all p-2 md:p-0 mt-10">
          <div class="divider divider-start font-semibold text-lg">词集</div>
          <!-- 骨架屏 -->
          <div v-if="vocabularyListLoading" v-for="item in 3" :key="item"
             class="skeleton bg-base-200 w-full h-[100px] mb-2"></div>
          <!-- 词集列表 -->
          <div v-for="item in vocabularyList" :key="item.id" @click="$router.push(`/vocabulary/${item.id}`)" class="bg-base-200 hover:bg-base-300
-                        mb-2 cursor-pointer rounded-2xl p-5 h-[100px]
+                        mb-2 cursor-pointer rounded-2xl p-5 h-[100px] ml-5
                         relative flex  justify-between items-center transition-all">
             <!-- 封面 -->
             <img :src="item.cover" alt="封面" class="absolute top-1/2 -translate-y-1/2 w-[120px] h-[80%]

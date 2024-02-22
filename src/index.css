@@ -22,7 +22,7 @@
    }
    /* 自定义版心 */
    .my-type-center {
-      @apply m-auto lg:w-[80%] md:w-[85%] overflow-hidden md:overflow-visible;
+      @apply m-auto lg:w-[80%] md:w-[85%];
    }
    /* 班级信息页 词集的响应式布局样式 */
    .my-class-info-word {

@@ -6,7 +6,7 @@
 
     <!--卡片-->
     <div class="stack size-full md:w-[80%] lg:w-[60%] xl:w-[70%] xl:h-[380px] max-w-[850px]">
-      <div class="tce-card-box p-2 size-full">
+      <div class="tce-card-box p-2 size-full overflow-hidden md:overflow-visible">
         <!--翻转卡片-->
         <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full" @click="turnCard">
           <div class="my-card-child">{{ vocabulary.wordsList?.[currentWordIndex].word }}</div>
@@ -213,8 +213,6 @@ async function getVocabularyDetail() {
     /*设置子元素的3D效果*/
     transform-style: inherit;
     //animation: word-turn 1s; // 点击
-
-    :nth-child(1) {}
 
     :nth-child(2) {
       transform: translateZ(-1px) rotateX(180deg);
