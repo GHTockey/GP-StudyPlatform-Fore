@@ -280,7 +280,7 @@ isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
 const createClassForm = ref<Classes>({
    id: null,
    annc: "",
-   creatorUid: userStore.userInfo!.id,
+   creatorUid: userStore.userInfo?.id || '',
    info: "",
    name: ""
 });

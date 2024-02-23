@@ -5,32 +5,34 @@
       <progress class="progress progress-accent my-5 min-h-2" :value="learnedWords.length"
          :max="vocabulary.wordsList?.length"></progress>
       <!-- card -->
-      <div class="flex-1 flex items-center">
-         <div class="w-full">
-            <!-- 选项卡 -->
-            <div>
-               <div class="flex justify-between">
-                  <span class="text-xl">选择正确选项</span>
-                  <span class="text-md">第 {{ learnNum }} 轮</span>
-               </div>
-               <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
-                  <p class="">{{ currentWord?.definition }}</p>
-               </div>
-               <!-- 选项 -->
-               <div class="flex flex-wrap justify-between">
-                  <button ref="optionsRef" :data-key="item" v-for="(item, index) in options" :key="index"
-                     @click="selectRight(item)" class="w-[calc((100%-0.5rem)/2)] mt-2 h-[50px] rounded-lg
-                  btn btn-info relative">
-                     <kbd class="kbd text-gray-400 absolute left-2">{{ index + 1 }}</kbd>
-                     <div>{{ item }}</div>
-                  </button>
-               </div>
-               <div class="text-right mt-1">
-                  <button @click="MyUtils.alert('todo')" class="btn btn-ghost">忘记了</button>
+      <Transition name="toggle-card">
+         <div v-show="transitionFlag" class="flex-1 flex items-center">
+            <div class="w-full">
+               <!-- 选项卡 -->
+               <div>
+                  <div class="flex justify-between">
+                     <span class="text-xl">选择正确选项</span>
+                     <span class="text-md">第 {{ learnNum }} 轮</span>
+                  </div>
+                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
+                     <p class="">{{ currentWord?.definition }}</p>
+                  </div>
+                  <!-- 选项 -->
+                  <div class="flex flex-wrap justify-between">
+                     <button ref="optionsRef" :data-key="item" v-for="(item, index) in options" :key="index"
+                        @click="selectRight(item)" class="w-[calc((100%-0.5rem)/2)] mt-2 h-[50px] rounded-lg
+                     btn btn-info relative">
+                        <kbd class="kbd text-gray-400 absolute left-2">{{ index + 1 }}</kbd>
+                        <div>{{ item }}</div>
+                     </button>
+                  </div>
+                  <div class="text-right mt-1">
+                     <button @click="MyUtils.alert('todo')" class="btn btn-ghost">忘记了</button>
+                  </div>
                </div>
             </div>
          </div>
-      </div>
+      </Transition>
       <!-- 提示操作栏 -->
       <div class="overflow-y-hidden min-h-[80px]">
          <div ref="tipRef" style="display: none;"
@@ -76,6 +78,7 @@ import { ref, onMounted } from "vue";
 import lodash from "lodash";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { MyUtils } from "@/utils";
+import { set } from "@vueuse/core";
 
 const route = useRoute();
 // 词集数据
@@ -130,7 +133,9 @@ const keydownEventContinue = (e: KeyboardEvent) => {
    if (e.key == 'Enter' || e.key == ' ') {
       continueEvent();
    }
-}
+};
+// 切换动画 flag
+const transitionFlag = ref(false);
 
 
 // 获取词集数据
@@ -239,6 +244,11 @@ function getRandomWord() {
       MyUtils.fire();
       return;
    }
+   // 切换动画
+   transitionFlag.value = false;
+   setTimeout(() => {
+      transitionFlag.value = true;
+   });
    // console.log(vocabulary.value);
    // 随机获取一个词语进行学习
    let word = vocabulary.value.wordsList![lodash.random(0, vocabulary.value.wordsList!.length - 1)]
@@ -335,6 +345,7 @@ async function getVocabulary(vid: string) {
       transform: translateX(5px);
    }
 }
+
 @keyframes tipShow {
    0% {
       transform: translateY(100%);
@@ -342,6 +353,38 @@ async function getVocabulary(vid: string) {
 
    100% {
       transform: translateY(0);
+   }
+}
+
+
+/* 卡片切换动画 */
+.toggle-card-enter-active {
+   animation: toggle-card-enter .3s;
+}
+// .toggle-card-leave-active {
+//    animation: toggle-card-leave .3s;
+// }
+
+@keyframes toggle-card-enter {
+   0% {
+      transform: translateX(20px);
+      opacity: 0;
+   }
+
+   100% {
+      transform: translateY(0);
+      opacity: 1;
+   }
+}
+@keyframes toggle-card-leave {
+   0% {
+      transform: translateX(0);
+      opacity: 1;
+   }
+
+   100% {
+      transform: translateX(-20px);
+      opacity: 0;
    }
 }
 </style>

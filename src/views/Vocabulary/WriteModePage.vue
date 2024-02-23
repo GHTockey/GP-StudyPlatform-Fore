@@ -5,54 +5,56 @@
       <progress class="progress progress-accent my-5 min-h-2" :value="learnedWords.length"
          :max="vocabulary.wordsList?.length"></progress>
 
-      <!-- 词条练习 -->
-      <div class="flex-1 flex items-center">
-         <div class="w-full">
-            <!-- 选项卡 -->
-            <div>
-               <div class="flex justify-between">
-                  <span class="text-xl">输入正确答案</span>
-                  <span class="text-md">第 {{ learnNum }} 轮</span>
-               </div>
-               <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
-                  <p class="">{{ currentWord?.definition }}</p>
-               </div>
-               <!-- 输入 -->
-               <div class="flex flex-wrap justify-between">
-                  <!-- 输入答案 -->
-                  <div v-show="isCorrect" class="flex w-full h-[50px]">
-                     <input ref="inputRef" v-model="userAnswer" type="text" placeholder="输入答案"
-                        class="mr-3 text-center border-b-2 border-gray-500 bg-base-100 focus:outline-none w-full" />
-                     <button @click="isRight" ref="okBtnRef" class="btn btn-success">确定</button>
+      <!-- 词条练习卡变 -->
+      <transition>
+         <div v-show="transitionFlag" class="flex-1 flex items-center">
+            <div class="w-full">
+               <!-- 选项卡 -->
+               <div>
+                  <div class="flex justify-between">
+                     <span class="text-xl">输入正确答案</span>
+                     <span class="text-md">第 {{ learnNum }} 轮</span>
                   </div>
-                  <!-- 复写 答错显示正确答案 -->
-                  <div v-show="!isCorrect" class="bg-pink-300x w-full">
-                     <p class="text-xl my-5">复写答案</p>
-                     <div class="flex justify-between gap-5">
-                        <div class="border-b-2 flex-1">
-                           <p class="text-xs font-bold text-green-500">正确答案：</p>
-                           <p class="text-lg my-2">{{ currentWord?.word }}</p>
+                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
+                     <p class="">{{ currentWord?.definition }}</p>
+                  </div>
+                  <!-- 输入 -->
+                  <div class="flex flex-wrap justify-between">
+                     <!-- 输入答案 -->
+                     <div v-show="isCorrect" class="flex w-full h-[50px]">
+                        <input ref="inputRef" v-model="userAnswer" type="text" placeholder="输入答案"
+                           class="mr-3 text-center border-b-2 border-gray-500 bg-base-100 focus:outline-none w-full" />
+                        <button @click="isRight" ref="okBtnRef" class="btn btn-success">确定</button>
+                     </div>
+                     <!-- 复写 答错显示正确答案 -->
+                     <div v-show="!isCorrect" class="bg-pink-300x w-full">
+                        <p class="text-xl my-5">复写答案</p>
+                        <div class="flex justify-between gap-5">
+                           <div class="border-b-2 flex-1">
+                              <p class="text-xs font-bold text-green-500">正确答案：</p>
+                              <p class="text-lg my-2">{{ currentWord?.word }}</p>
+                           </div>
+                           <div class="border-b-2 flex-1">
+                              <p class="text-xs font-bold text-red-500">您的答案：</p>
+                              <p class="text-lg my-2">{{ tempUserAnswer }}</p>
+                           </div>
                         </div>
-                        <div class="border-b-2 flex-1">
-                           <p class="text-xs font-bold text-red-500">您的答案：</p>
-                           <p class="text-lg my-2">{{ tempUserAnswer }}</p>
+                        <!-- 复写 -->
+                        <div class="h-[50px] flex mt-5">
+                           <input ref="duplicateRef" type="text" placeholder="复写答案"
+                              class="text-center border-b-2 bg-base-100 focus:outline-none w-full" />
                         </div>
                      </div>
-                     <!-- 复写 -->
-                     <div class="h-[50px] flex mt-5">
-                        <input ref="duplicateRef" type="text" placeholder="复写答案"
-                           class="text-center border-b-2 bg-base-100 focus:outline-none w-full" />
-                     </div>
+                     <!-- <button class="btn btn-primary" @click="startLearn">开始</button>
+                     <button class="btn btn-success" @click="isRight">确定</button> -->
                   </div>
-                  <!-- <button class="btn btn-primary" @click="startLearn">开始</button>
-                  <button class="btn btn-success" @click="isRight">确定</button> -->
+                  <!-- <div class="text-right mt-1">
+                     <button @click="MyUtils.alert('todo')" class="btn btn-ghost">忘记了</button>
+                  </div> -->
                </div>
-               <!-- <div class="text-right mt-1">
-                  <button @click="MyUtils.alert('todo')" class="btn btn-ghost">忘记了</button>
-               </div> -->
             </div>
          </div>
-      </div>
+      </transition>
 
       <!-- 提示操作栏 -->
       <div class="overflow-y-hidden min-h-[80px]">
@@ -82,14 +84,7 @@
       <p>输入：<input type="text" placeholder="输入答案" class="input w-full max-w-xs" v-model="userAnswer" /></p>
       <p>剩余：{{ wordsList.length + forgetWords.length }}</p> -->
 
-      <!-- <p>当前模式：{{ mode ? '严格' : '常规' }}</p>
-      <div>
-         <label class="swap swap-flip text-5xl">
-            <input type="checkbox" v-model="mode" />
-            <div class="swap-on">🥵</div>
-            <div class="swap-off">😇</div>
-         </label>
-      </div> -->
+      <!-- <p>当前模式：{{ mode ? '严格' : '常规' }}</p> -->
       <!-- <p class=" bg-orange-400">忘记的词语：{{ forgetWords }}</p>
       <p class=" bg-sky-500">剩余的词语：{{ wordsList }}</p>
       <p class=" bg-green-600">学习过的词语：{{ learnedWords }}</p> -->
@@ -208,6 +203,8 @@ const isRightEvent = (e: KeyboardEvent) => {
 };
 // 是否结束(学完了)
 const isEnd = ref(false);
+// 切换动画 flag
+const transitionFlag = ref(false);
 
 
 
@@ -270,6 +267,11 @@ function startLearn() {
       startLearn();
       return;
    }
+   // 切换动画
+   transitionFlag.value = false;
+   setTimeout(() => {
+      transitionFlag.value = true;
+   });
    // 设置当前词语
    currentWord.value = newWord;
    // 聚焦输入框

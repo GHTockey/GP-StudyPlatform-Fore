@@ -41,7 +41,7 @@ export class MyUtils {
       render(modelVNode, tempDiv)
    }
    // 页面放烟花
-   static fire(duration: number = 3000) {
+   static fire(duration: number = 2000) {
       let animationEnd = Date.now() + duration; // 当前时间+持续时间
       let defaults = { // 粒子配置
          startVelocity: 30, // 粒子爆炸速度

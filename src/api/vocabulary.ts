@@ -33,6 +33,11 @@ export class VocabularyAPI {
       return request<string>("/vocabulary-service/vocabulary", "PUT", vocabulary)
    }
 
+   /* 用户学习词集 API */
+   static userLearnVocabulary(v: { vid: string, uid: string }) {
+      return request<string>("/vocabulary-service/vocabulary/learn", "POST", v)
+   }
+
 
    // word service
    /* 新增新的词语 API */

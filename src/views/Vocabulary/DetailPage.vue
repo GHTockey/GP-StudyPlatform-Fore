@@ -58,7 +58,7 @@
       </div>
     </div>
 
-    <!-- 作者操作栏 -->
+    <!-- 作者-操作栏 -->
     <div class="m-[18px_0] h-16 w-full bg-base-200 rounded-xl p-[0_18px] flex justify-between">
       <div class="avatar h-full min-w-[150px] flex items-center">
         <div class="h-12 rounded-full ring ring-primary/50 ring-offset-base-100 ring-offset-2">
@@ -70,12 +70,13 @@
         </div>
       </div>
       <div class="flex items-center gap-4">
+        <button @click="userLearnVocabulary" :disabled="isLearn" class="btn btn-sm btn-info">{{ isLearn ? '已参与学习' : '参与学习'
+          }}</button>
         <template v-if="isSelf">
           <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)" class="btn btn-sm btn-secondary">编辑</button>
           <button class="btn btn-sm btn-error">删除</button>
         </template>
         <template v-else>
-          <button class="btn btn-sm btn-info">学习</button>
           <button class="btn btn-sm btn-warning">举报</button>
         </template>
       </div>
@@ -155,11 +156,23 @@ const turnCardRef = ref<HTMLDivElement | null>(null);
 const currentWordIndex = ref(0);
 // 是否是自己的词集
 const isSelf = ref(false);
+// 是否已参与学习
+const isLearn = ref(false);
 
 
 getVocabularyDetail();
 
 
+// 用户学习词集
+async function userLearnVocabulary() {
+  let result = await VocabularyAPI.userLearnVocabulary({ vid: vocabulary.value.id, uid: userStore.userInfo?.id as string });
+  if (result.code == 20000) {
+    MyUtils.alert(result.message, "success");
+    getVocabularyDetail();
+  } else {
+    MyUtils.alert(result.message, "error");
+  }
+}
 // 切换卡片 handler
 function togCard(behavior: 'prev' | 'next') {
   // console.log(turnCardRef.value, behavior);
@@ -192,7 +205,10 @@ function turnCard() {
 async function getVocabularyDetail() {
   let result = await VocabularyAPI.getVocabulary(route.params.id as string);
   if (result.code == 20000) {
+    // 判断是否是自己的词集
     isSelf.value = result.data.authorId == userStore.userInfo?.id;
+    // 判断是否已参与学习
+    isLearn.value = result.data.userList?.findIndex(item => item.id == userStore.userInfo?.id) != -1;
     return vocabulary.value = result.data;
   }
   MyUtils.alert(result.message, "error")
