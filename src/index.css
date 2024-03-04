@@ -26,8 +26,8 @@
    }
    /* 班级信息页 词集的响应式布局样式 */
    .my-class-info-word {
-      @apply w-full mb-[10px] overflow-hidden transition-all duration-300 bg-base-300 rounded-xl
-      xl:w-[calc((100%-20px)/3)] h-[180px] md:h-[300px] md:flex-wrap md:w-[calc((100%-10px)/2)];
+      @apply w-full mb-[10px] overflow-hidden transition-all duration-300 rounded-xl border border-base-300
+      xl:w-[calc((100%-20px)/3)] h-[180px] md:h-[230px] lg:h-[280px] md:flex-wrap md:w-[calc((100%-10px)/2)];
    }
    /* 表单输入框 小 */
    .my-form-input-sm {

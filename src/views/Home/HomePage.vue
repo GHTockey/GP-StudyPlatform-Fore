@@ -1,17 +1,17 @@
 <template>
-   <div class="home-container">
-      <!-- 学习日志 -->
-      <div class="log">
-         <a-row>
-            <a-col :xs="24" :md="8">1</a-col>
-            <a-col :xs="24" :md="8">2</a-col>
-            <a-col :xs="24" :md="8">3</a-col>
-         </a-row>
+   <div class="home-container my-type-center">
+
+      <!-- 主功能模式介绍轮播 -->
+      <div class="">
+         <p>1</p>
       </div>
 
-      <div class="recent">
+      <a-divider />
+
+       <!-- 近期学习的词集列表 -->
+      <div class="recent w-full">
          <a-row :gutter="[10, 10]">
-            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(item, i) in 50" :key="i">
+            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(item, i) in 10" :key="i">
                <div @click="$router.push('/detail/11111')">
                   <p>小黑子捕获计划{{ i + 1 }}</p>
                   <p>233 个词条</p>
@@ -37,35 +37,9 @@ import { UserOutlined } from "@ant-design/icons-vue";
 
 <style lang="less" scoped>
 .home-container {
-   border: 1px solid rgb(0, 255, 255);
-   height: 800px;
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-
-   .log {
-      background-color: cadetblue;
-      width: 80%;
-      height: 260px;
-      margin-top: 50px;
-
-      >div {
-         height: 100%;
-
-         >div {
-            border: 1px solid red;
-            width: 30%;
-            height: auto;
-         }
-      }
-   }
-
    .recent {
-      width: 80%;
-      height: 390px;
-
       >div {
-         height: 50%;
+         height: 200px;
 
          >div {
             height: 100%;

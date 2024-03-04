@@ -1,9 +1,10 @@
-import { h, render, ref } from "vue";
+import { h, render } from "vue";
 import confetti from "canvas-confetti";
 import Alert from "@/components/MyAlert.vue";
 import Modal from "@/components/MyModal.vue";
 
 export class MyUtils {
+   // 消息通知
    static alert(text: string, type?: "success" | "error" | "warning" | "info", time: number = 3000) {
       // 虚拟dom
       // let alertEl = h('div', { class: 'alert alert-info w-auto fixed top-28 left-1/2 -translate-x-1/2 shadow-lg' }, '6666666666666')
@@ -11,7 +12,11 @@ export class MyUtils {
          text, time, type
       })
 
+      // 在页面中创建一个div
       let tempDiv = document.createElement('div')
+
+      // let tempDiv = document.querySelector('#alertBox') as HTMLDivElement;
+
       // tempDiv.style.zIndex = '100000';
       document.body.appendChild(tempDiv)
       render(alertEl, tempDiv) // 将虚拟dom渲染到真实dom中
@@ -20,6 +25,7 @@ export class MyUtils {
          tempDiv.remove()
       }, time + 300) // 300 是为了给过渡时间
    }
+   // 警告弹窗
    static modal(title: string, content: string, ok: () => void) {
       let modelVNode = h(Modal, {
          title,

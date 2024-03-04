@@ -22,7 +22,7 @@
             <!-- 班级 -->
             <p class="hover:text-blue-500 cursor-pointer my-2 inline"
                @click="currentUserInfo?.classes ? $router.push('/classes/' + currentUserInfo.classes.id) : null">
-               <IconFont type="icon-banjixinxi" />&nbsp; {{ currentUserInfo?.classes?.name || '无' }}
+               <IconFont type="icon-banjixinxi" />&nbsp; {{ currentUserInfo?.classes?.name || '未加入' }}
             </p>
          </div>
          <!-- 头像 -->
@@ -42,6 +42,7 @@
                      <IconFont type="icon-xiugai" />修改信息
                   </button>
                </template>
+
                <template v-else>
                   <button class="btn btn-success text-white btn-sm">私信</button>
                </template>
@@ -49,25 +50,36 @@
          </div>
       </div>
 
-
-
       <!-- 选项切换 -->
       <div class="flex justify-center sm:justify-end">
-         <div role="tablist" class="tabs tabs-boxed mt-10 w-[300px] font-bold" @click="changeTab">
-            <a v-for="(item, i) in  ['发布词集', '学习清单', '动态信息'] " :key="i" :data-key="i + 1" role="tab"
-               class="tab transition-all" :class="tab == i + 1 ? 'tab-active' : ''">{{ item }}</a>
+         <div role="tablist" class="tabs tabs-boxed mt-10 w-[350px] font-bold">
+            <a v-for="(item, i) in  ['发布词集', '学习清单', '动态信息']" @click="changeTab(i + 1)" :key="i" role="tab"
+               class="tab transition-all" :class="tab == i + 1 ? 'tab-active' : ''">
+
+               <template v-if="i == 0">
+                  <IconFont type="icon-xuexiku" />
+               </template>
+
+               <template v-if="i == 1">
+                  <IconFont type="icon-qingdanguanli" />
+               </template>
+
+               <template v-if="i == 2">
+                  <IconFont type="icon-xingqiudiqiu" />
+               </template>
+               <span class="ml-1">{{ item }}</span>
+            </a>
          </div>
       </div>
 
-
       <!-- 发布的词集 -->
       <div v-show="tab == 1" class="my-transition-all p-2 md:p-0">
-         <div class="divider divider-start font-semibold text-lg">词集</div>
+         <div class="divider divider-start font-semibold text-lg">发布的词集</div>
          <!-- 骨架屏 -->
          <div v-if="vocabularyListLoading" v-for=" item  in  3 " :key="item"
             class="skeleton bg-base-200 w-full h-[100px] mb-2"></div>
          <!-- 词集列表 -->
-         <div v-for=" item  in  vocabularyList " :key="item.id" @click="$router.push(`/vocabulary/${item.id}`)" class="bg-base-200 hover:bg-base-300
+         <div v-for=" item in vocabularyList" :key="item.id" @click="$router.push(`/vocabulary/${item.id}`)" class="bg-base-200 hover:bg-base-300
                         mb-2 cursor-pointer rounded-2xl p-5 h-[100px] ml-5
                         relative flex  justify-between items-center transition-all">
             <!-- 封面 -->
@@ -96,6 +108,7 @@
             <!-- 结尾操作 -->
             <div class="gap-2 flex items-center sm:static sm:w-auto sm:flex-nowrap
                absolute right-2 flex-wrap w-8">
+
                <template v-if="isSelf">
                   <!-- 编辑 -->
                   <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-info"
@@ -115,7 +128,7 @@
 
       <!-- 学习的词集 -->
       <div v-show="tab == 2" class="my-transition-all p-2 md:p-0">
-         <div class="divider divider-start font-semibold text-lg">参与</div>
+         <div class="divider divider-start font-semibold text-lg">学习清单</div>
          <!-- 空数据状态 -->
          <a-empty v-if="userRelevanceVocList.length == 0 && userRelevanceVocListLoading == false"
             class="mt-20 text-gray-400" />
@@ -140,7 +153,7 @@
                   <span>{{ item.author?.username }}</span>
                </div>
                <!-- 操作 -->
-               <div class="absolute right-5 top-1/2 -translate-y-1/2">
+               <div v-if="isSelf" class="absolute right-5 top-1/2 -translate-y-1/2">
                   <!-- 取消 -->
                   <button class="btn btn-sm w-full btn-warning"
                      @click.stop="MyUtils.modal('移出清单', `将词集 【${item.title}】 移除我的学习清单？`, () => cancelLearnVocabulary(item.id))">
@@ -289,13 +302,9 @@ async function cancelLearnVocabulary(vid: string) {
    }
 }
 // 选项卡切换
-function changeTab(e: Event) {
-   let target = e.target as HTMLElement;
-   if (target.tagName == "A") {
-      tab.value = +target.getAttribute("data-key")! || 1;
-
-      if (tab.value == 2) getUserRelevanceVocListByUid();
-   }
+function changeTab(active: number) {
+   tab.value = active;
+   if (tab.value == 2) getUserRelevanceVocListByUid();
 }
 // 编辑弹框 【选择上传头像事件】
 async function handleAvatarChange(e: Event) {
@@ -378,21 +387,21 @@ async function getUserInfoAndVocabularyList() {
    } else {
       // console.log(route);
       message.error("未登录");
-      router.push("/");
+      router.push("/login");
    }
    vocabularyListLoading.value = false; // 加载完成 隐藏骨架屏
    editUserInfo.value = JSON.parse(JSON.stringify(currentUserInfo.value)); // 编辑用户信息回显
    // 判断是否是自己
    if (route.params?.id == userStore.userInfo?.id) {
       isSelf.value = true;
-      console.log(2);
    }
 }
 // 获取用户学习的词集列表
 async function getUserRelevanceVocListByUid() {
    // if (userRelevanceVocList.value!.length > 0) return;
+   userRelevanceVocList.value = [];
    userRelevanceVocListLoading.value = true;
-   let result = await VocabularyAPI.getUserRelevanceVocListByUid(userStore.userInfo?.id!);
+   let result = await VocabularyAPI.getUserRelevanceVocListByUid(currentUserInfo.value?.id!);
    userRelevanceVocListLoading.value = false;
    if (result.code == 20000) {
       userRelevanceVocList.value = result.data;

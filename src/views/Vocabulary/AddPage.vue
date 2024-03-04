@@ -282,8 +282,8 @@ async function submitForm() {
     vocabulary.value.count = vocabulary.value.wordsList!.length; // 词条数量
     console.log(vocabulary.value);
     await formRef.value?.validate()
-    if (vocabulary.value.count <= 0) {
-      MyUtils.alert('请至少添加一个词语', 'warning');
+    if (vocabulary.value.count < 4) {
+      MyUtils.alert('请至少添加 4 个词语', 'warning');
       return;
     }
     // 将临时id置空

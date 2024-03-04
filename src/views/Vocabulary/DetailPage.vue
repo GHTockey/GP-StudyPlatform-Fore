@@ -70,14 +70,15 @@
         </div>
       </div>
       <div class="flex items-center gap-4">
-        <button @click="userLearnVocabulary" :disabled="isLearn" class="btn btn-sm btn-info">{{ isLearn ? '已参与学习' : '参与学习'
-          }}</button>
+        <button @click="userLearnVocabulary" :disabled="isLearn" class="btn btn-sm btn-info">{{ isLearn ? '已加入学习清单' :
+          '添加至学习清单'
+        }}</button>
         <template v-if="isSelf">
           <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)" class="btn btn-sm btn-secondary">编辑</button>
-          <button class="btn btn-sm btn-error">删除</button>
+          <button @click="MyUtils.modal('操作确认',`您确定将词集 【${vocabulary.title}】 删除吗？`,()=>delVocabularyConfirm())" class="btn btn-sm btn-error">删除</button>
         </template>
         <template v-else>
-          <button class="btn btn-sm btn-warning">举报</button>
+          <button @click="MyUtils.alert('待开发')" class="btn btn-sm btn-warning">举报</button>
         </template>
       </div>
     </div>
@@ -170,6 +171,17 @@ const isLearn = ref(false);
 getVocabularyDetail();
 
 
+
+// 删除词集 【确认】
+async function delVocabularyConfirm() {
+  let result = await VocabularyAPI.delVocbulary(vocabulary.value.id);
+  if (result.code == 20000) {
+    MyUtils.alert("操作成功", "success");
+    getVocabularyDetail();
+  } else {
+    MyUtils.alert("操作失败", "error");
+  }
+}
 // 用户学习词集
 async function userLearnVocabulary() {
   let result = await VocabularyAPI.userLearnVocabulary({ vid: vocabulary.value.id, uid: userStore.userInfo?.id as string });

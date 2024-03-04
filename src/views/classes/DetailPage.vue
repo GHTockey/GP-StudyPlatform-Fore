@@ -37,7 +37,7 @@
          </div>
       </div>
       <!-- 选项卡切换 -->
-      <div role="tablist" class="tabs tabs-boxed w-1/2 transition-all rounded-b-none bg-base-200 font-bold"
+      <div role="tablist" class="tabs tabs-boxed w-[230px] transition-all rounded-b-none bg-base-200 font-bold"
          @click="tabSelectHandler($event)">
          <a role="tab" data-key="1" class="tab transition-all" :class="{ 'tab-active': tabValue == '1' }">成员</a>
          <a role="tab" data-key="2" class="tab transition-all" :class="{ 'tab-active': tabValue == '2' }">词集</a>
