@@ -49,6 +49,7 @@
                      </a>
                   </li>
                </template>
+
                <template v-else>
                   <li @click="$router.push('/login')">
                      <a>
@@ -214,7 +215,7 @@
             <p>创建班级</p>
          </div>
          <!-- 我的消息按钮 -->
-         <div class="size-[100px] relative btn p-0">
+         <div onclick="document.querySelector('#onlineBox').showModal();" class="size-[100px] relative btn p-0">
             <span class="my-center-console-icon">✉️</span>
             <p>我的消息</p>
          </div>
@@ -229,7 +230,8 @@
          <h3 class="font-bold text-lg">创建班级</h3>
          <p class="text-sm font-bold">与同学分享词集与在线交流</p>
          <div class="mt-5">
-            <input v-model="createClassForm.name" type="text" placeholder="输入班级名称" class="input input-bordered w-full" />
+            <input v-model="createClassForm.name" type="text" placeholder="输入班级名称"
+               class="input input-bordered w-full" />
             <input v-model="createClassForm.info" type="text" placeholder="输入班级描述"
                class="input input-bordered w-full mt-5" />
             <button @click="createClassSubmit" class="btn btn-primary mt-5 w-full">创建</button>

@@ -10,14 +10,14 @@
     // }
   }">
     <RouterView />
-    <OnlineWindow :show-window="true" />
+    <!-- 聊天窗口 -->
+    <OnlineWindow />
   </a-config-provider>
 </template>
 
 
 <script setup lang="ts">
 import OnlineWindow from "@/components/OnlineWindow.vue";
-import { onMounted } from "vue";
 import { RouterView } from 'vue-router'
 // antd 组件国际化
 import zhCN from "ant-design-vue/es/locale/zh_CN";
@@ -27,18 +27,6 @@ import "dayjs/locale/zh-cn";
 dayjs.locale("zh_CN")
 
 const myColorPrimary = "#a991f7";
-
-
-onMounted(() => {
-  (<HTMLDialogElement>document.querySelector("#onlineBox")).showModal();
-})
-
-
-
-
-
-
-
 </script>
 
 <style>

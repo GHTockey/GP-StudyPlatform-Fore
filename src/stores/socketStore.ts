@@ -9,14 +9,14 @@ export const useSocketStore = defineStore("socket", () => {
 
    // 连接
    function connect(uid: string | number) {
-      if(socket.value != null) return; // 已连接，直接返回
+      if (socket.value != null) return; // 已连接，直接返回
       socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
 
       socket.value.onopen = () => {
          console.log("连接成功:" + uid);
       }
       socket.value.onmessage = (event) => {
-         console.log("收到消息：", JSON.parse(event.data));
+         console.log("[socket-store]收到消息：", JSON.parse(event.data));
          let data: SocketMessageVo = JSON.parse(event.data);
          // 在线用户列表
          if (data.type == 3) onlineUidList.value = JSON.parse(data.message);
