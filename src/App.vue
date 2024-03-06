@@ -30,8 +30,15 @@ const myColorPrimary = "#a991f7";
 
 
 onMounted(() => {
-  (<HTMLDialogElement>document.querySelector("#onlineBox")).showModal()
+  (<HTMLDialogElement>document.querySelector("#onlineBox")).showModal();
 })
+
+
+
+
+
+
+
 </script>
 
 <style>

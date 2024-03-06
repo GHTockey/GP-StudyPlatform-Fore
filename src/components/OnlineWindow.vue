@@ -4,7 +4,7 @@
       <div class="modal-box max-w-[1000px] min-h-[700px]">
          <h3 class="font-bold text-lg mb-3">online</h3>
 
-         <div class="border border-red-500 h-[600px] flex overflow-hidden relative">
+         <div class="border h-[600px] flex overflow-hidden relative">
             <!-- 切换按钮 -->
             <div class="tooltip tooltip-right transition-all absolute z-10 top-1/2 -translate-x-1/2 hover:translate-x-0"
                data-tip="用户列表">
@@ -13,19 +13,20 @@
                </button>
             </div>
             <!-- 用户列表 -->
-            <div class="w-[280px] overflow-auto transition-all" :class="{ 'absolute -translate-x-full': hideUserList }">
+            <div class="w-[280px] overflow-auto transition-all bg-base-200/20"
+               :class="{ 'absolute -translate-x-full': hideUserList }">
                <!-- 项 -->
-               <div v-for="(item, index) in 20" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
+               <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
              mb-1 hover:bg-base-200">
-                  <!-- 头像 -->
-                  <div class="avatar offline mx-2">
+                  <!-- 头像 offline -->
+                  <div class="avatar mx-2" :class="onlineUidList.includes(item.id) ? 'online' : 'offline'">
                      <div class="size-[50px] rounded-full">
-                        <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                        <img :src="item.avatar" />
                      </div>
                   </div>
                   <!-- 用户名与信息 -->
                   <div class="flex-1 flex flex-wrap">
-                     <p class="w-full">李 {{ index }}</p>
+                     <p class="w-full">{{ item.username }}</p>
                      <span class="text-gray-500 text-sm">123456789</span>
                   </div>
                   <!-- 操作按钮 -->
@@ -40,7 +41,7 @@
                <!-- 未选择显示 -->
                <!-- <div>选择用户来聊天</div> -->
                <!-- 聊天内容 -->
-               <div class="bg-green-500/50 flex-1 overflow-y-auto">
+               <div class="flex-1 overflow-y-auto">
                   <!-- 条目 -->
                   <div class="chat chat-start">
                      <div class="chat-image avatar">
@@ -54,7 +55,7 @@
                         已读
                      </div>
                   </div>
-                  <div class="chat chat-end" v-for="i in 10">
+                  <div class="chat chat-end" v-for="i in 1">
                      <div class="chat-image avatar">
                         <div class="w-10 rounded-full">
                            <img alt="Tailwind CSS chat bubble component"
@@ -68,8 +69,17 @@
                   </div>
                </div>
                <!-- 输入消息框 -->
-               <div><textarea placeholder="Bio"
-                     class="textarea textarea-bordered textarea-xs w-full max-w-xs"></textarea>
+               <div class="flex p-2">
+                  <div class="w-[100px] gap-1 flex items-center">
+                     <button class="btn btn-sm btn-circle">
+                        <IconFont type="icon-biaoqing" />
+                     </button>
+                     <button class="btn btn-sm btn-circle">
+                        <IconFont type="icon-xuexiku" />
+                     </button>
+                  </div>
+                  <textarea rows="2" placeholder="输入消息"
+                     class="textarea textarea-bordered textarea-xs size-full"></textarea>
                </div>
             </div>
          </div>
@@ -79,13 +89,26 @@
                <button class="btn">关闭</button>
             </form>
          </div>
+         <button @click="sendMsg" class="btn">send</button>
       </div>
    </dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch, computed } from "vue";
+import { useSocketStore } from "@/stores/socketStore";
+import { useUserStore } from "@/stores/userStore";
 import IconFont from "@/utils/iconFont";
+import type { User } from "@/types/user";
+import { storeToRefs } from "pinia";
+import { UserAPI } from "@/api/user";
+import { MyUtils } from "@/utils";
+import _ from "lodash";
+
+const socketStore = useSocketStore();
+const userStore = useUserStore();
+
+const { onlineUidList } = storeToRefs(socketStore)
 
 withDefaults(
    defineProps<{
@@ -103,7 +126,57 @@ const showWindow = ref(false)
 const currentUser = ref();
 // 隐藏用户列表 flag
 const hideUserList = ref(false);
+// 在线用户列表
+const onlineList = ref<User[]>([])
+// 班级成员列表
+const classesUserList = ref<User[]>([])
+// 计算属性：在线用户列表和班级成员列表的合并
+const userListMerge = computed(() => {
+   // let data = onlineList.value.concat(classesUserList.value)
+   let data = _.uniqBy(onlineList.value.concat(classesUserList.value), "id")
+   console.log("onlineUidList", data, onlineUidList.value);
+   return data
+})
 
+async function getUserListByCid(cid: string) {
+   let result = await UserAPI.getUserListByCid(cid)
+   if (result.code == 20000) {
+      classesUserList.value = result.data
+   }
+}
+
+if (userStore.userInfo) {
+   // 添加自己到在线用户列表中
+   // onlineList.value.push(userStore.userInfo)
+   // 连接
+   socketStore.connect(userStore.userInfo.id)
+   // 获取班级成员
+   getUserListByCid(userStore.userInfo.classes!.id!)
+} else {
+   MyUtils.alert("请先登录")
+}
+
+
+
+function sendMsg() {
+   socketStore.send({
+      receiver_id: '1000006',
+      message: 'hello132'
+   })
+}
+
+
+watch(
+   () => onlineUidList.value,
+   () => {
+      // 更新用户列表
+      UserAPI.getUserListByIdList(onlineUidList.value).then(res => {
+         console.log("在线用户发生变化");
+         onlineList.value = res.data
+         // console.log(onlineList.value);
+      })
+   }
+)
 </script>
 
 <style lang="less"></style>

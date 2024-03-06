@@ -10,7 +10,8 @@ export const useClassesStore = defineStore("classesStore", () => {
       creatorUid: "",
       info: "",
       name: "",
-      userList: []
+      userList: [],
+      id: null
    });
 
 

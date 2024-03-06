@@ -68,6 +68,7 @@ import { UserAPI } from "@/api/user";
 import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import { useSocketStore } from "@/stores/socketStore";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -96,6 +97,9 @@ const onFinish = async (loginUser: { username: string, password: string }) => {
       userStore.setUserInfo(loginResult.data, loginResult.other.token); // 保存用户信息
       localStorage.setItem("token", loginResult.other.token); // 保存token
       message.success("登录成功"); // 提示登录成功
+      // 初始化 socketStore 连接
+      useSocketStore().connect(loginResult.data.id);
+
       // 如果有 returnUrl 参数则跳转到 returnUrl 参数指定的页面
       if (route.query.returnUrl) {
         router.push(route.query.returnUrl as string);

@@ -1,12 +1,6 @@
-// export interface UploadRequestOption<T = any> {
-//    onProgress?: (event: UploadProgressEvent) => void;
-//    onError?: (event: UploadRequestError | ProgressEvent, body?: T) => void;
-//    onSuccess?: (body: T, xhr?: XMLHttpRequest) => void;
-//    data?: Record<string, unknown>;
-//    filename?: string;
-//    file: Exclude<BeforeUploadFileType, File | boolean> | RcFile;
-//    withCredentials?: boolean;
-//    action: string;
-//    headers?: UploadRequestHeader;
-//    method: UploadRequestMethod;
-// }
+export type SocketMessageVo = {
+   sender_id?: string; // 发送者ID
+   receiver_id: string; // 接收者ID
+   message: string; // 消息内容
+   type?: 0 | 1 | 2 | 3; // 消息类型：0用户消息 1群发消息 2系统消息 3在线用户变化
+};

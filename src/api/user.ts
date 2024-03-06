@@ -29,4 +29,12 @@ export class UserAPI {
    static searchUser(keyword: string) {
       return request<User[]>(`${cloudServiceURL}/user/search/` + keyword, "GET");
    };
+   /** 根据ID列表获取用户列表 API */
+   static getUserListByIdList(ids: string[]) {
+      return request<User[]>(`${cloudServiceURL}/user/list`, "POST", ids);
+   }
+   /** 根据班级ID获取成员列表 API */
+   static getUserListByCid(cid: string) {
+      return request<User[]>(`${cloudServiceURL}/user/list/byCid/${cid}`, "GET");
+   }
 }
