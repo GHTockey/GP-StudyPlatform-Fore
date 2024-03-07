@@ -1,4 +1,4 @@
-import type { SocketMessageVo } from "@/types/other";
+import type { UserMessage } from "@/types/other";
 import { defineStore } from "pinia";
 import { ref, h, render } from "vue";
 import { useUserStore } from "./userStore";
@@ -20,9 +20,9 @@ export const useSocketStore = defineStore("socket", () => {
       }
       socket.value.onmessage = (event) => {
          console.log("[socket-store 主程序] 收到消息：", JSON.parse(event.data));
-         let data: SocketMessageVo = JSON.parse(event.data);
+         let userMessage: UserMessage = JSON.parse(event.data);
          // 在线用户列表
-         if (data.type == 3) onlineUidList.value = JSON.parse(data.message);
+         if (userMessage.type == 3) onlineUidList.value = JSON.parse(userMessage.message);
       }
       socket.value.onerror = (event) => {
          console.log("[socket-store 主程序] 连接失败：", event);
@@ -36,10 +36,10 @@ export const useSocketStore = defineStore("socket", () => {
       if (socket.value) socket.value.close();
    }
    // 发送消息
-   function send(data: SocketMessageVo) {
+   function send(userMessage: UserMessage) {
       let userStore = useUserStore();
-      data.sender_id = userStore.userInfo!.id;
-      socket.value?.send(JSON.stringify(data));
+      userMessage.senderId = userStore.userInfo!.id;
+      socket.value?.send(JSON.stringify(userMessage));
    }
    // 来信息的全局通知
    function receiveMsgNotification() {

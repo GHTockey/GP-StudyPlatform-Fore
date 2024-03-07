@@ -1,9 +1,9 @@
 <template>
    <!-- 聊天窗口 -->
    <dialog id="onlineBox" class="modal">
-      <div class="modal-box max-w-[1000px] min-h-[700px]">
+      <div class="modal-box max-w-[1000px] min-h-[300px]">
          <h3 class="font-bold text-lg mb-3">Online
-            <span v-if="currentUser" class="text-xs font-[500]">当前与 {{ currentUser.username }} 聊天中</span>
+            <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
          </h3>
          <div class="border h-[600px] flex overflow-hidden relative">
             <!-- 切换按钮 -->
@@ -16,10 +16,11 @@
             <!-- 用户列表 -->
             <div class="w-[280px] overflow-auto transition-all bg-base-200/20"
                :class="{ 'absolute -translate-x-full': hideUserList }">
+               {{ chatContent }}
                <!-- 项 -->
                <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
-             mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="currentUser = item;"
-                  :class="{ 'myActive': currentUser?.id == item.id }">
+             mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
+                  :class="{ 'myActive': currentChatUser?.id == item.id }">
                   <!-- 头像 offline -->
                   <div class="avatar mx-2" :class="onlineUidList.includes(item.id) ? 'online' : 'offline'">
                      <div class="size-[50px] rounded-full">
@@ -34,7 +35,8 @@
                   <!-- 操作按钮 -->
                   <div class="mr-2">
                      <!-- <button class="btn btn-circle btn-sm">test</button> -->
-                     <div class="badge badge-error">12</div>
+                     <!-- 未读消息数 -->
+                     <div class="badge badge-error">1</div>
                   </div>
                </div>
 
@@ -42,28 +44,28 @@
             <!-- 聊天盒 -->
             <div class="flex-1 px-2 flex flex-col">
                <!-- 未选择显示 -->
-               <div v-if="!currentUser" class="flex flex-wrap content-center justify-center size-full">
+               <div v-if="!currentChatUser" class="flex flex-wrap content-center justify-center size-full">
                   <img src="../assets/img//select-u.svg">
                   <p class="text-center w-full text-gray-500">请选择用户</p>
                </div>
                <template v-else>
                   <!-- 聊天内容 -->
-                  <div class="flex-1 overflow-y-auto">
+                  <div class="chatBox flex-1 overflow-y-auto">
                      <!-- {{ chatContent }} -->
                      <div v-for="(item, index) in targetChat" :key="index" class="chat"
-                        :class="item.sender_id == currentUser.id ? 'chat-start' : 'chat-end'">
+                        :class="item.senderId == currentChatUser.id ? 'chat-start' : 'chat-end'">
                         <div class="chat-image avatar">
                            <div class="w-10 rounded-full">
                               <!-- 头像 -->
                               <img alt="头像"
-                                 :src="(item.sender_id == userStore.userInfo?.id ? userStore.userInfo?.avatar : (userListMerge.find(u => u.id == item.sender_id)?.avatar))" />
+                                 :src="(item.senderId == userStore.userInfo?.id ? userStore.userInfo?.avatar : (userListMerge.find(u => u.id == item.senderId)?.avatar))" />
                            </div>
                         </div>
                         <!-- 内容 -->
                         <div class="chat-bubble">{{ item.message }}</div>
                         <!-- 反馈 -->
                         <div class="chat-footer opacity-50">
-                           {{ item.timestamp.toLocaleTimeString() }}
+                           {{ item.timestamp }}
                         </div>
                      </div>
                   </div>
@@ -89,6 +91,7 @@
                </template>
             </div>
          </div>
+         <!-- 关闭窗口 -->
          <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
          </form>
@@ -106,7 +109,7 @@ import { storeToRefs } from "pinia";
 import { UserAPI } from "@/api/user";
 import { MyUtils } from "@/utils";
 import _ from "lodash";
-import type { SocketMessageVo, UserChat } from "@/types/other";
+import type { UserMessage } from "@/types/other";
 import router from "@/router";
 
 const socketStore = useSocketStore();
@@ -126,8 +129,8 @@ withDefaults(
 
 // 显示聊天窗口
 const showWindow = ref(false)
-// 当前选中的用户
-const currentUser = ref<User>();
+// 当前聊天的用户
+const currentChatUser = ref<User>();
 // 隐藏用户列表 flag
 const hideUserList = ref(false);
 // 在线用户列表
@@ -143,29 +146,24 @@ const userListMerge = computed(() => {
 })
 // 计算属性：与当前选中用户的聊天信息
 const targetChat = computed(() => {
+   // 滚动到底部
+   setTimeout(() => {
+      let chatBox = document.querySelector(".chatBox") as HTMLDivElement;
+      chatBox.scrollTop = chatBox.scrollHeight
+   }, 100);
    return chatContent.value.filter(item => {
-      return item.receiver_id == currentUser.value!.id || item.sender_id == currentUser.value!.id
+      return item.receiverId == currentChatUser.value!.id || item.senderId == currentChatUser.value!.id
    })
 })
-// 输入框
+// 聊天内容输入框
 const inputMsg = ref("")
 // 聊天内容 (总)
-const chatContent = ref<UserChat[]>([]); // => [UserChat,...]
+const chatContent = ref<UserMessage[]>([]);
+// 未读消息对象
+const unreadMsgObj = ref({
 
+})
 
-// 数据库 (存放用户聊天记录)
-// let db:IDBDatabase;
-// const request = window.indexedDB.open("mydb", 1)
-// request.onerror = (event) => {
-//    console.log("数据库打开失败", event.target);
-// };
-// request.onsuccess = (event) => {
-//    db = request.result;
-// };
-// request.onupgradeneeded = (event) => {
-//    console.log("数据库升级成功");
-//    event.target?.
-// };
 
 if (userStore.userInfo) {
    // 添加自己到在线用户列表中
@@ -179,47 +177,60 @@ if (userStore.userInfo) {
    router.push("/login")
 }
 
-//  接收聊天消息 处理
-socketStore.socket?.addEventListener("message", (e) => {
-   let msgVo = JSON.parse(e.data) as SocketMessageVo;
-   console.log("[online-windows] 收到消息:", msgVo.message);
-   if (msgVo.type == 0) {
-      chatContent.value.push({
-         id: chatContent.value.length,
-         sender_id: msgVo.sender_id!,
-         receiver_id: msgVo.receiver_id!,
-         message: msgVo.message,
-         timestamp: new Date(),
-         is_read: 0
-      })
 
+// 选择用户事件
+function selectUser(user: User) {
+   currentChatUser.value = JSON.parse(JSON.stringify(user))
+   // // 关闭用户列表
+   hideUserList.value = true
+   // 拉取历史聊天记录
+   getChatRecord()
+}
+// 接收聊天消息 处理
+socketStore.socket?.addEventListener("message", (e) => {
+   let userMessage = JSON.parse(e.data) as UserMessage;
+   if (userMessage.type == 0) {
+      console.log("[online-windows] 收到消息:", userMessage.message);
+      chatContent.value.push(userMessage)
+
+      // 聊天窗口已打开就不在提示
       // dialog 原生组件中有属性 open 来控制弹窗的显示与隐藏
       let dialog = document.querySelector("#onlineBox") as HTMLDialogElement;
-      // 聊天窗口已打开就不在提示
-      if(!dialog.open) {
+      if (!dialog.open) {
          socketStore.receiveMsgNotification()
       }
    }
 });
 
-function sendMsg() {
-   if (currentUser.value) {
-      socketStore.send({
-         receiver_id: currentUser.value.id,
-         message: inputMsg.value,
-         type: 0
-      })
-      // 添加到聊天内容中
-      chatContent.value.push({
-         id: chatContent.value.length,
-         sender_id: userStore.userInfo!.id,
-         receiver_id: currentUser.value.id,
+// 获取指定聊天记录
+async function getChatRecord() {
+   if (userStore.userInfo?.id && currentChatUser.value?.id) {
+      let result = await UserAPI.getChatRecordList(userStore.userInfo.id, currentChatUser.value.id)
+      if (result.code == 20000) {
+         chatContent.value.push(...result.data)
+      }
+   } else {
+      console.log("用户未登录或未选择聊天对象");
+   }
+}
+
+// 发送消息
+async function sendMsg() {
+   if (currentChatUser.value) {
+      let userMessage: UserMessage = {
+         id: 0,
+         senderId: userStore.userInfo!.id,
+         receiverId: currentChatUser.value.id,
          message: inputMsg.value,
          timestamp: new Date(),
-         is_read: 0
-      })
+         is_read: 1,
+         type: 0
+      }
+      socketStore.send(userMessage)
       // 清空输入框
       inputMsg.value = ""
+      // 添加到聊天记录
+      chatContent.value.push(userMessage)
    } else {
       MyUtils.alert("请选择用户")
    }
@@ -233,6 +244,7 @@ async function getUserListByCid(cid: string) {
 }
 
 watch(
+   // 监听在线用户列表变化
    () => onlineUidList.value,
    () => {
       // 更新用户列表
