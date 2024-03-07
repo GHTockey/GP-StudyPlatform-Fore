@@ -10,7 +10,7 @@
          <div class="z-10">
             <button onclick="document.querySelector('#onlineBox').showModal();"
                class="btn btn-sm btn-info mr-2">查看</button>
-            <button class="btn btn-sm"> 1 小时内不再提醒</button>
+            <!-- <button class="btn btn-sm"> 1 小时内不再提醒</button> -->
          </div>
          <!-- 进度条 -->
          <div ref="tceProgressEl" class="tceProgressEl transition-all absolute top-0 left-0 size-full"></div>
@@ -26,7 +26,7 @@ const flag = ref(false)
 const tceProgressEl = ref<HTMLDivElement | null>(null)
 
 onMounted(() => {
-   console.log("通知组件已打开");
+   // console.log("通知组件已打开");
    setTimeout(() => {
       flag.value = true;
       if (tceProgressEl.value) {
@@ -43,7 +43,7 @@ onMounted(() => {
 
 </script>
 
-<style>
+<style scoped>
 /* hover 暂停进度条 */
 #myNotification:hover .tceProgressEl {
    background-color: rgb(255, 124, 124);
@@ -52,7 +52,7 @@ onMounted(() => {
 
 /* 进度条背景渐变 */
 .tceProgressEl {
-   background: linear-gradient(90deg, rgba(255, 255, 255, 0), #f7a991);
+   background: linear-gradient(90deg, rgba(255, 255, 255, 0), gray);
 }
 
 /* 进度条动画 */

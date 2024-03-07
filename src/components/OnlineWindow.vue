@@ -249,9 +249,5 @@ watch(
 .myActive {
    background-color: oklch(var(--b2));
    border: 1px solid oklch(var(--p));
-
-   /* >.avatar>div {
-      border: 2px solid oklch(var(--su));
-   }*/
 }
 </style>

@@ -5,7 +5,9 @@ import { useUserStore } from "./userStore";
 import MyNotification from "@/components/MyNotification.vue"
 
 export const useSocketStore = defineStore("socket", () => {
+   // socket 对象
    const socket = ref<WebSocket | null>(null);
+   // 在线用户的uid列表
    const onlineUidList = ref<string[]>([]);
 
    // 连接
@@ -14,7 +16,7 @@ export const useSocketStore = defineStore("socket", () => {
       socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
 
       socket.value.onopen = () => {
-         console.log("连接成功:" + uid);
+         console.log("[socket-store 主程序] 连接成功:" + uid);
       }
       socket.value.onmessage = (event) => {
          console.log("[socket-store 主程序] 收到消息：", JSON.parse(event.data));
@@ -23,10 +25,10 @@ export const useSocketStore = defineStore("socket", () => {
          if (data.type == 3) onlineUidList.value = JSON.parse(data.message);
       }
       socket.value.onerror = (event) => {
-         console.log("连接失败：", event);
+         console.log("[socket-store 主程序] 连接失败：", event);
       }
       socket.value.onclose = (event) => {
-         console.log("连接关闭：", event);
+         console.log("[socket-store 主程序] 连接关闭：", event);
       }
    }
    // 关闭连接

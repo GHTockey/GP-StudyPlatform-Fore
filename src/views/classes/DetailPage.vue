@@ -24,8 +24,9 @@
                <p class="text-gray-500 text-xs">创建者</p>
             </div>
          </div>
+         <!-- 按钮 -->
          <div class="flex items-center gap-4">
-            <button v-if="isMember" class="btn btn-sm btn-success">聊天室</button>
+            <button @click="openChatWindow" v-if="isMember" class="btn btn-sm btn-success">聊天室</button>
             <button v-if="isMember && !isSelf" class="btn btn-sm btn-error"
                @click="MyUtils.modal('操作确认', '您确定要退出该班级吗？', quitClasses)">退出</button>
             <button v-if="!isMember" class="btn btn-sm btn-accent" @click="joinClasses">加入</button>
@@ -49,10 +50,11 @@
             <div v-show="tabValue == '1'" class="p-2 w-full flex min-h-96">
                <ul class="flex-1">
                   <li class="border-[2px] border-base-300 hover:bg-base-300 rounded-lg mb-1"
-                     v-for=" user in classes.userList">
+                     v-for="user in classes.userList">
                      <div class="h-14 flex relative">
                         <!-- 头像 -->
-                        <div class="avatar p-1 shadow-base-content">
+                        <div :class="onlineUidList.findIndex(uid => uid == user.id) == -1 ? 'offline' : 'online'"
+                           class="avatar p-1 shadow-base-content">
                            <div class="rounded-lg">
                               <img :src="user.avatar" />
                            </div>
@@ -95,7 +97,8 @@
                               " :style="{ backgroundImage: `url(${voc.cover})` }">
                         </div>
                         <!-- 内容 -->
-                        <div class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
+                        <div
+                           class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
                            <p class="w-full font-[600] text-base-content cursor-pointer hover:text-primary transition-all"
                               @click="$router.push(`/vocabulary/${voc.id}`)">{{ voc.title }}</p>
                            <p class="w-full text-sm mb-4">{{ voc.desc }}</p>
@@ -190,8 +193,10 @@ import { message } from "ant-design-vue";
 import router from "@/router";
 import type { User } from "@/types/user";
 import { MyUtils } from "@/utils";
+import { useSocketStore } from "@/stores/socketStore";
+import { storeToRefs } from "pinia";
 
-
+const { onlineUidList } = storeToRefs(useSocketStore());
 const userStore = useUserStore();
 // 路由对象
 const route = useRoute();
@@ -260,6 +265,13 @@ getClasses()
 
 
 
+// 打开聊天窗口
+function openChatWindow() {
+   let onlineDialog: HTMLDialogElement | null = document.querySelector("#onlineBox")
+   if (onlineDialog) {
+      onlineDialog.showModal()
+   }
+}
 // 用户退出班级 【确认框确认】
 async function quitClasses() {
    let result = await ClassesAPI.quitClasses({ uid: userStore.userInfo!.id, cid: classes.value.id! });
