@@ -44,6 +44,7 @@ declare module 'vue' {
     MyAlert: typeof import('./src/components/MyAlert.vue')['default']
     MyModal: typeof import('./src/components/MyModal.vue')['default']
     MyModal2: typeof import('./src/components/MyModal2.vue')['default']
+    MyNotification: typeof import('./src/components/MyNotification.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
     OnlineWindow: typeof import('./src/components/OnlineWindow.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

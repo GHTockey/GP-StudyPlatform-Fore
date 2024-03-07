@@ -33,7 +33,8 @@
                   </div>
                   <!-- 操作按钮 -->
                   <div class="mr-2">
-                     <button class="btn btn-circle btn-sm">test</button>
+                     <!-- <button class="btn btn-circle btn-sm">test</button> -->
+                     <div class="badge badge-error">12</div>
                   </div>
                </div>
 
@@ -181,6 +182,7 @@ if (userStore.userInfo) {
 //  接收聊天消息 处理
 socketStore.socket?.addEventListener("message", (e) => {
    let msgVo = JSON.parse(e.data) as SocketMessageVo;
+   console.log("[online-windows] 收到消息:", msgVo.message);
    if (msgVo.type == 0) {
       chatContent.value.push({
          id: chatContent.value.length,
@@ -190,6 +192,13 @@ socketStore.socket?.addEventListener("message", (e) => {
          timestamp: new Date(),
          is_read: 0
       })
+
+      // dialog 原生组件中有属性 open 来控制弹窗的显示与隐藏
+      let dialog = document.querySelector("#onlineBox") as HTMLDialogElement;
+      // 聊天窗口已打开就不在提示
+      if(!dialog.open) {
+         socketStore.receiveMsgNotification()
+      }
    }
 });
 
@@ -209,6 +218,8 @@ function sendMsg() {
          timestamp: new Date(),
          is_read: 0
       })
+      // 清空输入框
+      inputMsg.value = ""
    } else {
       MyUtils.alert("请选择用户")
    }

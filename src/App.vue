@@ -26,7 +26,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh_CN")
 
-const myColorPrimary = "#a991f7";
+// const myColorPrimary = "#a991f7";
 </script>
 
 <style>
