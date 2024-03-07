@@ -14,8 +14,9 @@
             </div>
          </div>
          <div class="form-control">
-            <!-- 控制台按钮 -->
+            <!-- 中控台按钮 -->
             <div class="tooltip tooltip-bottom" data-tip="中制台">
+               <div v-show="unreadMessage.length" class="badge badge-error absolute right-0 top-0 p-0 size-2"></div>
                <button class="btn btn-circle btn-sm" @click="centerConsoleShow = true">
                   <IconFont type="icon-zhongduankongzhi" />
                </button>
@@ -216,6 +217,8 @@
          </div>
          <!-- 我的消息按钮 -->
          <div onclick="document.querySelector('#onlineBox').showModal();" class="size-[100px] relative btn p-0">
+            <!-- 未读消息数 -->
+            <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{ unreadMessage.length }}</div>
             <span class="my-center-console-icon">✉️</span>
             <p>我的消息</p>
          </div>
@@ -256,12 +259,15 @@ import lodash from "lodash";
 import IconFont from "@/utils/iconFont";
 import { useWindowScroll } from "@vueuse/core";
 import { MyUtils } from "@/utils";
+import { useSocketStore } from "@/stores/socketStore";
 
 // vueuse 获取滚动位置
 const { y } = useWindowScroll();
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
+const { unreadMessage } = storeToRefs(useSocketStore());
+
 // 搜索弹框组件
 const searchDialog = ref<HTMLDialogElement | null>(null);
 // 搜索关键词

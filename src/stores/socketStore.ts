@@ -10,27 +10,24 @@ export const useSocketStore = defineStore("socket", () => {
    const socket = ref<WebSocket | null>(null);
    // 在线用户的uid列表
    const onlineUidList = ref<string[]>([]);
+   // 未读消息
+   const unreadMessage = ref<UserMessage[]>([]);
 
    // 连接
    function connect(uid: string | number) {
       if (socket.value != null) return; // 已连接，直接返回
       socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
 
-      socket.value.onopen = () => {
+      socket.value.onopen = async () => {
          console.log("[socket-store 主程序] 连接成功:" + uid);
 
          // 【用户登录未读消息的提示】
-         let userStore = useUserStore();
-         UserAPI.getUnreadMessage(userStore.userInfo!.id).then((res) => {
-            if (res.code == 20000) {
-               // console.log("[socket-store 主程序] 获取未读消息成功：", res.data.length);
-               if (res.data.length > 0) {
-                  setTimeout(() => {
-                     receiveMsgNotification("您有" + res.data.length + "条未读消息，请注意查收！", 8000);
-                  }, 1000)
-               }
-            }
-         })
+         await overallSituationUnreadMsgHandler();
+         if (unreadMessage.value.length > 0) {
+            setTimeout(() => {
+               receiveMsgNotification("您有" + unreadMessage.value.length + "条未读消息，请注意查收！", 8000);
+            }, 1000);
+         }
       }
       socket.value.onmessage = (event) => {
          console.log("[socket-store 主程序] 收到消息：", JSON.parse(event.data));
@@ -42,7 +39,8 @@ export const useSocketStore = defineStore("socket", () => {
          console.log("[socket-store 主程序] 连接失败：", event);
       }
       socket.value.onclose = (event) => {
-         console.log("[socket-store 主程序] 连接关闭：", event);
+         console.log("[socket-store 主程序] 连接关闭");
+         socket.value = null;
       }
    }
    // 关闭连接
@@ -66,6 +64,16 @@ export const useSocketStore = defineStore("socket", () => {
       // 渲染虚拟dom到页面
       render(nodeDom, tempDiv);
    }
+   // 全局的未读消息处理提示
+   async function overallSituationUnreadMsgHandler() {
+      let userStore = useUserStore();
+      let result = await UserAPI.getUnreadMessage(userStore.userInfo!.id);
+      if (result.code == 20000) {
+         // console.log("[socket-store 主程序] 获取未读消息成功：", result.data.length);
+         unreadMessage.value = result.data;
+      }
+   }
+
 
    return {
       connect,
@@ -73,6 +81,8 @@ export const useSocketStore = defineStore("socket", () => {
       socket,
       send,
       onlineUidList,
-      receiveMsgNotification
+      receiveMsgNotification,
+      unreadMessage,
+      overallSituationUnreadMsgHandler
    }
 });

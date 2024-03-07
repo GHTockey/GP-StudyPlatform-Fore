@@ -10,8 +10,8 @@
     // }
   }">
     <RouterView />
-    <!-- 聊天窗口 -->
-    <OnlineWindow />
+    <!-- 聊天窗口 (限定与token是为了登录后再连接socket服务) -->
+    <OnlineWindow v-if="userStore.token" />
   </a-config-provider>
 </template>
 
@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import OnlineWindow from "@/components/OnlineWindow.vue";
 import { RouterView } from 'vue-router'
+import { useUserStore } from "@/stores/userStore";
 // antd 组件国际化
 import zhCN from "ant-design-vue/es/locale/zh_CN";
 // antd 日期选择器
@@ -27,6 +28,8 @@ import "dayjs/locale/zh-cn";
 dayjs.locale("zh_CN")
 
 // const myColorPrimary = "#a991f7";
+
+const userStore = useUserStore();
 </script>
 
 <style>
