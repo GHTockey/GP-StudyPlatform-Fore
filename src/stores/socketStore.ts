@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { ref, h, render } from "vue";
 import { useUserStore } from "./userStore";
 import MyNotification from "@/components/MyNotification.vue"
+import { UserAPI } from "@/api/user";
 
 export const useSocketStore = defineStore("socket", () => {
    // socket 对象
@@ -17,6 +18,19 @@ export const useSocketStore = defineStore("socket", () => {
 
       socket.value.onopen = () => {
          console.log("[socket-store 主程序] 连接成功:" + uid);
+
+         // 【用户登录未读消息的提示】
+         let userStore = useUserStore();
+         UserAPI.getUnreadMessage(userStore.userInfo!.id).then((res) => {
+            if (res.code == 20000) {
+               // console.log("[socket-store 主程序] 获取未读消息成功：", res.data.length);
+               if (res.data.length > 0) {
+                  setTimeout(() => {
+                     receiveMsgNotification("您有" + res.data.length + "条未读消息，请注意查收！", 8000);
+                  }, 1000)
+               }
+            }
+         })
       }
       socket.value.onmessage = (event) => {
          console.log("[socket-store 主程序] 收到消息：", JSON.parse(event.data));
@@ -42,9 +56,9 @@ export const useSocketStore = defineStore("socket", () => {
       socket.value?.send(JSON.stringify(userMessage));
    }
    // 来信息的全局通知
-   function receiveMsgNotification() {
+   function receiveMsgNotification(message?: string, duration?: number) {
       // 创建虚拟dom
-      let nodeDom = h(MyNotification);
+      let nodeDom = h(MyNotification, { message, duration });
       // 创建真实dom 
       let tempDiv = document.createElement("div");
       // 挂载到页面

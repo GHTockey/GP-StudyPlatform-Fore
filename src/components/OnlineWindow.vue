@@ -16,7 +16,6 @@
             <!-- 用户列表 -->
             <div class="w-[280px] overflow-auto transition-all bg-base-200/20"
                :class="{ 'absolute -translate-x-full': hideUserList }">
-               {{ unreadMsgObj }}
                <!-- 项 -->
                <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
              mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
@@ -46,13 +45,17 @@
             <div class="flex-1 px-2 flex flex-col">
                <!-- 未选择显示 -->
                <div v-if="!currentChatUser" class="flex flex-wrap content-center justify-center size-full">
-                  <img src="../assets/img//select-u.svg">
+                  <img class=" max-w-[300px]" src="../assets/img//select-u.svg">
                   <p class="text-center w-full text-gray-500">请选择用户</p>
                </div>
                <template v-else>
                   <!-- 聊天内容 -->
                   <div class="chatBox flex-1 overflow-y-auto">
-                     <!-- {{ chatContent }} -->
+                     <!-- 离线提示 -->
+                     <div v-show="!targetUserStatus" class="flex justify-center items-center gap-2 p-2">
+                        <IconFont type="icon-jinggao" />
+                        <span>对方离线状态，你发送的消息将会在对方上线后进行推送</span>
+                     </div>
                      <div v-for="(item, index) in targetChat" :key="index" class="chat"
                         :class="item.senderId == currentChatUser.id ? 'chat-start' : 'chat-end'">
                         <div class="chat-image avatar">
@@ -156,6 +159,10 @@ const targetChat = computed(() => {
       return item.receiverId == currentChatUser.value!.id && item.senderId == userStore.userInfo!.id
          || item.receiverId == userStore.userInfo!.id && item.senderId == currentChatUser.value!.id
    })
+})
+// 计算属性：当前选中用户的状态
+const targetUserStatus = computed(() => {
+   return onlineUidList.value.includes(currentChatUser.value!.id)
 })
 // 聊天内容输入框
 const inputMsg = ref("")
