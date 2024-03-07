@@ -1,6 +1,6 @@
 <template>
    <!-- 聊天窗口 -->
-   <dialog id="onlineBox" class="modal">
+   <dialog id="onlineBox" class="modal" @close="currentChatUser = undefined; hideUserList = false;">
       <div class="modal-box max-w-[1000px] min-h-[300px]">
          <h3 class="font-bold text-lg mb-3">Online
             <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
@@ -16,7 +16,7 @@
             <!-- 用户列表 -->
             <div class="w-[280px] overflow-auto transition-all bg-base-200/20"
                :class="{ 'absolute -translate-x-full': hideUserList }">
-               {{ chatContent }}
+               {{ unreadMsgObj }}
                <!-- 项 -->
                <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
              mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
@@ -36,7 +36,8 @@
                   <div class="mr-2">
                      <!-- <button class="btn btn-circle btn-sm">test</button> -->
                      <!-- 未读消息数 -->
-                     <div class="badge badge-error">1</div>
+                     <!-- <div class="badge badge-error">1</div> -->
+                     <div v-if="unreadMsgObj[item.id]" class="badge badge-error">{{ unreadMsgObj[item.id] }}</div>
                   </div>
                </div>
 
@@ -152,7 +153,8 @@ const targetChat = computed(() => {
       chatBox.scrollTop = chatBox.scrollHeight
    }, 100);
    return chatContent.value.filter(item => {
-      return item.receiverId == currentChatUser.value!.id || item.senderId == currentChatUser.value!.id
+      return item.receiverId == currentChatUser.value!.id && item.senderId == userStore.userInfo!.id
+         || item.receiverId == userStore.userInfo!.id && item.senderId == currentChatUser.value!.id
    })
 })
 // 聊天内容输入框
@@ -160,9 +162,7 @@ const inputMsg = ref("")
 // 聊天内容 (总)
 const chatContent = ref<UserMessage[]>([]);
 // 未读消息对象
-const unreadMsgObj = ref({
-
-})
+const unreadMsgObj = ref<{ [key: string]: number }>({})
 
 
 if (userStore.userInfo) {
@@ -172,6 +172,8 @@ if (userStore.userInfo) {
    socketStore.connect(userStore.userInfo.id)
    // 获取班级成员
    getUserListByCid(userStore.userInfo.classes!.id!)
+   // 获取未读消息
+   getUnreadMsg()
 } else {
    MyUtils.alert("请先登录")
    router.push("/login")
@@ -185,29 +187,49 @@ function selectUser(user: User) {
    hideUserList.value = true
    // 拉取历史聊天记录
    getChatRecord()
+   // 清空未读消息数
+   unreadMsgObj.value[user.id] = 0
+   // 将当前用户的消息设置为已读
+   UserAPI.markChatRecordAsRead(user.id, userStore.userInfo!.id)
 }
-// 接收聊天消息 处理
+// 接收聊天消息 【处理】
 socketStore.socket?.addEventListener("message", (e) => {
    let userMessage = JSON.parse(e.data) as UserMessage;
    if (userMessage.type == 0) {
       console.log("[online-windows] 收到消息:", userMessage.message);
       chatContent.value.push(userMessage)
 
-      // 聊天窗口已打开就不在提示
+      // // 通知获取消息
+      // if(currentChatUser.value) getChatRecord()
+
+      // 【通知提示】 聊天窗口已打开就不在提示
       // dialog 原生组件中有属性 open 来控制弹窗的显示与隐藏
       let dialog = document.querySelector("#onlineBox") as HTMLDialogElement;
       if (!dialog.open) {
          socketStore.receiveMsgNotification()
       }
+
+      // 【未读消息程序】
+      if (currentChatUser.value?.id != userMessage.senderId) { // 当前信息不是当前聊天对象发送的
+         // 未读消息数 +1
+         if (unreadMsgObj.value[userMessage.senderId]) {
+            unreadMsgObj.value[userMessage.senderId]++
+         } else {
+            // 不存在则添加
+            unreadMsgObj.value[userMessage.senderId] = 1
+         }
+      }
    }
 });
 
-// 获取指定聊天记录
+// 获取聊天记录
 async function getChatRecord() {
    if (userStore.userInfo?.id && currentChatUser.value?.id) {
       let result = await UserAPI.getChatRecordList(userStore.userInfo.id, currentChatUser.value.id)
       if (result.code == 20000) {
          chatContent.value.push(...result.data)
+         // 去重 (因为在发送时有添加到 chatContent 中，在获取时会和数据库中的重复)
+         chatContent.value = _.uniqBy(chatContent.value, "id")
       }
    } else {
       console.log("用户未登录或未选择聊天对象");
@@ -240,6 +262,22 @@ async function getUserListByCid(cid: string) {
    let result = await UserAPI.getUserListByCid(cid)
    if (result.code == 20000) {
       classesUserList.value = result.data
+   }
+}
+// 获取未读消息
+async function getUnreadMsg() {
+   let result = await UserAPI.getUnreadMessage(userStore.userInfo!.id)
+   if (result.code == 20000) {
+      let data = result.data
+      // 未读消息数
+      data.forEach((item: any) => {
+         if (unreadMsgObj.value[item.senderId]) {
+            unreadMsgObj.value[item.senderId]++
+         } else {
+            unreadMsgObj.value[item.senderId] = 1
+         }
+      });
+      chatContent.value.push(...data)
    }
 }
 

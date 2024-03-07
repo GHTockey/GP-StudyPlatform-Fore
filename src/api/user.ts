@@ -1,4 +1,4 @@
-import type { UserMessage, SocketMessageVo } from "@/types/other";
+import type { UserMessage } from "@/types/other";
 import type { User } from "@/types/user";
 import { request } from "@/utils/request";
 
@@ -40,11 +40,19 @@ export class UserAPI {
    }
    // 【聊天记录】
    /** 添加聊天记录 API */
-   static addChatRecord(data: SocketMessageVo) {
+   static addChatRecord(data: UserMessage) {
       return request<string>(`${cloudServiceURL}/user/chatRecord`, "POST", data);
    }
    /** 获取聊天记录列表 API */
    static getChatRecordList(uid: string, toUid: string) {
       return request<UserMessage[]>(`${cloudServiceURL}/user/chatRecord/${uid}/${toUid}`, "GET");
+   }
+   /** 将聊天记录标记为已读 API */
+   static markChatRecordAsRead(uid: string, toUid: string) {
+      return request<string>(`${cloudServiceURL}/user/chatRecord/read/${uid}/${toUid}`, "PUT");
+   }
+   /** 获取未读消息 API */
+   static getUnreadMessage(uid: string) {
+      return request<UserMessage[]>(`${cloudServiceURL}/user/chatRecord/unread/${uid}`, "GET");
    }
 }
