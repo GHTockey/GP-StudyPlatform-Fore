@@ -12,6 +12,8 @@ export const useSocketStore = defineStore("socket", () => {
    const onlineUidList = ref<string[]>([]);
    // 未读消息
    const unreadMessage = ref<UserMessage[]>([]);
+   // 聊天窗口的显示
+   const chatWindowShow = ref(false);
 
    // 连接
    function connect(uid: string | number) {
@@ -92,6 +94,7 @@ export const useSocketStore = defineStore("socket", () => {
       onlineUidList,
       receiveMsgNotification,
       unreadMessage,
-      overallSituationUnreadMsgHandler
+      overallSituationUnreadMsgHandler,
+      chatWindowShow
    }
 });

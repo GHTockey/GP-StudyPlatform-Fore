@@ -1,6 +1,7 @@
 <template>
    <!-- 聊天窗口 -->
-   <dialog id="onlineBox" class="modal" @close="currentChatUser = undefined; hideUserList = false;">
+   <div id="onlineBox" v-show="chatWindowShow" class="modal bg-pink-500 opacity-100 pointer-events-auto"
+      @close="currentChatUser = undefined; hideUserList = false;">
       <div class="modal-box max-w-[1000px] min-h-[300px]">
          <h3 class="font-bold text-lg mb-3">OnlineChat
             <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
@@ -49,7 +50,7 @@
                <template v-else>
                   <!-- 聊天记录内容 -->
                   <div class="chatBox flex-1 overflow-y-auto">
-                     <div v-for="(item, index) in targetChat" :key="index" class="chat"
+                     <div @click="handlePreview" v-for="(item, index) in targetChat" :key="index" class="chat"
                         :class="item.senderId == currentChatUser.id ? 'chat-start' : 'chat-end'">
                         <div class="chat-image avatar">
                            <div class="w-10 rounded-full">
@@ -119,11 +120,14 @@
             </div>
          </div>
          <!-- 关闭窗口 -->
-         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-         </form>
+         <button @click="socketStore.chatWindowShow = false"
+            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
       </div>
-   </dialog>
+   </div>
+   <a-image :width="200" :style="{ display: 'none' }" :preview="{
+      visible: previewVisible,
+      onVisibleChange: setVisible,
+   }" :src="previewImage" />
 </template>
 
 <script setup lang="ts">
@@ -146,23 +150,21 @@ const userStore = useUserStore();
 
 const { onlineUidList } = storeToRefs(socketStore)
 
-// withDefaults(
-//    defineProps<{
-//       showWindow?: boolean;
-//    }>(),
-//    // 默认值
-//    {
-//       showWindow: false,
-//    }
-// );
+withDefaults(
+   defineProps<{
+      chatWindowShow?: boolean;
+   }>(),
+   // 默认值
+   {
+      chatWindowShow: false,
+   }
+);
 console.log("online-window 程序已加载");
 onBeforeUnmount(() => {
    console.log("online-window 程序已卸载");
    // 关闭连接
    socketStore.close()
 })
-// 显示聊天窗口
-// const showWindow = ref(false)
 // 当前聊天的用户
 const currentChatUser = ref<User>();
 // 隐藏用户列表 flag
@@ -183,7 +185,9 @@ const targetChat = computed(() => {
    // 滚动到底部 [TODO:临时解决方案，后续优化]
    setTimeout(() => {
       let chatBox = document.querySelector(".chatBox") as HTMLDivElement;
-      chatBox.scrollTop = chatBox.scrollHeight
+      if (chatBox) {
+         chatBox.scrollTop = chatBox.scrollHeight
+      }
    });
 
    // 过滤出当前选中用户的聊天记录
@@ -195,8 +199,8 @@ const targetChat = computed(() => {
    // 将聊天内容中的图片转换为img标签
    data.forEach(item => {
       // 匹配图片
-      let reg = /!\[图片\]\((.*?)\)/g
-      item.message = item.message.replace(reg, `<img onclick="console.log(123123123)" src="$1" class="w-[100px]">`)
+      let reg = /!\[图片\]\((.*?)\)/g;
+      item.message = item.message.replace(reg, `<img src="$1" class="w-[100px]">`)
    })
    return data;
 })
@@ -216,6 +220,14 @@ const imgFiles = ref<File[]>([])
 const uploadProgress = ref(0)
 // 上传完成图片列表 (markdown格式) 【![流汗黄豆](E:\传智课堂\img\流汗黄豆.png)】
 const uploadImgMDList = ref<string[]>([])
+// 预览图片 flag
+const previewVisible = ref(false)
+// 显示预览图片
+const setVisible = (value: boolean): void => {
+   previewVisible.value = value;
+};
+// 预览的图片地址
+const previewImage = ref("")
 
 if (userStore.userInfo) {
    // 添加自己到在线用户列表中
@@ -233,6 +245,15 @@ if (userStore.userInfo) {
 
 
 
+// 预览图片事件
+function handlePreview(e: Event) {
+   let el = e.target as HTMLElement;
+   // console.log(el.tagName);
+   if (el.tagName == "IMG") {
+      previewImage.value = el.getAttribute("src") as string
+      setVisible(true)
+   }
+}
 // 获取文件的url
 function getFileUrl(file: File) {
    return URL.createObjectURL(file);
@@ -314,9 +335,7 @@ socketStore.socket?.addEventListener("message", (e) => {
       if (currentChatUser.value) getChatRecord()
 
       // 【通知提示】 聊天窗口已打开就不再提示
-      // dialog 原生组件中有属性 open 来控制弹窗的显示与隐藏
-      let dialog = document.querySelector("#onlineBox") as HTMLDialogElement;
-      if (!dialog.open) {
+      if (socketStore.chatWindowShow == false) {
          socketStore.receiveMsgNotification()
       }
 

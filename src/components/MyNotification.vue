@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSocketStore } from "@/stores/socketStore";
 import { ref, onMounted } from "vue";
 
 const flag = ref(false)
@@ -48,10 +49,10 @@ onMounted(() => {
 
 // 提示组件按钮点击事件
 function handleClick() {
-   let onlineBox = document.querySelector('#onlineBox') as HTMLDialogElement
+   const socketStore = useSocketStore();
    // 打开聊天窗口
-   if (onlineBox) {
-      onlineBox.showModal()
+   if (socketStore.chatWindowShow == false) {
+      socketStore.chatWindowShow = true;
    }
    // 加速进度条动画
    if (tceProgressEl.value) {

@@ -218,7 +218,7 @@
             <p>创建班级</p>
          </div>
          <!-- 我的消息按钮 -->
-         <div onclick="document.querySelector('#onlineBox').showModal();" @click="centerConsoleShow = false;"
+         <div @click="centerConsoleShow = false; chatWindowShow = true;"
             class="size-[100px] relative btn p-0">
             <!-- 未读消息数 -->
             <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{
@@ -271,7 +271,7 @@ const { y } = useWindowScroll();
 
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
-const { unreadMessage } = storeToRefs(useSocketStore());
+const { unreadMessage, chatWindowShow } = storeToRefs(useSocketStore());
 
 // 搜索弹框组件
 const searchDialog = ref<HTMLDialogElement | null>(null);

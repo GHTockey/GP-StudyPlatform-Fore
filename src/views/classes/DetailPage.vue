@@ -97,8 +97,7 @@
                               " :style="{ backgroundImage: `url(${voc.cover})` }">
                         </div>
                         <!-- 内容 -->
-                        <div
-                           class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
+                        <div class="p-4 w-[65%] md:h-[40%] md:w-full relative flex flex-wrap content-center text-gray-500">
                            <p class="w-full font-[600] text-base-content cursor-pointer hover:text-primary transition-all"
                               @click="$router.push(`/vocabulary/${voc.id}`)">{{ voc.title }}</p>
                            <p class="w-full text-sm mb-4">{{ voc.desc }}</p>
@@ -267,9 +266,9 @@ getClasses()
 
 // 打开聊天窗口
 function openChatWindow() {
-   let onlineDialog: HTMLDialogElement | null = document.querySelector("#onlineBox")
-   if (onlineDialog) {
-      onlineDialog.showModal()
+   const socketStore = useSocketStore();
+   if (socketStore.chatWindowShow == false) {
+      socketStore.chatWindowShow = true;
    }
 }
 // 用户退出班级 【确认框确认】
