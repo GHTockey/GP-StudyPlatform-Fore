@@ -20,7 +20,7 @@
                <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
              mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
                   :class="{ 'myActive': currentChatUser?.id == item.id }">
-                  <!-- 头像 offline -->
+                  <!-- 头像 -->
                   <div class="avatar mx-2" :class="onlineUidList.includes(item.id) ? 'online' : 'offline'">
                      <div class="size-[50px] rounded-full">
                         <img :src="item.avatar" />
@@ -49,7 +49,7 @@
                   <p class="text-center w-full text-gray-500">请选择用户</p>
                </div>
                <template v-else>
-                  <!-- 聊天内容 -->
+                  <!-- 聊天记录内容 -->
                   <div class="chatBox flex-1 overflow-y-auto">
                      <div v-for="(item, index) in targetChat" :key="index" class="chat"
                         :class="item.senderId == currentChatUser.id ? 'chat-start' : 'chat-end'">
@@ -63,8 +63,9 @@
                         <!-- 内容 -->
                         <div class="chat-bubble">{{ item.message }}</div>
                         <!-- 反馈 -->
-                        <div class="chat-footer opacity-50">
-                           {{ item.timestamp }}
+                        <div v-if="item.senderId != currentChatUser.id" class="chat-footer opacity-50">
+                           <!-- {{ item.timestamp }} -->
+                           {{ item.isRead == 0 ? "已读" : "未读" }}
                         </div>
                      </div>
                   </div>
@@ -75,6 +76,8 @@
                         class="flex justify-center items-center gap-2 p-2 w-full text-orange-400">
                         <IconFont type="icon-jinggao" />
                         <span class="text-sm">对方处于离线状态，您发送的消息将会在对方上线后进行推送</span>
+                     </div>
+                     <div id="imgBox" class="bg-pink-500 w-full h-[100px] flex overflow-x-auto">
                      </div>
                      <!-- 按钮 -->
                      <div class="w-full gap-2 flex items-center">
@@ -87,10 +90,13 @@
                         <button class="btn btn-xs btn-circle">
                            <IconFont type="icon-lianjie" />
                         </button>
+                        <button class="btn btn-xs btn-circle">
+                           <IconFont type="icon-lianjie" />
+                        </button>
                      </div>
                      <!-- 输入框 -->
                      <div class="flex w-full mt-2 gap-2">
-                        <textarea v-model="inputMsg" rows="2" placeholder="输入消息"
+                        <textarea v-model="inputMsg" rows="2" placeholder="输入消息" @paste="pasteHandler"
                            class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea>
                         <button @click="sendMsg" class="btn btn-success">发送</button>
                      </div>
@@ -195,6 +201,42 @@ if (userStore.userInfo) {
 }
 
 
+
+// 输入框粘贴事件
+function pasteHandler(e: ClipboardEvent) {
+   let clipboardData = e.clipboardData; //获取粘贴板数据
+   // 获取粘贴板文本
+   // let text = clipboardData?.getData("text");
+   // console.log(text);
+   // 文件对象
+   let files = clipboardData?.files;
+   if (files?.length && files[0].type.includes("image")) {
+      console.log(files);
+      // // 转为 img 标签
+      // let img = document.createElement("img");
+      // img.src = URL.createObjectURL(files[0]);
+      // img.style.width = "100px";
+      // img.style.height = "100px";
+      // // 插入到输入框
+      // let textarea = e.target as HTMLTextAreaElement;
+      // textarea.value += img.outerHTML;
+
+      // img 
+      let img = new Image();
+      let reader = new FileReader();
+      reader.onload = function (e) {
+         img.src = e.target?.result as string;
+      }
+      reader.readAsDataURL(files[0]);
+      // 插入到元素
+      let imgBox = document.getElementById("imgBox") as HTMLDivElement;
+      img.style.width = "100px";
+      imgBox.appendChild(img);
+
+
+
+   }
+}
 // 选择用户事件
 async function selectUser(user: User) {
    currentChatUser.value = JSON.parse(JSON.stringify(user))
@@ -203,7 +245,7 @@ async function selectUser(user: User) {
    // 拉取历史聊天记录
    getChatRecord()
    // 将当前用户的消息设置为已读
-   console.log(unreadMsgObj.value);
+   // console.log(unreadMsgObj.value);
    if (unreadMsgObj.value[user.id] > 0) {
       await UserAPI.markChatRecordAsRead(user.id, userStore.userInfo!.id)
       // 清空未读消息数
@@ -214,6 +256,7 @@ async function selectUser(user: User) {
 // 接收聊天消息 【处理】
 socketStore.socket?.addEventListener("message", (e) => {
    let userMessage = JSON.parse(e.data) as UserMessage;
+   // 【私聊消息】
    if (userMessage.type == 0) {
       console.log("[online-windows] 收到消息:", userMessage.message);
       chatContent.value.push(userMessage)
@@ -246,6 +289,12 @@ socketStore.socket?.addEventListener("message", (e) => {
          socketStore.overallSituationUnreadMsgHandler()
       }
    }
+   // 【已读反馈】
+   if (userMessage.type == 4) {
+      let data: { msg: string, id: number } = JSON.parse(userMessage.message)
+      // 
+      getChatRecord()
+   }
 });
 
 // 获取聊天记录
@@ -259,7 +308,6 @@ async function getChatRecord() {
          // 去重排序 (因为数据会和本地数据合并引发顺序问题)
          chatContent.value = _.sortBy(_.uniqBy(chatContent.value, "id"), "id")
          // chatContent.value = _.sortedUniqBy(chatContent.value, "id")
-
       }
    } else {
       console.log("用户未登录或未选择聊天对象");
@@ -277,8 +325,8 @@ async function sendMsg() {
          senderId: userStore.userInfo!.id,
          receiverId: currentChatUser.value.id,
          message: inputMsg.value,
-         timestamp: new Date().toLocaleTimeString(),
-         is_read: 1,
+         timestamp: new Date().toLocaleTimeString(), // 仅本地显示 后端会再次处理
+         isRead: 1,
          type: 0
       }
       socketStore.send(userMessage)
@@ -299,6 +347,7 @@ async function getUserListByCid(cid: string) {
 }
 // 获取未读消息
 async function getUnreadMsg() {
+   unreadMsgObj.value = {}
    let result = await UserAPI.getUnreadMessage(userStore.userInfo!.id)
    if (result.code == 20000) {
       let data = result.data
@@ -333,4 +382,7 @@ watch(
    background-color: oklch(var(--b2));
    border: 1px solid oklch(var(--p));
 }
-</style>
+
+// #imgBox > img {
+
+// }</style>

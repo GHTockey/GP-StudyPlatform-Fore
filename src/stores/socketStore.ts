@@ -36,11 +36,20 @@ export const useSocketStore = defineStore("socket", () => {
          if (userMessage.type == 3) onlineUidList.value = JSON.parse(userMessage.message);
       }
       socket.value.onerror = (event) => {
-         console.log("[socket-store 主程序] 连接失败：", event);
+         console.log("[socket-store 主程序] 连接失败");
       }
       socket.value.onclose = (event) => {
-         console.log("[socket-store 主程序] 连接关闭");
+         console.log("[socket-store 主程序] 连接断开");
          socket.value = null;
+         // 用户是否登录
+         let userStore = useUserStore();
+         if (userStore.token) {
+            console.log("[socket-store 主程序] 将在3秒后尝试重新连接");
+            setTimeout(() => {
+               connect(userStore.userInfo!.id);
+            }, 3000);
+         }
+
       }
    }
    // 关闭连接

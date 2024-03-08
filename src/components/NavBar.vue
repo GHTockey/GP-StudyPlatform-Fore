@@ -205,20 +205,25 @@
             <p>主题切换</p>
          </div>
          <!-- 发布词集按钮 -->
-         <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false">
+         <div class="size-[100px] relative btn p-0"
+            @click="$router.push('/vocabulary/add'); centerConsoleShow = false;">
             <!--图标 -->
             <span class="my-center-console-icon">📖</span>
             <p>发布词集</p>
          </div>
          <!-- 创建班级按钮 -->
-         <div onclick="document.querySelector('#createClassDialog').showModal() " class="size-[100px] relative btn p-0">
+         <div onclick="document.querySelector('#createClassDialog').showModal()" @click="centerConsoleShow = false;"
+            class="size-[100px] relative btn p-0">
             <span class="my-center-console-icon">🏫</span>
             <p>创建班级</p>
          </div>
          <!-- 我的消息按钮 -->
-         <div onclick="document.querySelector('#onlineBox').showModal();" class="size-[100px] relative btn p-0">
+         <div onclick="document.querySelector('#onlineBox').showModal();" @click="centerConsoleShow = false;"
+            class="size-[100px] relative btn p-0">
             <!-- 未读消息数 -->
-            <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{ unreadMessage.length }}</div>
+            <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{
+      unreadMessage.length
+   }}</div>
             <span class="my-center-console-icon">✉️</span>
             <p>我的消息</p>
          </div>
@@ -348,6 +353,7 @@ function logout() {
 }
 // 主题切换事件
 function themeChange(e: Event) {
+   centerConsoleShow.value = false;
    let checkEl = e.target as HTMLInputElement;
    // console.log(checkEl.checked);
    localStorage.setItem("isDark", String(checkEl.checked))
