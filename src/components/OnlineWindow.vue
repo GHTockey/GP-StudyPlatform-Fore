@@ -33,9 +33,7 @@
                   </div>
                   <!-- 操作按钮 -->
                   <div class="mr-2">
-                     <!-- <button class="btn btn-circle btn-sm">test</button> -->
                      <!-- 未读消息数 -->
-                     <!-- <div class="badge badge-error">1</div> -->
                      <div v-if="unreadMsgObj[item.id]" class="badge badge-error">{{ unreadMsgObj[item.id] }}</div>
                   </div>
                </div>
@@ -61,7 +59,8 @@
                            </div>
                         </div>
                         <!-- 内容 -->
-                        <div class="chat-bubble">{{ item.message }}</div>
+                        <!-- <div class="chat-bubble">{{ item.message }}</div> -->
+                        <div class="chat-bubble" v-html="item.message"></div>
                         <!-- 反馈 -->
                         <div v-if="item.senderId != currentChatUser.id" class="chat-footer opacity-50">
                            <!-- {{ item.timestamp }} -->
@@ -77,7 +76,16 @@
                         <IconFont type="icon-jinggao" />
                         <span class="text-sm">对方处于离线状态，您发送的消息将会在对方上线后进行推送</span>
                      </div>
-                     <div id="imgBox" class="bg-pink-500 w-full h-[100px] flex overflow-x-auto">
+
+                     <!-- 发送的图片预览队列 -->
+                     <div v-if="imgFiles.length" id="imgBox"
+                        class="border rounded-lg w-full h-[100px] flex gap-2 overflow-x-auto mb-2 relative">
+                        <progress v-show="uploadProgress > 0 && uploadProgress < 100"
+                           class="progress progress-accent w-full absolute bottom-0" :value="uploadProgress"
+                           max="100"></progress>
+                        <div v-for="(item, index) in imgFiles" :key="index" class="w-[100px]">
+                           <img :src="getFileUrl(item)" />
+                        </div>
                      </div>
                      <!-- 按钮 -->
                      <div class="w-full gap-2 flex items-center">
@@ -98,7 +106,13 @@
                      <div class="flex w-full mt-2 gap-2">
                         <textarea v-model="inputMsg" rows="2" placeholder="输入消息" @paste="pasteHandler"
                            class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea>
-                        <button @click="sendMsg" class="btn btn-success">发送</button>
+                        <button v-if="!(uploadProgress > 0 && uploadProgress < 100)" @click="sendMsg"
+                           class="btn btn-success">发送</button>
+                        <button v-else class="btn">
+                           <span class="loading loading-spinner"></span>
+                           上传图片中
+                        </button>
+                        <!-- <button @click="uploadImg" class="btn btn-success">测试上传</button> -->
                      </div>
                   </div>
                </template>
@@ -124,21 +138,23 @@ import { MyUtils } from "@/utils";
 import _ from "lodash";
 import type { UserMessage } from "@/types/other";
 import router from "@/router";
+import type { AxiosProgressEvent } from "axios";
+import { OtherAPI } from "@/api/other";
 
 const socketStore = useSocketStore();
 const userStore = useUserStore();
 
 const { onlineUidList } = storeToRefs(socketStore)
 
-withDefaults(
-   defineProps<{
-      showWindow?: boolean;
-   }>(),
-   // 默认值
-   {
-      showWindow: false,
-   }
-);
+// withDefaults(
+//    defineProps<{
+//       showWindow?: boolean;
+//    }>(),
+//    // 默认值
+//    {
+//       showWindow: false,
+//    }
+// );
 console.log("online-window 程序已加载");
 onBeforeUnmount(() => {
    console.log("online-window 程序已卸载");
@@ -146,7 +162,7 @@ onBeforeUnmount(() => {
    socketStore.close()
 })
 // 显示聊天窗口
-const showWindow = ref(false)
+// const showWindow = ref(false)
 // 当前聊天的用户
 const currentChatUser = ref<User>();
 // 隐藏用户列表 flag
@@ -164,15 +180,25 @@ const userListMerge = computed(() => {
 })
 // 计算属性：与当前选中用户的聊天信息
 const targetChat = computed(() => {
-   // 滚动到底部
+   // 滚动到底部 [TODO:临时解决方案，后续优化]
    setTimeout(() => {
       let chatBox = document.querySelector(".chatBox") as HTMLDivElement;
       chatBox.scrollTop = chatBox.scrollHeight
    });
-   return chatContent.value.filter(item => {
+
+   // 过滤出当前选中用户的聊天记录
+   let data = chatContent.value.filter(item => {
       return item.receiverId == currentChatUser.value!.id && item.senderId == userStore.userInfo!.id
          || item.receiverId == userStore.userInfo!.id && item.senderId == currentChatUser.value!.id
    })
+
+   // 将聊天内容中的图片转换为img标签
+   data.forEach(item => {
+      // 匹配图片
+      let reg = /!\[图片\]\((.*?)\)/g
+      item.message = item.message.replace(reg, `<img onclick="console.log(123123123)" src="$1" class="w-[100px]">`)
+   })
+   return data;
 })
 // 计算属性：当前选中用户的状态
 const targetUserStatus = computed(() => {
@@ -184,7 +210,12 @@ const inputMsg = ref("")
 const chatContent = ref<UserMessage[]>([]);
 // 未读消息对象
 const unreadMsgObj = ref<{ [key: string]: number }>({})
-
+// 图片文件队列
+const imgFiles = ref<File[]>([])
+// 上传进度
+const uploadProgress = ref(0)
+// 上传完成图片列表 (markdown格式) 【![流汗黄豆](E:\传智课堂\img\流汗黄豆.png)】
+const uploadImgMDList = ref<string[]>([])
 
 if (userStore.userInfo) {
    // 添加自己到在线用户列表中
@@ -202,39 +233,57 @@ if (userStore.userInfo) {
 
 
 
-// 输入框粘贴事件
+// 获取文件的url
+function getFileUrl(file: File) {
+   return URL.createObjectURL(file);
+}
+// 批量上传图片
+async function uploadImg() {
+   if (!imgFiles.value.length) return;
+   console.log("开始批量上传图片");
+   // forEach 不能使用 async
+   for (let index = 0; index < imgFiles.value.length; index++) {
+      const file = imgFiles.value[index];
+      let fileData = new FormData()
+      fileData.append("file", file)
+      let result = await OtherAPI.imageUpl(fileData, (e: AxiosProgressEvent) => {
+         // 计算上传进度 (根据文件数量计算，此时的进度是所有文件的总进度,包括单文件的进度)
+         uploadProgress.value = (index) / imgFiles.value.length * 100 + e.loaded / e.total! / imgFiles.value.length * 100;
+         // console.log(uploadProgress.value);
+      })
+      // // 计算上传进度
+      // uploadProgress.value = (imgFiles.value.indexOf(file) + 1) / imgFiles.value.length * 100
+
+      // 以markdown格式保存
+      uploadImgMDList.value.push(`![图片](${result.data})`)
+   }
+}
+// 输入框粘贴事件 【处理图片】
 function pasteHandler(e: ClipboardEvent) {
    let clipboardData = e.clipboardData; //获取粘贴板数据
    // 获取粘贴板文本
    // let text = clipboardData?.getData("text");
    // console.log(text);
+
+   let imgBox = document.getElementById("imgBox") as HTMLDivElement;
    // 文件对象
-   let files = clipboardData?.files;
-   if (files?.length && files[0].type.includes("image")) {
-      console.log(files);
-      // // 转为 img 标签
-      // let img = document.createElement("img");
-      // img.src = URL.createObjectURL(files[0]);
-      // img.style.width = "100px";
-      // img.style.height = "100px";
-      // // 插入到输入框
-      // let textarea = e.target as HTMLTextAreaElement;
-      // textarea.value += img.outerHTML;
-
-      // img 
-      let img = new Image();
-      let reader = new FileReader();
-      reader.onload = function (e) {
-         img.src = e.target?.result as string;
+   let files = clipboardData?.files as FileList;
+   for (const key in files) {
+      // 判断是否是图片
+      if (typeof files[key] == "object" && files[key].type.includes("image")) {
+         // 添加到待上传队列
+         imgFiles.value.push(files[key])
+         // 预览 (Base64)
+         // let img = new Image();
+         // let reader = new FileReader();
+         // reader.onload = function (e) {
+         //    img.src = e.target?.result as string;
+         // }
+         // img.style.width = "100px";
+         // reader.readAsDataURL(files[key]); // 读取文件
+         // // 插入到元素
+         // imgBox.appendChild(img);
       }
-      reader.readAsDataURL(files[0]);
-      // 插入到元素
-      let imgBox = document.getElementById("imgBox") as HTMLDivElement;
-      img.style.width = "100px";
-      imgBox.appendChild(img);
-
-
-
    }
 }
 // 选择用户事件
@@ -306,8 +355,12 @@ async function getChatRecord() {
          // 去重 (因为在发送时有添加到 chatContent 中，在获取时会和数据库中的重复)
          // chatContent.value = _.uniqBy(chatContent.value, "id")
          // 去重排序 (因为数据会和本地数据合并引发顺序问题)
-         chatContent.value = _.sortBy(_.uniqBy(chatContent.value, "id"), "id")
-         // chatContent.value = _.sortedUniqBy(chatContent.value, "id")
+         // chatContent.value = _.sortBy(_.uniqBy(chatContent.value, "id"), "id")
+         // 去重优先级：两条数据id相同，但时间不同，以时间最新的为准
+
+         // 重复数据以时间最新的为准
+         // 先排序再去重，这样得到的数据是最新的
+         chatContent.value = _.uniqBy(_.sortBy(chatContent.value, "id"), "id")
       }
    } else {
       console.log("用户未登录或未选择聊天对象");
@@ -318,13 +371,18 @@ async function getChatRecord() {
 async function sendMsg() {
    // 去除回车
    inputMsg.value = inputMsg.value.replace(/\n/g, "")
-   if (inputMsg.value == "") return;
+   if (inputMsg.value == "" && !imgFiles.value.length) {
+      // console.log("消息队列为空", inputMsg.value, imgFiles.value.length);
+      return
+   };
+   // 上传图片
+   await uploadImg()
    if (currentChatUser.value) {
       let userMessage: UserMessage = {
          id: 0,
          senderId: userStore.userInfo!.id,
          receiverId: currentChatUser.value.id,
-         message: inputMsg.value,
+         message: inputMsg.value + uploadImgMDList.value.join("\n"),
          timestamp: new Date().toLocaleTimeString(), // 仅本地显示 后端会再次处理
          isRead: 1,
          type: 0
@@ -334,6 +392,12 @@ async function sendMsg() {
       inputMsg.value = ""
       // 添加到聊天记录到本地
       chatContent.value.push(userMessage)
+      // 清除图片队列
+      imgFiles.value = []
+      // 清除上传进度
+      uploadProgress.value = 0
+      // 清除上传完成markdown图片列表
+      uploadImgMDList.value = []
    } else {
       MyUtils.alert("请选择用户")
    }
@@ -382,7 +446,4 @@ watch(
    background-color: oklch(var(--b2));
    border: 1px solid oklch(var(--p));
 }
-
-// #imgBox > img {
-
-// }</style>
+</style>

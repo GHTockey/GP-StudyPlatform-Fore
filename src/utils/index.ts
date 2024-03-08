@@ -2,6 +2,8 @@ import { h, render } from "vue";
 import confetti from "canvas-confetti";
 import Alert from "@/components/MyAlert.vue";
 import Modal from "@/components/MyModal.vue";
+import { OtherAPI } from "@/api/other";
+import type { AxiosProgressEvent } from "axios";
 
 export class MyUtils {
    // 消息通知
@@ -84,5 +86,21 @@ export class MyUtils {
             origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
          });
       }, 150); // 爆炸间隔
+   }
+   // 上传图片前校验
+   static beforeUploadImg(file: File) {
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+      if (!isJPG) {
+         console.log('只能上传jpg或png格式的图片');
+         MyUtils.alert('只能上传jpg或png格式的图片', 'error');
+         return false;
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+         console.log('图片大小不能超过2MB');
+         MyUtils.alert('图片大小不能超过2MB', 'error');
+         return false;
+      }
+      return true;
    }
 }

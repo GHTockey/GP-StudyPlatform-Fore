@@ -10,7 +10,7 @@ let baseURL: string = "/api"; // 已在 vite 开启代理
 
 const service = axios.create({
    baseURL,
-   timeout: 3000,
+   // timeout: 3000,
 });
 
 // 请求拦截
@@ -32,6 +32,7 @@ service.interceptors.response.use(res => {
    // 业务逻辑成功，返回响应数据，作为 axios 成功的结果
    return res.data
 }, err => {
+   console.log("错误对象：", err);
    if (err.response.status == 401) {
       // console.log("token失效，重新登录");
       message.error("认证已过期，重新登录")
