@@ -13,7 +13,7 @@ export const useSocketStore = defineStore("socket", () => {
    // 未读消息
    const unreadMessage = ref<UserMessage[]>([]);
    // 聊天窗口的显示
-   const chatWindowShow = ref(false);
+   const chatWindowShow = ref(true);
 
    // 连接
    function connect(uid: string | number) {
@@ -32,8 +32,8 @@ export const useSocketStore = defineStore("socket", () => {
          }
       }
       socket.value.onmessage = (event) => {
-         console.log("[socket-store 主程序] 收到消息：", JSON.parse(event.data));
          let userMessage: UserMessage = JSON.parse(event.data);
+         console.log("[socket-store 主程序] 收到消息：", userMessage);
          // 在线用户列表
          if (userMessage.type == 3) onlineUidList.value = JSON.parse(userMessage.message);
       }
@@ -46,10 +46,10 @@ export const useSocketStore = defineStore("socket", () => {
          // 用户是否登录
          let userStore = useUserStore();
          if (userStore.token) {
-            console.log("[socket-store 主程序] 将在3秒后尝试重新连接");
+            console.log("[socket-store 主程序] 将在5秒后尝试重新连接");
             setTimeout(() => {
                connect(userStore.userInfo!.id);
-            }, 3000);
+            }, 5000);
          }
 
       }

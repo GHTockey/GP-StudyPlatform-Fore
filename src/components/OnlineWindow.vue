@@ -89,8 +89,8 @@
                         </div>
                      </div>
                      <!-- 按钮 -->
-                     <div class="w-full gap-2 flex items-center">
-                        <button class="btn btn-xs btn-circle">
+                     <div class="w-full gap-2 flex items-center relative">
+                        <button @click="showSelectEmoji = true" class="btn btn-xs btn-circle">
                            <IconFont type="icon-biaoqing" />
                         </button>
                         <button class="btn btn-xs btn-circle">
@@ -100,20 +100,32 @@
                            <IconFont type="icon-lianjie" />
                         </button>
                         <button class="btn btn-xs btn-circle">
-                           <IconFont type="icon-lianjie" />
+                           <IconFont type="icon-yonghu" />
                         </button>
+                        <!-- 表情选择容器 -->
+                        <Transition name="one">
+                           <div v-show="showSelectEmoji" class="bg-base-200 absolute -top-[240px] w-[80%] max-w-[500px] h-[230px] left-0 overflow-y-auto
+                            flex flex-wrap justify-between p-2 rounded-lg gap-2">
+                              <div v-for="(item, index) in emojiFiles" :key="index" @click="handleEmojiClick"
+                                 class="size-[35px] cursor-pointer hover:scale-125 transition-all">
+                                 <img :src="`/douyinemoji/${item}`" />
+                              </div>
+                           </div>
+                        </Transition>
                      </div>
                      <!-- 输入框 -->
                      <div class="flex w-full mt-2 gap-2">
-                        <textarea v-model="inputMsg" rows="2" placeholder="输入消息" @paste="pasteHandler"
-                           class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea>
+                        <!-- <textarea v-model="inputMsg" rows="2" placeholder="输入消息" @paste="pasteHandler"
+                           class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea> -->
+                        <div contenteditable ref="inputMsgBoxRef" @paste.prevent="pasteHandler"
+                           class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg">
+                        </div>
                         <button v-if="!(uploadProgress > 0 && uploadProgress < 100)" @click="sendMsg"
                            class="btn btn-success">发送</button>
                         <button v-else class="btn">
                            <span class="loading loading-spinner"></span>
                            上传图片中
                         </button>
-                        <!-- <button @click="uploadImg" class="btn btn-success">测试上传</button> -->
                      </div>
                   </div>
                </template>
@@ -200,7 +212,11 @@ const targetChat = computed(() => {
    data.forEach(item => {
       // 匹配图片
       let reg = /!\[图片\]\((.*?)\)/g;
-      item.message = item.message.replace(reg, `<img src="$1" class="w-[100px]">`)
+      item.message = item.message.replace(reg, `<img style="display: inline-block;" src="$1" class="w-[100px]">`)
+      // 匹配表情
+      let emojiReg = /!\[表情\]\((.*?)\)/g;
+      item.message = item.message.replace(emojiReg, `<div class="emoji-div" role="emoji" style="background-image: url(/douyinemoji/$1)"></div>`)
+
    })
    return data;
 })
@@ -209,7 +225,7 @@ const targetUserStatus = computed(() => {
    return onlineUidList.value.includes(currentChatUser.value!.id)
 })
 // 聊天内容输入框
-const inputMsg = ref("")
+// const inputMsg = ref("")
 // 聊天内容 (总)
 const chatContent = ref<UserMessage[]>([]);
 // 未读消息对象
@@ -228,6 +244,13 @@ const setVisible = (value: boolean): void => {
 };
 // 预览的图片地址
 const previewImage = ref("")
+// 表情文件列表
+const emojiFiles = getFilesInPublicFolder()
+// 选择表情容器 flag
+const showSelectEmoji = ref(false)
+// 输入内容元素 ref
+const inputMsgBoxRef = ref<HTMLDivElement | null>(null)
+
 
 if (userStore.userInfo) {
    // 添加自己到在线用户列表中
@@ -245,6 +268,63 @@ if (userStore.userInfo) {
 
 
 
+
+// 处理输入框内容 (将内容里的表情(div role=emoji) 转换为 ![表情](名称.png) 且保持表情和文字的顺序)
+function processInputBox() {
+   let inputContent = "";
+   let inputMsgBox = document.querySelector("[contenteditable]") as HTMLDivElement;
+   inputMsgBox.childNodes.forEach((item) => {
+      if (item.nodeType == 3) {
+         // 文字
+         inputContent += item.nodeValue
+      } else {
+         // 表情
+         let div = item as HTMLDivElement;
+         // 获取地址
+         let url = div.style.backgroundImage?.replace(/url\(\"(.*)\"\)/, "$1")
+         // 获取名称
+         let name = url?.split("/").pop()?.split(".")[0]
+         inputContent += `![表情](${name}.png)`
+      }
+   })
+   return inputContent;
+}
+// 点击表情事件
+function handleEmojiClick(e: Event) {
+   if ((<HTMLElement>e.target).tagName == "IMG") {
+      let img = e.target as HTMLImageElement;
+      // let inputMsgBox = document.querySelector("#inputMsgBox") as HTMLDivElement;
+      // 插入到输入框
+      // let img = el.cloneNode() as HTMLImageElement;
+      // img.style.width = "20px";
+      // img.style.height = "20px";
+      // img.style.margin = "0 2px";
+      // img.style.verticalAlign = "middle";
+      // img.style.display = "inline-block";
+      // inputMsgBox.innerHTML += img.outerHTML
+      // showSelectEmoji.value = false
+
+      // 插入到输入框 (div背景图片)
+      let div = document.createElement("div");
+      div.className = "emoji-div";
+      div.setAttribute("role", "emoji")
+      div.style.backgroundImage = `url(${img.src})`;
+      div.setAttribute("contenteditable", "false")
+      inputMsgBoxRef.value!.innerHTML += div.outerHTML
+      showSelectEmoji.value = false
+
+   }
+}
+// 获取 public 文件夹下的表情文件列表
+function getFilesInPublicFolder() {
+   const files = import.meta.glob('/public/douyinemoji/*');
+   const fileNames = Object.keys(files);
+   // 去除路径
+   fileNames.forEach((item, index) => {
+      fileNames[index] = item.replace("/public/douyinemoji/", "")
+   })
+   return fileNames;
+}
 // 预览图片事件
 function handlePreview(e: Event) {
    let el = e.target as HTMLElement;
@@ -270,8 +350,10 @@ async function uploadImg() {
       let result = await OtherAPI.imageUpl(fileData, (e: AxiosProgressEvent) => {
          // 计算上传进度 (根据文件数量计算，此时的进度是所有文件的总进度,包括单文件的进度)
          uploadProgress.value = (index) / imgFiles.value.length * 100 + e.loaded / e.total! / imgFiles.value.length * 100;
-         // console.log(uploadProgress.value);
+         console.log(uploadProgress.value);
       })
+      if (result.code != 20000) return new Error(result.message)
+
       // // 计算上传进度
       // uploadProgress.value = (imgFiles.value.indexOf(file) + 1) / imgFiles.value.length * 100
 
@@ -286,7 +368,7 @@ function pasteHandler(e: ClipboardEvent) {
    // let text = clipboardData?.getData("text");
    // console.log(text);
 
-   let imgBox = document.getElementById("imgBox") as HTMLDivElement;
+   // let imgBox = document.getElementById("imgBox") as HTMLDivElement;
    // 文件对象
    let files = clipboardData?.files as FileList;
    for (const key in files) {
@@ -360,7 +442,7 @@ socketStore.socket?.addEventListener("message", (e) => {
    // 【已读反馈】
    if (userMessage.type == 4) {
       let data: { msg: string, id: number } = JSON.parse(userMessage.message)
-      // 
+      console.log("已读反馈", data);
       getChatRecord()
    }
 });
@@ -380,6 +462,8 @@ async function getChatRecord() {
          // 重复数据以时间最新的为准
          // 先排序再去重，这样得到的数据是最新的
          chatContent.value = _.uniqBy(_.sortBy(chatContent.value, "id"), "id")
+         // 去除id为0的数据
+         chatContent.value = chatContent.value.filter(item => item.id != 0)
       }
    } else {
       console.log("用户未登录或未选择聊天对象");
@@ -389,9 +473,11 @@ async function getChatRecord() {
 // 发送消息
 async function sendMsg() {
    // 去除回车
-   inputMsg.value = inputMsg.value.replace(/\n/g, "")
-   if (inputMsg.value == "" && !imgFiles.value.length) {
+   // inputMsg.value = inputMsg.value.replace(/\n/g, "")
+   let inputMsg = processInputBox()
+   if (inputMsg == "" && !imgFiles.value.length) {
       // console.log("消息队列为空", inputMsg.value, imgFiles.value.length);
+      console.log("消息队列为空");
       return
    };
    // 上传图片
@@ -401,14 +487,14 @@ async function sendMsg() {
          id: 0,
          senderId: userStore.userInfo!.id,
          receiverId: currentChatUser.value.id,
-         message: inputMsg.value + uploadImgMDList.value.join("\n"),
+         message: inputMsg + uploadImgMDList.value.join("\n"),
          timestamp: new Date().toLocaleTimeString(), // 仅本地显示 后端会再次处理
          isRead: 1,
          type: 0
       }
       socketStore.send(userMessage)
       // 清空输入框
-      inputMsg.value = ""
+      inputMsgBoxRef.value!.innerHTML = ""
       // 添加到聊天记录到本地
       chatContent.value.push(userMessage)
       // 清除图片队列
@@ -460,9 +546,19 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .myActive {
    background-color: oklch(var(--b2));
    border: 1px solid oklch(var(--p));
+}
+
+.emoji-div {
+   background-size: contain;
+   background-repeat: no-repeat;
+   width: 30px;
+   height: 30px;
+   margin: 0px 2px;
+   vertical-align: middle;
+   display: inline-block;
 }
 </style>

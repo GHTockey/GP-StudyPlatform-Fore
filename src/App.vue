@@ -44,6 +44,15 @@ const socketStore = useSocketStore();
   animation: el-leave 0.3s;
 } */
 
+/* 单元素动画 */
+.one-enter-active {
+  animation: el-enter 0.3s;
+}
+
+.one-leave-active {
+  animation: el-leave 0.3s;
+}
+
 @keyframes el-enter {
   0% {
     transform: translateY(20px);
@@ -58,14 +67,12 @@ const socketStore = useSocketStore();
 
 @keyframes el-leave {
   0% {
-    width: 100%;
-    /* transform: translateY(0); */
+    transform: translateY(0);
     opacity: 1;
   }
 
   100% {
-    width: 0;
-    /* transform: translateY(20px); */
+    transform: translateY(20px);
     opacity: 0;
   }
 }
