@@ -3,7 +3,8 @@
    <div id="onlineBox" v-show="chatWindowShow" class="modal bg-pink-500 opacity-100 pointer-events-auto"
       @close="currentChatUser = undefined; hideUserList = false;">
       <div class="modal-box max-w-[1000px] min-h-[400px]">
-         <h3 class="font-bold text-lg mb-3">OnlineChat
+         <h3 class="font-bold text-lg mb-3">
+            OnlineChat
             <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
          </h3>
          <div class="border h-[600px] flex overflow-hidden relative">
@@ -50,7 +51,7 @@
                <template v-else>
                   <!-- 聊天记录内容 -->
                   <div class="chatBox flex-1 overflow-y-auto">
-                     <div @click="handlePreview" v-for="(item, index) in targetChat" :key="index" class="chat"
+                     <div @click="msgSpecialProgram" v-for="(item, index) in targetChat" :key="index" class="chat"
                         :class="item.senderId == currentChatUser.id ? 'chat-start' : 'chat-end'">
                         <div class="chat-image avatar">
                            <div class="w-10 rounded-full">
@@ -77,7 +78,6 @@
                         <IconFont type="icon-jinggao" />
                         <span class="text-sm">对方处于离线状态，您发送的消息将会在对方上线后进行推送</span>
                      </div>
-
                      <!-- 发送的图片预览队列 -->
                      <div v-if="imgFiles.length" id="imgBox"
                         class="border rounded-lg w-full h-[100px] flex gap-2 overflow-x-auto mb-2 relative">
@@ -90,21 +90,25 @@
                      </div>
                      <!-- 按钮 -->
                      <div class="w-full gap-2 flex items-center relative">
-                        <button @click="showSelectEmoji = true" class="btn btn-xs btn-circle">
+                        <!-- 选择表情按钮 -->
+                        <button @click="inputBoxBtns = 1" class="btn btn-sm btn-circle">
                            <IconFont type="icon-biaoqing" />
                         </button>
-                        <button class="btn btn-xs btn-circle">
+                        <!-- 选择词集按钮 -->
+                        <button @click="inputBoxBtns = 2" class="btn btn-sm btn-circle">
                            <IconFont type="icon-xuexiku" />
                         </button>
-                        <button class="btn btn-xs btn-circle">
+                        <!-- 选择链接按钮 -->
+                        <button class="btn btn-sm btn-circle">
                            <IconFont type="icon-lianjie" />
                         </button>
-                        <button class="btn btn-xs btn-circle">
+                        <!-- 选择用户按钮 -->
+                        <button class="btn btn-sm btn-circle">
                            <IconFont type="icon-yonghu" />
                         </button>
-                        <!-- 表情选择容器 -->
-                        <Transition name="one">
-                           <div v-show="showSelectEmoji" class="bg-base-200/95 absolute -top-[240px] w-[80%] max-w-[500px] h-[230px] left-0 overflow-y-auto
+                        <TransitionGroup name="one">
+                           <!-- 表情选择容器 -->
+                           <div v-if="inputBoxBtns == 1" key="emoji" class="bg-base-200/95 absolute -top-[240px] w-[80%] max-w-[500px] h-[230px] left-0 overflow-y-auto
                                flex flex-wrap justify-between items-start p-2 rounded-lg gap-2">
                               <!-- 历史选择 -->
                               <div v-show="historyEmoji.length" class="w-full border-b border-gray-500/50 pb-2">
@@ -121,7 +125,40 @@
                                  <img :src="`/douyinemoji/${item}`" />
                               </div>
                            </div>
-                        </Transition>
+                           <!-- 选择词集容器 -->
+                           <div key="voc" v-else-if="inputBoxBtns == 2"
+                              class="bg-base-200 shadow-md rounded-lg w-[80%] h-[350px] absolute -top-[360px] p-2 flex flex-wrap flex-col">
+                              <div class="flex items-center w-full p-2">
+                                 <p class="font-bold text-lg">筛选：</p>
+                                 <input class="input input-sm" v-model="filterVocKey" type="text">
+                              </div>
+                              <div class="w-full flex-1 mt-2 flex flex-wrap overflow-y-auto gap-1">
+                                 <!-- 项 -->
+                                 <div v-for="(voc, index) in filterVocList" :key="index" @click="handleVocClick(voc)"
+                                    class="bg-base-300 md:w-[49%] h-[100px] flex rounded-xl overflow-hidden cursor-pointer">
+                                    <div class="w-[100px] bg-gray-500/50 flex items-center justify-center text-4xl">📖
+                                    </div>
+                                    <div class="flex-1 flex flex-wrap content-center pl-2 gap-x-3">
+                                       <!-- 标题 -->
+                                       <div class="w-full flex items-center">
+                                          <p class="font-bold text-lg mb-2">{{ voc.title }}</p>
+                                       </div>
+                                       <!-- 作者与数量 -->
+                                       <div class="avatar placeholder flex items-center">
+                                          <div class="bg-neutral text-neutral-content rounded-full size-5 mr-2">
+                                             <img :src="voc.author?.avatar" />
+                                          </div>
+                                          <span>{{ voc.author?.username }}</span>
+                                       </div>
+                                       <p class="text-sm flex items-center">
+                                          <IconFont type="icon-icon-test" />
+                                          <span class="ml-1">{{ voc.count }}</span>
+                                       </p>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </TransitionGroup>
                      </div>
                      <!-- 输入框 -->
                      <div class="flex w-full mt-2 gap-2">
@@ -167,6 +204,8 @@ import router from "@/router";
 import type { AxiosProgressEvent } from "axios";
 import { OtherAPI } from "@/api/other";
 import { useStorage } from '@vueuse/core'
+import { VocabularyAPI } from "@/api/vocabulary";
+import type { Vocabulary } from "@/types/vocabulary";
 
 
 const socketStore = useSocketStore();
@@ -226,11 +265,44 @@ const targetChat = computed(() => {
    data.forEach(item => {
       // 匹配图片
       let reg = /!\[图片\]\((.*?)\)/g;
-      item.message = item.message.replace(reg, `<img style="display: inline-block;" src="$1" class="w-[100px]">`)
+      item.message = item.message.replace(reg, `<img style="display: inline-block;" src="$1" class="chat-bubble-img">`)
+
       // 匹配表情
       let emojiReg = /!\[表情\]\((.*?)\)/g;
       item.message = item.message.replace(emojiReg, `<div class="emoji-div" role="emoji" style="background-image: url(/douyinemoji/$1)"></div>`)
 
+      // 匹配词集 (先提取id，再根据id获取词集信息，然后以模版字符串替换)
+      let vocReg = /!\[词集\]\((.*?)\)/g;
+      let vocId = vocReg.exec(item.message)?.[1]
+      // console.log('vocId', vocId);
+      if (vocId) {
+         // let voc = userVocList.value.find(v => v.id == vocId)
+         VocabularyAPI.getVocabulary(vocId).then(res => { // 由于是异步请求 TODO: 闪屏问题 (后续添加loading)
+            if (res.code == 20000) {
+               let voc = res.data
+               item.message = item.message.replace(vocReg, `
+                  <div role="voc" data-cid="${voc.id}" class="bg-base-300 h-[100px] flex rounded-xl overflow-hidden cursor-pointer">
+                     <div class="w-[100px] bg-gray-500/50 flex items-center justify-center text-4xl">📖</div>
+                     <div class="flex-1 flex flex-wrap content-center pl-2 gap-x-3 text-base-content">
+                        <div class="w-full flex items-center">
+                           <p class="font-bold text-lg mb-2">${voc.title}</p>
+                        </div>
+                        <div class="avatar placeholder flex items-center">
+                           <div class="bg-neutral text-neutral-content rounded-full size-5 mr-2">
+                              <span role="img" class="anticon"><svg width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" class=""><use xlink:href="#icon-yonghu"></use></svg><!----></span>
+                           </div>
+                           <span>${voc.author?.username}</span>
+                        </div>
+                        <p class="text-sm flex items-center">
+                           <span role="img" class="anticon"><svg width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" class=""><use xlink:href="#icon-icon-test"></use></svg><!----></span>
+                           <span class="ml-1">${voc.count}</span>
+                        </p>
+                     </div>
+                  </div>
+               `)
+            }
+         })
+      }
    })
    return data;
 })
@@ -260,10 +332,18 @@ const setVisible = (value: boolean): void => {
 const previewImage = ref("")
 // 表情文件列表
 const emojiFiles = getFilesInPublicFolder()
-// 选择表情容器 flag
-const showSelectEmoji = ref(true)
 // 输入内容元素 ref
 const inputMsgBoxRef = ref<HTMLDivElement | null>(null)
+// 词集列表
+const userVocList = ref<Vocabulary[]>([])
+// 筛选词集关键词
+const filterVocKey = ref("")
+// 计算属性：筛选词集列表
+const filterVocList = computed(() => {
+   return userVocList.value.filter(item => item.title.includes(filterVocKey.value))
+})
+// 统一：输入框按钮开关 (0:关闭 1:表情 2:词集 3:链接 4:用户)
+const inputBoxBtns = ref<0 | 1 | 2 | 3 | 4>(0)
 
 
 if (userStore.userInfo) {
@@ -275,6 +355,8 @@ if (userStore.userInfo) {
    getUserListByCid(userStore.userInfo.classes!.id!)
    // 获取未读消息
    getUnreadMsg()
+   // 获取用户词集列表
+   getUserAllVocListByUid()
 } else {
    MyUtils.alert("请先登录")
    router.push("/login")
@@ -283,6 +365,39 @@ if (userStore.userInfo) {
 
 
 
+// 词集点击事件 【发送】
+function handleVocClick(voc: Vocabulary) {
+   let userMessage: UserMessage = {
+      id: 0,
+      senderId: userStore.userInfo!.id,
+      receiverId: currentChatUser.value!.id,
+      message: `![词集](${voc.id})`,
+      timestamp: new Date().toLocaleTimeString(), // 仅本地显示 后端会再次处理
+      isRead: 1,
+      type: 0
+   }
+   socketStore.send(userMessage)
+   // 添加到聊天记录到本地
+   chatContent.value.push(userMessage)
+}
+// 获取用户学习的词集列表
+async function getUserAllVocListByUid() {
+   // if (userRelevanceVocList.value!.length > 0) return;
+   let result = await VocabularyAPI.getUserRelevanceVocListByUid(userStore.userInfo!.id);
+   if (result.code == 20000) {
+      userVocList.value.push(...result.data);
+   } else {
+      console.log("获取用户学习的词集列表失败");
+   }
+   let vocListRes = await VocabularyAPI.getVocabularyListByUid(userStore.userInfo!.id);
+   if (vocListRes.code == 20000) {
+      userVocList.value.push(...vocListRes.data);
+   } else {
+      console.log("获取用户发布的词集列表失败");
+   }
+   // 去重
+   userVocList.value = _.uniqBy(userVocList.value, "id")
+}
 // 处理输入框内容 (将内容里的表情(div role=emoji) 转换为 ![表情](名称.png) 且保持表情和文字的顺序)
 function processInputBox() {
    let inputContent = "";
@@ -314,7 +429,7 @@ function handleEmojiClick(e: Event) {
       div.style.backgroundImage = `url(${img.src})`;
       div.setAttribute("contenteditable", "false")
       inputMsgBoxRef.value!.innerHTML += div.outerHTML
-      showSelectEmoji.value = false
+      inputBoxBtns.value = 0 // 关闭表情选择
 
       // 保存文件名到本地存储 (最多保存11条数据,不重复，最新的在最前面)
       let emojiName = img.src.split("/").pop() as string;
@@ -340,14 +455,40 @@ function getFilesInPublicFolder() {
    })
    return fileNames;
 }
-// 预览图片事件
-function handlePreview(e: Event) {
+// 聊天消息特殊程序
+function msgSpecialProgram(e: Event) { // 事件委托
    let el = e.target as HTMLElement;
    // console.log(el.tagName);
+   // 图片
    if (el.tagName == "IMG") {
-      previewImage.value = el.getAttribute("src") as string
-      setVisible(true)
+      const src = el.getAttribute("src");
+      if (src) {
+         previewImage.value = src;
+         setVisible(true);
+      }
    }
+   // // 词集 (元素递归的去获取role=voc的元素, 得到词集id，然后跳转到词集详情页)
+   // if (el.tagName == "DIV") {
+   //    while (el.getAttribute("role") != "voc") {
+   //       el = el.parentElement as HTMLElement
+   //    }
+   //    let vocId = el.getAttribute("data-cid")
+   //    if (vocId) {
+   //       router.push(`/vocabulary/${vocId}`)
+   //    }
+   // }
+
+   // 处理词集点击 (使用closest方法来查找具有role="voc"属性的祖先元素，以替代原先的循环遍历父元素的方式，提高代码的简洁性和效率)
+   let ancestor = el.closest('[role="voc"]');
+   if (ancestor) {
+      const vocId = ancestor.getAttribute("data-cid");
+      if (vocId) {
+         router.push(`/vocabulary/${vocId}`);
+         socketStore.chatWindowShow = false;
+      }
+   }
+
+
 }
 // 获取文件的url
 function getFileUrl(file: File) {
@@ -575,5 +716,28 @@ watch(
    margin: 0px 2px;
    vertical-align: middle;
    display: inline-block;
+}
+
+.chat-bubble-img {
+   border-radius: 18px;
+   max-width: 180px;
+
+   &:hover {
+      cursor: pointer;
+
+      &:after {
+         content: "点击预览";
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0, 0, 0, 0.5);
+         color: white;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+   }
 }
 </style>
