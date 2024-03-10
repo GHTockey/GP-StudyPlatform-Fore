@@ -2,7 +2,7 @@
    <!-- 聊天窗口 -->
    <div id="onlineBox" v-show="chatWindowShow" class="modal bg-pink-500 opacity-100 pointer-events-auto"
       @close="currentChatUser = undefined; hideUserList = false;">
-      <div class="modal-box max-w-[1000px] min-h-[300px]">
+      <div class="modal-box max-w-[1000px] min-h-[400px]">
          <h3 class="font-bold text-lg mb-3">OnlineChat
             <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
          </h3>
@@ -19,7 +19,7 @@
                :class="{ 'absolute -translate-x-full': hideUserList }">
                <!-- 项 -->
                <div v-for="(item, index) in userListMerge" :key="index" class="bg-base-200/50 transition-all rounded-lg h-[60px] flex items-center justify-between
-             mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
+                mb-1 hover:bg-base-200 cursor-pointer border border-transparent" @click="selectUser(item);"
                   :class="{ 'myActive': currentChatUser?.id == item.id }">
                   <!-- 头像 -->
                   <div class="avatar mx-2" :class="onlineUidList.includes(item.id) ? 'online' : 'offline'">
@@ -104,8 +104,18 @@
                         </button>
                         <!-- 表情选择容器 -->
                         <Transition name="one">
-                           <div v-show="showSelectEmoji" class="bg-base-200 absolute -top-[240px] w-[80%] max-w-[500px] h-[230px] left-0 overflow-y-auto
-                            flex flex-wrap justify-between p-2 rounded-lg gap-2">
+                           <div v-show="showSelectEmoji" class="bg-base-200/95 absolute -top-[240px] w-[80%] max-w-[500px] h-[230px] left-0 overflow-y-auto
+                               flex flex-wrap justify-between items-start p-2 rounded-lg gap-2">
+                              <!-- 历史选择 -->
+                              <div v-show="historyEmoji.length" class="w-full border-b border-gray-500/50 pb-2">
+                                 <div class="flex flex-wrap gap-2">
+                                    <div v-for="(item, index) in historyEmoji" :key="index" @click="handleEmojiClick"
+                                       class="size-[35px] cursor-pointer hover:scale-125 transition-all">
+                                       <img :src="`/douyinemoji/${item}`" />
+                                    </div>
+                                 </div>
+                              </div>
+                              <!-- 项 -->
                               <div v-for="(item, index) in emojiFiles" :key="index" @click="handleEmojiClick"
                                  class="size-[35px] cursor-pointer hover:scale-125 transition-all">
                                  <img :src="`/douyinemoji/${item}`" />
@@ -116,7 +126,7 @@
                      <!-- 输入框 -->
                      <div class="flex w-full mt-2 gap-2">
                         <!-- <textarea v-model="inputMsg" rows="2" placeholder="输入消息" @paste="pasteHandler"
-                           class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea> -->
+                              class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg"></textarea> -->
                         <div contenteditable ref="inputMsgBoxRef" @paste.prevent="pasteHandler"
                            class="textarea bg-base-200 textarea-xs flex-1" @keydown.enter="sendMsg">
                         </div>
@@ -156,9 +166,13 @@ import type { UserMessage } from "@/types/other";
 import router from "@/router";
 import type { AxiosProgressEvent } from "axios";
 import { OtherAPI } from "@/api/other";
+import { useStorage } from '@vueuse/core'
+
 
 const socketStore = useSocketStore();
 const userStore = useUserStore();
+// 历史表情
+const historyEmoji = useStorage<string[]>('historyEmoji', [])
 
 const { onlineUidList } = storeToRefs(socketStore)
 
@@ -247,7 +261,7 @@ const previewImage = ref("")
 // 表情文件列表
 const emojiFiles = getFilesInPublicFolder()
 // 选择表情容器 flag
-const showSelectEmoji = ref(false)
+const showSelectEmoji = ref(true)
 // 输入内容元素 ref
 const inputMsgBoxRef = ref<HTMLDivElement | null>(null)
 
@@ -293,17 +307,6 @@ function processInputBox() {
 function handleEmojiClick(e: Event) {
    if ((<HTMLElement>e.target).tagName == "IMG") {
       let img = e.target as HTMLImageElement;
-      // let inputMsgBox = document.querySelector("#inputMsgBox") as HTMLDivElement;
-      // 插入到输入框
-      // let img = el.cloneNode() as HTMLImageElement;
-      // img.style.width = "20px";
-      // img.style.height = "20px";
-      // img.style.margin = "0 2px";
-      // img.style.verticalAlign = "middle";
-      // img.style.display = "inline-block";
-      // inputMsgBox.innerHTML += img.outerHTML
-      // showSelectEmoji.value = false
-
       // 插入到输入框 (div背景图片)
       let div = document.createElement("div");
       div.className = "emoji-div";
@@ -313,6 +316,18 @@ function handleEmojiClick(e: Event) {
       inputMsgBoxRef.value!.innerHTML += div.outerHTML
       showSelectEmoji.value = false
 
+      // 保存文件名到本地存储 (最多保存11条数据,不重复，最新的在最前面)
+      let emojiName = img.src.split("/").pop() as string;
+      let emojiList = historyEmoji.value;
+      // 去重
+      emojiList = emojiList.filter((item: string) => item != emojiName)
+      // 最多11条
+      if (emojiList.length >= 11) {
+         emojiList.pop()
+      }
+      // 添加到最前面
+      emojiList.unshift(emojiName)
+      historyEmoji.value = emojiList
    }
 }
 // 获取 public 文件夹下的表情文件列表
