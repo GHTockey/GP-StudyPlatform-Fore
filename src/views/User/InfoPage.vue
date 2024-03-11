@@ -308,16 +308,15 @@ function changeTab(active: number) {
 }
 // 编辑弹框 【选择上传头像事件】
 async function handleAvatarChange(e: Event) {
-   let file = (<HTMLInputElement>e.target).files?.[0] as File;
-   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+   let file = (<HTMLInputElement>e.target).files?.[0] as File; // 获取文件对象
+   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'; // 检查是不是图片
    if (!isJpgOrPng) return message.error('只能上传JPG格式的文件!');
-   const isLt2M = file.size / 1024 / 1024 < 2;
+   const isLt2M = file.size / 1024 / 1024 < 2; // 检查图片大小
    if (!isLt2M) return message.error('头像必须小于2MB!');
-   let formData = new FormData();
-   formData.append('file', file);
-   let result = await OtherAPI.imageUpl(formData, (p) => {
-      progress.value = Math.floor(p.progress! * 100)
-      // console.log(progress.value);
+   let formData = new FormData(); // 创建 formData
+   formData.append('file', file); // 添加文件
+   let result = await OtherAPI.imageUpl(formData, (p) => { // 调用接口
+      progress.value = Math.floor(p.progress! * 100) // 上传进度
    });
    if (result.code == 20000) {
       editUserInfo.value.avatar = result.data;

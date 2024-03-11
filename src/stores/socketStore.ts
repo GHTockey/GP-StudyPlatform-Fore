@@ -13,7 +13,7 @@ export const useSocketStore = defineStore("socket", () => {
    // 未读消息
    const unreadMessage = ref<UserMessage[]>([]);
    // 聊天窗口的显示
-   const chatWindowShow = ref(true);
+   const chatWindowShow = ref(false);
 
    // 连接
    function connect(uid: string | number) {

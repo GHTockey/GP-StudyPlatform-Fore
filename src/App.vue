@@ -11,7 +11,7 @@
   }">
     <RouterView />
     <!-- 聊天窗口 (限定与token是为了登录后再连接socket服务) -->
-    <OnlineWindow v-if="userStore.token" :chat-window-show="socketStore.chatWindowShow" />
+    <OnlineWindow  :chat-window-show="socketStore.chatWindowShow" />
   </a-config-provider>
 </template>
 

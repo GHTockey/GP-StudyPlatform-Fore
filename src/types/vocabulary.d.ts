@@ -18,6 +18,7 @@ export type Vocabulary = {
    authorId: string,
    createTime: string,
    updateTime: string,
+   stuNum: number,
    // 关联
    wordsList?: Word[],
    author?: User,
