@@ -9,7 +9,7 @@
       <div class="tce-card-box p-2 size-full overflow-hidden md:overflow-visible">
         <!--翻转卡片-->
         <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full" @click="turnCard">
-          <div class="my-card-child">{{ vocabulary.wordsList?.[currentWordIndex].word }}</div>
+          <div class="my-card-child">{{ vocabulary.wordsList?.[currentWordIndex]?.word }}</div>
           <div class="my-card-child size-full absolute top-0">{{
             vocabulary.wordsList?.[currentWordIndex].definition }}</div>
         </div>

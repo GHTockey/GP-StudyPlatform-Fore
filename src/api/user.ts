@@ -55,4 +55,12 @@ export class UserAPI {
    static getUnreadMessage(uid: string) {
       return request<UserMessage[]>(`${cloudServiceURL}/user/chatRecord/unread/${uid}`, "GET");
    }
+   /** 获取学习数前5的用户列表 API */
+   static getActiveUserList() {
+      return request<User[]>(`${cloudServiceURL}/user/activeUserList`, "GET");
+   }
+   /** 更新用户的词集学习数 API */
+   static updateUserVocLearnCount(data: { uid: string, vid: string }) {
+      return request<string>(`${cloudServiceURL}/vocabulary/updateStudyTotal`, "PUT", data);
+   }
 }

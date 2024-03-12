@@ -11,13 +11,13 @@
             </div>
             <!-- 图标展示 -->
             <div :style="`background-image: url(${item.img});`"
-               class="absolute size-[200px] top-1/2 -translate-y-1/2 left-10 bg-cover">
+               class="absolute size-[200px] top-1/2 -translate-y-1/2 md:left-10 left-2 bg-cover">
                <!-- <img class="absolute bottom-0 left-1/2 -translate-x-1/2" :src="item.img"> -->
             </div>
             <!-- 文字介绍 -->
-            <div class="absolute top-1/2 -translate-y-1/2 right-10 text-base-content/100">
-               <h1 class="text-2xl font-bold">{{ item.title }}</h1>
-               <p class="text-lg">{{ item.desc }}</p>
+            <div class="absolute top-1/2 -translate-y-1/2 right-2 md:right-10 w-[180px] md:w-auto text-base-content/100">
+               <h1 class="md:text-2xl text-xl font-bold">{{ item.title }}</h1>
+               <p class="md:text-lg text-md">{{ item.desc }}</p>
             </div>
          </div>
       </a-carousel>
@@ -40,7 +40,7 @@
             聊天消息
          </button>
          <!-- 后台管理 -->
-         <button @click="$router.push('/admin')" class="btn btn-warning">
+         <button v-show="!isNormalUser" @click="$router.push('/admin')" class="btn btn-warning">
             <IconFont type="icon-houtaiguanli-houtaiguanli" class="text-xl" />
             后台管理
          </button>
@@ -49,9 +49,10 @@
       <!-- 分割线 -->
       <div class="divider divider-start font-bold">近期学习</div>
       <!-- 近期学习的词集列表 h-[calc((200px*2)+10px)] overflow-y-auto -->
-      <div v-if="false" class="recent w-full">
+      <div v-if="vocStudyList.length"
+         class="recent w-full transition-all h-[calc((200px+0.8rem)*4)] md:h-[calc((200px+0.8rem)*2)] min-[1600px]:h-[calc((200px+0.8rem)*1)]">
          <a-row :gutter="[10, 10]">
-            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(voc, i) in vocStudyList.splice(0, 4)" :key="i">
+            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(voc, i) in vocStudyList" :key="i">
                <div class="cardT z-10 rounded-lg text-gray-200" @click="$router.push('/vocabulary/' + voc.id)">
                   <p>{{ voc.title }}</p>
                   <p>{{ voc.count }} 个词条</p>
@@ -74,15 +75,16 @@
             </a-col>
          </a-row>
       </div>
+      <div v-else class="text-center text-xl text-gray-500 py-5">暂无数据</div>
 
       <!-- 热门词集和活跃者 -->
       <div class="min-h-[200px] mt-5">
-         <div class="flex justify-between">
+         <div class="flex justify-between gap-2">
             <div class="w-1/2">
                <h2 class="font-bold">热门词集</h2>
                <!-- 项 -->
                <div v-for="(voc, index) in mostStudyVocList" :key="index" @click="$router.push('/vocabulary/' + voc.id)"
-                  class="my-1 mx-2 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative
+                  class="my-1 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative
                   hover:bg-base-300 cursor-pointer">
                   <!-- 标题 -->
                   <p class="font-bold w-full">{{ voc.title }}</p>
@@ -103,23 +105,24 @@
                </div>
             </div>
             <div class="w-1/2">
-               <h2 class="font-bold">活跃用户</h2>
+               <h2 class="font-bold">学霸</h2>
                <!-- 项 -->
-               <div v-for="(user,i) in 5" class="bg-base-200 my-1 rounded-lg h-[80px] relative hover:bg-base-300 cursor-pointer">
+               <div v-for="(user, i) in mostStudyUserList"
+                  class="bg-base-200 my-1 rounded-lg h-[80px] relative hover:bg-base-300 cursor-pointer">
                   <div class="flex items-center h-full pl-3 gap-3">
                      <!-- 头像 -->
                      <div class="avatar">
                         <div class="w-12 rounded-full">
-                           <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                           <img :src="user.avatar" />
                         </div>
                      </div>
                      <div>
-                        <p class="font-bold">用户名</p>
-                        <p class="text-sm">学习了 100 个词条</p>
+                        <p class="font-bold">{{ user.username }}</p>
+                        <p class="text-sm">学习了 {{ user.studyTotal }} 次词集</p>
                      </div>
                   </div>
                   <div class=" absolute top-1/2 -translate-y-1/2 right-5">
-                     <div>No. <span class="font-bold text-3xl">{{ i+1 }}</span> </div>
+                     <div>No. <span class="font-bold text-3xl">{{ i + 1 }}</span> </div>
                   </div>
                </div>
             </div>
@@ -136,6 +139,8 @@ import type { Vocabulary } from "@/types/vocabulary";
 import { ref } from "vue";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { message } from "ant-design-vue";
+import { UserAPI } from "@/api/user";
+import type { User } from "@/types/user";
 
 const userStore = useUserStore();
 const socketStore = useSocketStore();
@@ -162,6 +167,10 @@ const carouselData = [
 const vocStudyList = ref<Vocabulary[]>([]);
 // 学习量前5的词集列表
 const mostStudyVocList = ref<Vocabulary[]>([]);
+// 学习量前5的用户列表
+const mostStudyUserList = ref<User[]>([]);
+// 是否是普通用户 (不是管理员和老师)
+const isNormalUser = ref<boolean>(true);
 
 
 if (userStore.userInfo && userStore.userInfo.id) {
@@ -169,6 +178,10 @@ if (userStore.userInfo && userStore.userInfo.id) {
    getUserRelevanceVocListByUid();
    // 获取学习数量最多的词集列表
    getMostStudyVocList();
+   // 获取学习数前5的用户列表
+   getMostStudyUserList();
+   // 判断是否是普通用户
+   isNormalUser.value = userStore.userInfo.roleList?.findIndex((item) => item.id == 1 || item.id == 2) == -1;
 }
 
 
@@ -177,6 +190,12 @@ async function getUserRelevanceVocListByUid() {
    let result = await VocabularyAPI.getUserRelevanceVocListByUid(userStore.userInfo?.id!);
    if (result.code == 20000) {
       vocStudyList.value = result.data;
+      // 最多显示4个词集
+      if (vocStudyList.value.length > 4) {
+         vocStudyList.value = vocStudyList.value.slice(0, 4);
+      }
+      // console.log("vocStudyList", vocStudyList.value);
+
    } else {
       message.error("获取用户学习的词集列表失败");
    }
@@ -190,6 +209,15 @@ async function getMostStudyVocList() {
       message.error("获取学习数量最多的词集列表失败");
    }
 }
+// 获取学习数前5的用户列表
+async function getMostStudyUserList() {
+   let result = await UserAPI.getActiveUserList();
+   if (result.code == 20000) {
+      mostStudyUserList.value = result.data;
+   } else {
+      message.error("获取学习数前5的用户列表失败");
+   }
+}
 </script>
 
 <style lang="less" scoped>
@@ -199,6 +227,7 @@ async function getMostStudyVocList() {
       // height: calc((200px * 2) + 30px);
       // background-color: antiquewhite;
       // overflow: hidden;
+
 
       >div {
          height: 200px;

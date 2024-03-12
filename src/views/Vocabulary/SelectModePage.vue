@@ -74,11 +74,12 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import type { Vocabulary, Word } from "@/types/vocabulary";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import lodash from "lodash";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { MyUtils } from "@/utils";
-import { set } from "@vueuse/core";
+import { UserAPI } from "@/api/user";
+import { useUserStore } from "@/stores/userStore";
 
 const route = useRoute();
 // 词集数据
@@ -91,7 +92,8 @@ const vocabulary = ref<Vocabulary>({
    authorId: "",
    createTime: "",
    updateTime: "",
-   wordsList: []
+   wordsList: [],
+   stuNum: 0
 });
 // 当前词语
 const currentWord = ref<Word>();
@@ -242,6 +244,13 @@ function getRandomWord() {
       isEnd.value = true;
       learnNum.value++;
       MyUtils.fire();
+      let userStore = useUserStore();
+      UserAPI.updateUserVocLearnCount(
+         {
+            vid: vocabulary.value.id,
+            uid: userStore.userInfo!.id
+         }
+      )
       return;
    }
    // 切换动画
@@ -361,6 +370,7 @@ async function getVocabulary(vid: string) {
 .toggle-card-enter-active {
    animation: toggle-card-enter .3s;
 }
+
 // .toggle-card-leave-active {
 //    animation: toggle-card-leave .3s;
 // }
@@ -376,6 +386,7 @@ async function getVocabulary(vid: string) {
       opacity: 1;
    }
 }
+
 @keyframes toggle-card-leave {
    0% {
       transform: translateX(0);
