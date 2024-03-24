@@ -11,10 +11,10 @@
       <a-form :model="vocabulary" class="mr-5 flex flex-wrap flex-col flex-1 text-base-content" ref="formRef">
         <a-form-item name="title" :rules="{ required: true, message: '请输入名称' }">
           <input type="text" placeholder="名称" v-model="vocabulary.title"
-                 class="input w-full bg-base-200 text-base-content"/>
+            class="input w-full bg-base-200 text-base-content" />
         </a-form-item>
         <textarea type="text" placeholder="描述" v-model="vocabulary.desc"
-                  class="textarea w-full bg-base-200 flex-1 resize-none"></textarea>
+          class="textarea w-full bg-base-200 flex-1 resize-none"></textarea>
       </a-form>
       <!-- 封面 w-[400px] h-[230px] -->
       <div class="tce-cover-box btn p-0 bg-base-200 w-[230px] h-[150px] relative rounded-lg shadow-md
@@ -30,13 +30,13 @@
         </div>
         <!-- 上传进度 -->
         <div v-else-if="progress > 0 && progress < 100" class="radial-progress"
-             :style="`--value:${progress}; --size:8rem; --thickness: 2px;`" role="progressbar">{{ progress }}%
+          :style="`--value:${progress}; --size:8rem; --thickness: 2px;`" role="progressbar">{{ progress }}%
         </div>
         <!-- 图片 -->
         <img v-else-if="vocabulary.cover" :src="vocabulary.cover" alt="cover" class="absolute size-full">
         <!-- 清除图片 -->
         <div v-if="vocabulary.cover" @click="vocabulary.cover = ''; progress = 0"
-             class="tce-clear absolute transition-all opacity-0 size-full bg-gray-500/80 text-white/80 flex justify-center items-center">
+          class="tce-clear absolute transition-all opacity-0 size-full bg-gray-500/80 text-white/80 flex justify-center items-center">
           清除图片
         </div>
       </div>
@@ -64,11 +64,11 @@
               <div>
                 <!-- 拖拽按钮 -->
                 <button class="dragEl btn btn-xs rounded-full">
-                  <IconFont type="icon-yidong"/>
+                  <IconFont type="icon-yidong" />
                 </button>
                 <!-- 删除按钮 -->
                 <button @click="delWord(element.id)" class="btn btn-xs rounded-full">
-                  <IconFont type="icon-shanchu"/>
+                  <IconFont type="icon-shanchu" />
                 </button>
               </div>
             </div>
@@ -76,14 +76,13 @@
             <div class="flex justify-between gap-5 p-5">
               <!-- 词语 -->
               <div class="my-word-item-edit flex items-end before:content-['词语']"><textarea v-model="element.word"
-                                                                                              oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
-                                                                                              rows="1"
-                                                                                              class="bg-transparent w-full focus:outline-none resize-none"></textarea>
+                  oninput="this.rows = (this.value.match(/\n/g) || []).length+1" rows="1"
+                  class="bg-transparent w-full focus:outline-none resize-none"></textarea>
               </div>
               <!-- 定义 -->
               <div class="my-word-item-edit flex items-end before:content-['定义']">
                 <textarea v-model="element.definition" oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
-                          rows="1" class="bg-transparent w-full focus:outline-none resize-none"></textarea>
+                  rows="1" class="bg-transparent w-full focus:outline-none resize-none"></textarea>
               </div>
             </div>
           </div>
@@ -109,8 +108,7 @@
           <div class="relative mt-8 border-gray-500/50 border-2 flex-1 min-h-[300px] max-h-[500px]">
             <p class="absolute -top-7 font-semibold text-sm">文本数据</p>
             <textarea v-model="importData" @input="importHandler"
-                      class="size-full min-h-[300px] bg-transparent resize-none  focus:outline-none"
-                      placeholder="词语1  定义1" />
+              class="size-full min-h-[300px] bg-transparent resize-none  focus:outline-none" placeholder="词语1  定义1" />
           </div>
           <!-- 预览位置 -->
           <div class="relative mt-8 flex-1 min-h-[300px] max-h-[500px]">
@@ -118,7 +116,7 @@
             <div class="size-full overflow-auto">
               <!-- 词条 -->
               <div v-for="(words, i) in handleData" :key="i"
-                   class="bg-base-200 rounded-md mb-2 flex justify-between items-center">
+                class="bg-base-200 rounded-md mb-2 flex justify-between items-center">
                 <div class="pl-1 text-sm italic text-gray-400/50">{{ i + 1 }}</div>
                 <div class="flex-1 p-2 pb-3 text-sm">
                   <p class="my-word-item-edit before:content-['词语'] border-b">{{ words.word }}</p>
@@ -136,28 +134,28 @@
             <p class="text-sm mb-1 ml-1 font-semibold">词语和定义之间的分隔符：</p>
             <div class="join">
               <input @click="customSymbol = null" class="join-item btn btn-sm" type="radio" v-model="joinSymbol"
-                     value="blank" name="option" aria-label="空格"/>
+                value="blank" name="option" aria-label="空格" />
               <input @click="customSymbol = null" class="join-item btn btn-sm" type="radio" v-model="joinSymbol"
-                     value="comma" name="option" aria-label="逗号"/>
+                value="comma" name="option" aria-label="逗号" />
               <input class="join-item btn btn-sm" type="radio" name="option" aria-label="自定义"
-                     @click="customSymbol = '', joinSymbol = null"/>
+                @click="customSymbol = '', joinSymbol = null" />
               <input v-if="customSymbol != null" v-model="customSymbol" placeholder="请输入"
-                     class="join-item input input-sm max-w-16 bg-primary text-info-content text-xs font-semibold"
-                     type="text"/>
+                class="join-item input input-sm max-w-16 bg-primary text-info-content text-xs font-semibold"
+                type="text" />
             </div>
           </div>
           <div>
             <p class="text-sm mb-1 ml-1 font-semibold">词条之间的分隔符：</p>
             <div class="join">
               <input @click="customSymbol2 = null" class="join-item btn btn-sm" type="radio" v-model="joinSymbol2"
-                     value="line" name="option2" aria-label="换行"/>
+                value="line" name="option2" aria-label="换行" />
               <input @click="customSymbol2 = null" class="join-item btn btn-sm" type="radio" v-model="joinSymbol2"
-                     value="semicolon" name="option2" aria-label="分号"/>
+                value="semicolon" name="option2" aria-label="分号" />
               <input class="join-item btn btn-sm" type="radio" name="option2" aria-label="自定义"
-                     @click="customSymbol2 = '', joinSymbol2 = null"/>
+                @click="customSymbol2 = '', joinSymbol2 = null" />
               <input v-if="customSymbol2 != null" v-model="customSymbol2" placeholder="请输入"
-                     class="join-item input input-sm max-w-16 bg-primary text-info-content text-xs font-semibold"
-                     type="text"/>
+                class="join-item input input-sm max-w-16 bg-primary text-info-content text-xs font-semibold"
+                type="text" />
             </div>
           </div>
         </div>
@@ -174,16 +172,16 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onBeforeUnmount, onMounted, watch} from 'vue';
-import {useUserStore} from "@/stores/userStore";
-import type {Vocabulary, Word} from "@/types/vocabulary";
-import {VocabularyAPI} from "@/api/vocabulary";
-import {OtherAPI} from "@/api/other";
-import {useRouter, useRoute} from "vue-router";
-import {MyUtils} from '@/utils';
+import { ref, watch } from 'vue';
+import { useUserStore } from "@/stores/userStore";
+import type { Vocabulary, Word } from "@/types/vocabulary";
+import { VocabularyAPI } from "@/api/vocabulary";
+import { OtherAPI } from "@/api/other";
+import { useRouter, useRoute } from "vue-router";
+import { MyUtils } from '@/utils';
 import IconFont from "@/utils/iconFont";
 import Draggable from "vuedraggable";
-import type {FormExpose} from 'ant-design-vue/es/form/Form';
+import type { FormExpose } from 'ant-design-vue/es/form/Form';
 
 const route = useRoute();
 const router = useRouter();
@@ -199,7 +197,8 @@ const vocabulary = ref<Vocabulary>({
   authorId: '',
   createTime: '',
   updateTime: '',
-  wordsList: []
+  wordsList: [],
+  stuNum: 0
 });
 // 上传进度
 const progress = ref(0);
@@ -256,23 +255,23 @@ function execBatchImport() {
 function importHandler() {
   // 根据分隔符将文本分割成数组对象
   let data = importData.value.split(joinSymbol2.value == 'line' ? '\n' : customSymbol2.value || ';') // 区分词条
-      .filter(item => item.trim() != '') // 过滤空行
-      .map((item, i) => {
-        let temp = item.split(joinSymbol.value == 'blank' ? ' ' : customSymbol.value || ',') // 区分词语和定义
-        return {
-          id: 'temp' + i,
-          vid: vocabulary.value.id || null,
-          word: temp[0],
-          definition: temp[1]
-        }
-      })
+    .filter(item => item.trim() != '') // 过滤空行
+    .map((item, i) => {
+      let temp = item.split(joinSymbol.value == 'blank' ? ' ' : customSymbol.value || ',') // 区分词语和定义
+      return {
+        id: 'temp' + i,
+        vid: vocabulary.value.id || null,
+        word: temp[0],
+        definition: temp[1]
+      }
+    })
   handleData.value = data;
 }
 
 // 监听分隔符的变化
 watch([joinSymbol, customSymbol, joinSymbol2, customSymbol2], () => {
   importHandler();
-}, {immediate: true});
+}, { immediate: true });
 
 // 提交表单
 async function submitForm() {
@@ -383,7 +382,7 @@ async function delWord(id: string) {
 </script>
 
 <style scoped>
-:hover.tce-cover-box > .tce-clear {
+:hover.tce-cover-box>.tce-clear {
   opacity: 1;
 }
 </style>

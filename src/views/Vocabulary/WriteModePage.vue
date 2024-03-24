@@ -5,7 +5,7 @@
       <progress class="progress progress-accent my-5 min-h-2" :value="learnedWords.length"
          :max="vocabulary.wordsList?.length"></progress>
 
-      <!-- 词条练习卡变 -->
+      <!-- 词条练习卡片 -->
       <transition>
          <div v-show="transitionFlag" class="flex-1 flex items-center">
             <div class="w-full">
@@ -77,17 +77,6 @@
             </div>
          </div>
       </div>
-
-
-      <!-- <h3>标题：{{ vocabulary.title }}</h3>
-      <p>定义：{{ currentWord?.definition }} <span>答案:{{ currentWord?.word }}</span></p>
-      <p>输入：<input type="text" placeholder="输入答案" class="input w-full max-w-xs" v-model="userAnswer" /></p>
-      <p>剩余：{{ wordsList.length + forgetWords.length }}</p> -->
-
-      <!-- <p>当前模式：{{ mode ? '严格' : '常规' }}</p> -->
-      <!-- <p class=" bg-orange-400">忘记的词语：{{ forgetWords }}</p>
-      <p class=" bg-sky-500">剩余的词语：{{ wordsList }}</p>
-      <p class=" bg-green-600">学习过的词语：{{ learnedWords }}</p> -->
    </div>
    <!-- 结束 -->
    <div v-else class="hero h-full">
@@ -132,30 +121,43 @@
 
 <script setup lang="ts">
 import type { Vocabulary, Word } from "@/types/vocabulary";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import lodash from "lodash";
 import { message } from "ant-design-vue";
 import { VocabularyAPI } from "@/api/vocabulary";
 import { MyUtils } from "@/utils";
+import { useUserStore } from "@/stores/userStore";
+import { UserAPI } from "@/api/user";
 
 const route = useRoute();
 
 // 词集数据
 const vocabulary = ref<Vocabulary>({
+   // 单词id
    id: "",
+   // 单词标题
    title: "",
+   // 单词描述
    desc: "",
+   // 单词封面
    cover: "",
+   // 单词数量
    count: 0,
+   // 作者id
    authorId: "",
+   // 创建时间
    createTime: "",
+   // 更新时间
    updateTime: "",
-   wordsList: []
+   // 单词列表
+   wordsList: [],
+   // 学生数量
+   stuNum: 0
 });
 // 剩余的词语
 const wordsList = ref<Word[]>([]);
-// 模式 false常规(选项和答案类似，中文可以类似，英文必须完全匹配  如：我是一个kaiwen 答案可以是: 我是kaiwen)  true严格(选项和答案完全一致)
+// 模式 false 常规(选项和答案类似，中文可以类似，英文必须完全匹配  如：我是一个kaiwen 答案可以是: 我是kaiwen)  true严格(选项和答案完全一致)
 const mode = ref<boolean>(false);
 // 当前学习的词语
 const currentWord = ref<Word>();
@@ -430,6 +432,21 @@ async function getVocabulary(vid: string) {
       MyUtils.alert(result.message, "error");
    }
 };
+// 监听学完了
+watch(
+   () => isEnd.value,
+   (val) => {
+      if (val) {
+         let userStore = useUserStore();
+         UserAPI.updateUserVocLearnCount(
+            {
+               vid: vocabulary.value.id,
+               uid: userStore.userInfo!.id
+            }
+         )
+      }
+   }
+);
 </script>
 
 <style lang="less">

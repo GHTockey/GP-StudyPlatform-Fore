@@ -75,7 +75,8 @@
         }}</button>
         <template v-if="isSelf">
           <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)" class="btn btn-sm btn-secondary">编辑</button>
-          <button @click="MyUtils.modal('操作确认',`您确定将词集 【${vocabulary.title}】 删除吗？`,()=>delVocabularyConfirm())" class="btn btn-sm btn-error">删除</button>
+          <button @click="MyUtils.modal('操作确认', `您确定将词集 【${vocabulary.title}】 删除吗？`, () => delVocabularyConfirm())"
+            class="btn btn-sm btn-error">删除</button>
         </template>
         <template v-else>
           <button @click="MyUtils.alert('待开发')" class="btn btn-sm btn-warning">举报</button>
@@ -154,7 +155,8 @@ const route = useRoute();
 
 // 词集数据
 const vocabulary = ref<Vocabulary>({
-  authorId: "", count: 0, cover: "", createTime: "", desc: "", id: "", title: "", updateTime: ""
+  authorId: "", count: 0, cover: "", createTime: "", desc: "", id: "", title: "", updateTime: "",
+  stuNum: 0
 });
 // 是否翻转
 const isTurn = ref(false);

@@ -34,7 +34,9 @@ const router = createRouter({
         },
       ]
     },
-    { path: '/login', name: '登录页', component: () => import("@/views/login/LoginPage.vue") }
+    { path: '/login', name: '登录页', component: () => import("@/views/login/LoginPage.vue") },
+    // 第三方登录 (绑定)
+    { path: '/thirdLogin', name: '第三方登录绑定', component: () => import("@/views/login/ThirdLoginPage.vue") }
   ]
 })
 

@@ -42,14 +42,20 @@
           <span class="w-full text-right">
             <span class="text-xs hover:text-blue-400 cursor-pointer" @click="isRegister = !isRegister">注册账号</span>
           </span>
-          <div class="divider text-white w-full">社交登录</div>
+          <div class="divider text-gray-200 w-full">第三方登录</div>
           <div class="flex justify-center gap-1">
-            <a-button type="primary" class="btn social-btn rounded-lg">
-              😋QQ
-            </a-button>
-            <a-button type="primary" class="btn social-btn rounded-lg">
-              😋QQ
-            </a-button>
+            <button class="btn">
+              <iconFont type="icon-github" class="text-2xl" />
+            </button>
+            <button class="btn">
+              <iconFont type="icon-gitee-fill-round" class="text-2xl" />
+            </button>
+            <button class="btn">
+              <iconFont type="icon-QQ" class="text-2xl" />
+            </button>
+            <button class="btn">
+              <iconFont type="icon-weixin" class="text-2xl" />
+            </button>
           </div>
         </template>
         <template v-else>
@@ -69,6 +75,7 @@ import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import { useSocketStore } from "@/stores/socketStore";
+import iconFont from "@/utils/iconFont";
 
 const route = useRoute();
 const userStore = useUserStore();

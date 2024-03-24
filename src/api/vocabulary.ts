@@ -49,7 +49,7 @@ export class VocabularyAPI {
    static getUserRelevanceVocListByUid(uid: string) {
       return request<Vocabulary[]>(`${cloudServiceURL}/vocabulary/learn/${uid}`, 'GET')
    }
-   /* 获取学习最多的词集列表 (前5个) */
+   /* 获取学习最多的词集列表 按数量排序 */
    static getMostStudyVocList() {
       return request<Vocabulary[]>(`${cloudServiceURL}/vocabulary/most`, 'GET')
    }

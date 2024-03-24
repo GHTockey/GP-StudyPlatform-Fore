@@ -1,10 +1,10 @@
 <template>
    <div class="home-container my-type-center">
 
-      <a-carousel effect="fade" autoplay>
+      <a-carousel effect="fade" autoplay class="transition-all">
          <!-- 主功能模式介绍轮播 -->
          <div v-for="(item, index) in carouselData" :key="index"
-            class="manBox h-[250px] relative rounded-xl overflow-hidden">
+            class="manBox h-[250px] transition-all relative rounded-xl overflow-hidden">
             <!-- 背景模糊 -->
             <div class="absolute size-full my-bg-gradient">
                <img class="w-[400px] absolute top-1/2 -translate-y-1/2 -right-10 blur-lg rotate-45" :src="item.img">
@@ -15,7 +15,8 @@
                <!-- <img class="absolute bottom-0 left-1/2 -translate-x-1/2" :src="item.img"> -->
             </div>
             <!-- 文字介绍 -->
-            <div class="absolute top-1/2 -translate-y-1/2 right-2 md:right-10 w-[180px] md:w-auto text-base-content/100">
+            <div
+               class="absolute top-1/2 -translate-y-1/2 right-2 md:right-10 w-[180px] transition-all md:w-auto text-base-content/100">
                <h1 class="md:text-2xl text-xl font-bold">{{ item.title }}</h1>
                <p class="md:text-lg text-md">{{ item.desc }}</p>
             </div>
@@ -91,7 +92,7 @@
                   <!-- 头像 -->
                   <div class="flex gap-2 mt-2 items-center">
                      <div class="avatar">
-                        <div class="size-7 rounded-full">
+                        <div class="size-5 rounded-full">
                            <img :src="voc.author?.avatar" />
                         </div>
                      </div>
@@ -107,7 +108,7 @@
             <div class="w-1/2">
                <h2 class="font-bold">学霸</h2>
                <!-- 项 -->
-               <div v-for="(user, i) in mostStudyUserList"
+               <div v-for="(user, i) in mostStudyUserList" :key="i" @click="$router.push('/user/' + user.id)"
                   class="bg-base-200 my-1 rounded-lg h-[80px] relative hover:bg-base-300 cursor-pointer">
                   <div class="flex items-center h-full pl-3 gap-3">
                      <!-- 头像 -->
@@ -204,7 +205,13 @@ async function getUserRelevanceVocListByUid() {
 async function getMostStudyVocList() {
    let result = await VocabularyAPI.getMostStudyVocList();
    if (result.code == 20000) {
-      mostStudyVocList.value = result.data;
+      // mostStudyVocList.value = result.data;
+      // 最多显示5个词集
+      if (result.data.length > 5) {
+         mostStudyVocList.value = result.data.slice(0, 5);
+      } else {
+         mostStudyVocList.value = result.data;
+      }
    } else {
       message.error("获取学习数量最多的词集列表失败");
    }

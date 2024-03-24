@@ -387,8 +387,8 @@ if (userStore.userInfo) {
    // 获取班级数据
    getClasses()
 } else {
-   MyUtils.alert("请先登录")
-   router.push("/login")
+   // MyUtils.alert("请先登录")
+   // router.push("/login")
 }
 
 
