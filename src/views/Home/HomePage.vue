@@ -142,7 +142,9 @@ import { VocabularyAPI } from "@/api/vocabulary";
 import { message } from "ant-design-vue";
 import { UserAPI } from "@/api/user";
 import type { User } from "@/types/user";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const userStore = useUserStore();
 const socketStore = useSocketStore();
 
@@ -173,7 +175,11 @@ const mostStudyUserList = ref<User[]>([]);
 // 是否是普通用户 (不是管理员和老师)
 const isNormalUser = ref<boolean>(true);
 
-
+// 第三方登录(且已绑定)
+if (route.query.token) {
+   getUserInfoByToken()
+}
+// 判断是否登录
 if (userStore.userInfo && userStore.userInfo.id) {
    // 获取用户学习的词集列表
    getUserRelevanceVocListByUid();
@@ -185,6 +191,17 @@ if (userStore.userInfo && userStore.userInfo.id) {
    isNormalUser.value = userStore.userInfo.roleList?.findIndex((item) => item.id == 1 || item.id == 2) == -1;
 }
 
+
+// 通过 token 获取用户信息
+async function getUserInfoByToken(){
+   let result = await UserAPI.getUserInfoByToken(route.query.token as string);
+   if (result.code == 20000) {
+      userStore.setUserInfo(result.data, route.query.token as string);
+      console.log("用户信息", userStore.userInfo);
+      // 重新加载页面
+      location.href = "/";
+   }
+}
 
 // 获取用户学习的词集列表
 async function getUserRelevanceVocListByUid() {

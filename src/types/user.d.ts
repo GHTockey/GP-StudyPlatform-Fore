@@ -3,10 +3,14 @@ import type { Classes } from "./classes"
 export type User = {
    id: string,
    username: string,
-   // password: string,
+   password?: string,
    avatar: string,
    email: string,
    sex: string,
+   githubAccountBingId?: string | null,
+   giteeAccountBingId?: string | null,
+   weixinAccountBingId?: string | null,
+   qqAccountBingId?: string | null,
 
    classes?: Classes
    permissionList?: Permission[],

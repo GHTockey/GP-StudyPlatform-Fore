@@ -63,4 +63,21 @@ export class UserAPI {
    static updateUserVocLearnCount(data: { uid: string, vid: string }) {
       return request<string>(`${cloudServiceURL}/vocabulary/updateStudyTotal`, "PUT", data);
    }
+   /* 第三方用户与本地用户绑定 API */
+   static oAuthBind(oAuthUser: User, oKey: string, type: string) {
+      return request<User>(`${cloudServiceURL}/user/oauth/bind?type=${type}&oKey=${oKey}`, "POST", oAuthUser);
+   }
+   /* 通过 token 获取用户信息 API */
+   static getUserInfoByToken(token: string) {
+      return request<User>(`${cloudServiceURL}/user/token/${token}`, "GET");
+   }
+   /* OAuth 注册并登录 API */
+   static oAuthRegisterLogin(oAuthUser: {
+      username: string;
+      avatar: string;
+      email: string;
+      password: string;
+   }, oKey: string, type: string) {
+      return request<User>(`${cloudServiceURL}/user/oauth/register/login?type=${type}&oKey=${oKey}`, "POST", oAuthUser);
+   }
 }

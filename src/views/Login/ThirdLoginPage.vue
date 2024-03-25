@@ -6,13 +6,13 @@
          <!-- 标题 -->
          <h1 class="text-center text-2xl font-bold mt-8">第三方账号绑定</h1>
          <!-- 双方图标 -->
-         <div class="flex my-5 justify-center gap-10">
+         <div class="flex my-5 justify-center gap-12">
             <!-- 对方 -->
             <div class=" flex items-center">
                <div class="avatar">
                   <!--  ring ring-white -->
-                  <div class="w-16 rounded-full bg-white ring ring-gray-300">
-                     <img src="/logo/github-logo.svg" />
+                  <div class="w-[72px] p-1 rounded-full bg-white ring ring-gray-300">
+                     <img :src="`/logo/${oAuthType.toLocaleLowerCase()}-logo.svg`" />
                   </div>
                </div>
             </div>
@@ -23,34 +23,200 @@
             <!-- 我方 -->
             <div class=" flex items-center">
                <div class="avatar">
-                  <div class="w-16 rounded-full bg-white ring ring-gray-300">
+                  <div class="w-[72px] p-1 rounded-full bg-white ring ring-gray-300">
                      <img src="/douyinemoji/cde766dbded94bab8cac6f71e9690bc1.png" />
                   </div>
                </div>
             </div>
          </div>
          <!-- 说明 -->
-         <p class="text-center">你已通过 {{ OAuthType }} 授权，完善以下信息以继续</p>
+         <p class="text-center">你已通过 <span class="font-bold">{{ oAuthType }}</span> 授权，完善以下信息以继续</p>
          <!-- 表单 -->
-         <div class="grid place-content-center gap-4 my-5 text-base-content">
-            <input type="text" placeholder="手机号 / 邮箱" class="input input-bordered input-md w-[350px]" />
-            <input type="text" placeholder="密码" class="input input-bordered input-md w-[350px]" />
-         </div>
+         <a-form ref="bindUserFormRef" :model="bindUserForm">
+            <div class="grid place-content-center mt-5 text-base-content">
+               <a-form-item name="username" :rules="[{ required: true, message: '请输入您的用户名!' }]">
+                  <input v-model="bindUserForm.username" type="text" placeholder="用户名"
+                     class="input input-bordered input-md w-[350px]" />
+               </a-form-item>
+               <a-form-item name="password" :rules="[{ required: true, message: '请输入您的密码!' }]">
+                  <input v-model="bindUserForm.password" type="password" placeholder="密码"
+                     class="input input-bordered input-md w-[350px]" />
+               </a-form-item>
+            </div>
+         </a-form>
          <!-- 按钮 -->
          <div class="grid place-content-center gap-2">
-            <button class="btn btn-primary w-[350px]">绑定已有账号并登录</button>
-            <button class="btn w-[350px]">使用第三方信息注册并登录</button>
+            <button @click="bindLocalUserHandler" class="btn btn-primary text-white w-[350px]">绑定已有账号并登录</button>
+            <button onclick="verifyModal.showModal()" class="btn btn-success text-white w-[350px]">使用你的 {{ oAuthType }}
+               用户信息注册并登录</button>
          </div>
       </div>
+
+      <!-- 直接注册确认信息对话框 -->
+      <!-- Open the modal using ID.showModal() method -->
+      <dialog id="verifyModal" class="modal">
+         <div class="modal-box">
+            <h3 class="font-bold text-lg">确认你的信息</h3>
+            <div class="min-h-[350px]">
+               <!-- 头像 -->
+               <div class="flex justify-center p-5">
+                  <div class="avatar">
+                     <div class="w-[68px] rounded-full bg-white ring ring-gray-300">
+                        <img :src="oAuthUserData.avatar" />
+                     </div>
+                  </div>
+               </div>
+               <!-- 表单 -->
+               <a-form ref="registerFormRef" :rules="rules" :model="oAuthUserData" :label-col="{ span: 5 }"
+                  :wrapper-col="{ span: 16 }">
+                  <a-form-item label="用户名" name="username" :rules="{ required: true, message: '请输入用户名' }">
+                     <input v-model="oAuthUserData.username" class="input input-bordered input-sm w-full" type="text">
+                  </a-form-item>
+                  <a-form-item label="密码" name="password" :rules="{ required: true, message: '请输入密码' }">
+                     <input v-model="oAuthUserData.password" class="input input-bordered input-sm w-full" type="password">
+                  </a-form-item>
+                  <a-form-item label="确认密码" name="passwordConfirm">
+                     <input v-model="oAuthUserData.passwordConfirm" class="input input-bordered input-sm w-full"
+                        type="password">
+                  </a-form-item>
+                  <a-form-item label="邮箱">
+                     <input v-model="oAuthUserData.email" class="input input-bordered input-sm w-full" type="text">
+                  </a-form-item>
+               </a-form>
+               <!-- <span>数据来自</span> -->
+            </div>
+            <div class="modal-action">
+               <form method="dialog" class="flex gap-2">
+                  <button class="btn">取消</button>
+                  <button @click.prevent="registerOAuthUserHandler" class="btn btn-primary">确定</button>
+               </form>
+            </div>
+         </div>
+      </dialog>
    </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+import { OtherAPI } from "@/api/other";
+import { UserAPI } from "@/api/user";
+import { ref } from "vue";
+import type { User } from "@/types/user";
+import type { FormExpose } from "ant-design-vue/es/form/Form";
+import { MyUtils } from "@/utils";
+import { useSocketStore } from "@/stores/socketStore";
+import { useUserStore } from "@/stores/userStore";
+import router from "@/router";
+import type { GithubUser } from "@/types/other";
+import type { Rule } from "ant-design-vue/es/form";
 
-const OAuthType = useRoute().query.type as string;
-const OAuthKeyName = useRoute().query.okey as string;
+const userStore = useUserStore();
 
+// 用于绑定的第三方登录类型和 key
+const oAuthType = useRoute().query.type as string;
+const oAuthKey = useRoute().query.okey as string;
+
+// 绑定本地用户表单数据
+const bindUserForm = ref<User>({
+   email: "",
+   // mobile: "",
+   username: "",
+   password: "",
+   avatar: "",
+   sex: "",
+   id: ""
+});
+// 第三方用户数据
+const oAuthUserData = ref({
+   username: "",
+   avatar: "",
+   email: "",
+   password: "",
+   passwordConfirm: ""
+})
+
+// 绑定本地用户表单实例
+const bindUserFormRef = ref<FormExpose | null>(null);
+// 注册表单实例
+const registerFormRef = ref<FormExpose | null>(null);
+
+
+
+// 获取第三方登录用户信息
+getOAuthUserDataHandler()
+
+
+
+
+// 执行注册
+async function registerOAuthUserHandler() {
+   try {
+      await registerFormRef.value?.validate();
+      let result = await UserAPI.oAuthRegisterLogin(oAuthUserData.value, oAuthKey, oAuthType)
+      console.log(result);
+      // 注册成功  跳转
+      userStore.setUserInfo(result.data, result.other.token); // 保存用户信息
+      MyUtils.alert("注册成功", "success"); // 提示登录成功
+      // 初始化 socketStore 连接
+      useSocketStore().connect(result.data.id);
+      // 跳转到首页
+      router.push("/user");
+   } catch (error) {
+
+   }
+}
+
+// 执行绑定
+async function bindLocalUserHandler() {
+   try {
+      // 表单验证
+      await bindUserFormRef.value?.validate();
+      let result = await UserAPI.oAuthBind(bindUserForm.value, oAuthKey, oAuthType)
+      if (result.code == 20000) {
+         userStore.setUserInfo(result.data, result.other.token); // 保存用户信息
+         MyUtils.alert("登录成功", "success"); // 提示登录成功
+         // 初始化 socketStore 连接
+         useSocketStore().connect(result.data.id);
+         // 跳转到首页
+         router.push("/user");
+      } else {
+         MyUtils.alert(result.message, "error")
+      }
+
+   } catch (error) {
+
+   }
+
+}
+
+// 获取第三方登录用户信息程序
+async function getOAuthUserDataHandler() {
+   let result = await OtherAPI.getOAuthUserData(oAuthKey, oAuthType)
+   console.log(result.data);
+   if (result.code == 20000) {
+      if (oAuthType.toLocaleUpperCase() == "GITHUB") {
+         let githubUser = result.data as GithubUser
+         oAuthUserData.value.avatar = githubUser.avatar_url
+         oAuthUserData.value.email = githubUser.email || ''
+         oAuthUserData.value.username = githubUser.login
+      }
+   } else {
+      MyUtils.alert(result.message, "error")
+   }
+}
+
+const validatePass2 = async (_rule: Rule, value: string) => {
+   if (value === '') {
+      return Promise.reject('请重新输入密码');
+   } else if (value !== oAuthUserData.value.password) {
+      return Promise.reject("两次输入不匹配!");
+   } else {
+      return Promise.resolve();
+   }
+};
+const rules: Record<string, Rule[]> = {
+   passwordConfirm: [{ validator: validatePass2, trigger: 'change', required: true }]
+};
 </script>
 
 <style>
