@@ -107,13 +107,13 @@ import { MyUtils } from "@/utils";
 import { useSocketStore } from "@/stores/socketStore";
 import { useUserStore } from "@/stores/userStore";
 import router from "@/router";
-import type { GithubUser } from "@/types/other";
+import type { GiteeUser, GithubUser, OAuthLoginType } from "@/types/other";
 import type { Rule } from "ant-design-vue/es/form";
 
 const userStore = useUserStore();
 
 // 用于绑定的第三方登录类型和 key
-const oAuthType = useRoute().query.type as string;
+const oAuthType = useRoute().query.type as OAuthLoginType;
 const oAuthKey = useRoute().query.okey as string;
 
 // 绑定本地用户表单数据
@@ -199,6 +199,13 @@ async function getOAuthUserDataHandler() {
          oAuthUserData.value.avatar = githubUser.avatar_url
          oAuthUserData.value.email = githubUser.email || ''
          oAuthUserData.value.username = githubUser.login
+      } else if (oAuthType.toLocaleUpperCase() == "GITEE") {
+         let giteeUser = result.data as GiteeUser
+         oAuthUserData.value.avatar = giteeUser.avatar_url
+         oAuthUserData.value.email = giteeUser.email || ''
+         oAuthUserData.value.username = giteeUser.login
+      } else {
+         console.log("未知的第三方登录类型");
       }
    } else {
       MyUtils.alert(result.message, "error")

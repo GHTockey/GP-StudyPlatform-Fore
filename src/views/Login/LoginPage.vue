@@ -44,17 +44,17 @@
           </span>
           <div class="divider text-gray-200 w-full">第三方登录</div>
           <div class="flex justify-center gap-1">
-            <button class="btn">
-              <iconFont type="icon-github" class="text-2xl" />
+            <button @click="toThirdLogin('github')" class="btn">
+              <IconFont type="icon-github" class="text-2xl" />
+            </button>
+            <button @click="toThirdLogin('gitee')" class="btn">
+              <IconFont type="icon-gitee-fill-round" class="text-2xl" />
             </button>
             <button class="btn">
-              <iconFont type="icon-gitee-fill-round" class="text-2xl" />
+              <IconFont type="icon-QQ" class="text-2xl" />
             </button>
             <button class="btn">
-              <iconFont type="icon-QQ" class="text-2xl" />
-            </button>
-            <button class="btn">
-              <iconFont type="icon-weixin" class="text-2xl" />
+              <IconFont type="icon-weixin" class="text-2xl" />
             </button>
           </div>
         </template>
@@ -71,11 +71,13 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
 import { UserAPI } from "@/api/user";
+import { OtherAPI } from "@/api/other";
 import { message } from "ant-design-vue/es";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import { useSocketStore } from "@/stores/socketStore";
-import iconFont from "@/utils/iconFont";
+import IconFont from "@/utils/iconFont";
+import type { OAuthLoginType } from "@/types/other";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -91,6 +93,18 @@ const isRegister = ref(false);
 // 显示的图片
 const imgName = ref("读书.png")
 
+
+// 跳转至第三方登录页面
+async function toThirdLogin(type: OAuthLoginType) {
+  let result = await OtherAPI.getOAuthUrl(type);
+  if (result.code === 20000) {
+    // window.location.href = result.data;
+    // 新窗口打开
+    window.open(result.data);
+  } else {
+    message.error(result.message);
+  }
+}
 
 const onFinish = async (loginUser: { username: string, password: string }) => {
   loading.value = true;
