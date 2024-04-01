@@ -85,8 +85,7 @@
                <h2 class="font-bold">热门词集</h2>
                <!-- 项 -->
                <div v-for="(voc, index) in mostStudyVocList" :key="index" @click="$router.push('/vocabulary/' + voc.id)"
-                  class="my-1 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative
-                  hover:bg-base-300 cursor-pointer">
+                  class="my-1 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative hover:bg-base-300 cursor-pointer">
                   <!-- 标题 -->
                   <p class="font-bold w-full">{{ voc.title }}</p>
                   <!-- 头像 -->
@@ -193,11 +192,11 @@ if (userStore.userInfo && userStore.userInfo.id) {
 
 
 // 通过 token 获取用户信息
-async function getUserInfoByToken(){
+async function getUserInfoByToken() {
    let result = await UserAPI.getUserInfoByToken(route.query.token as string);
    if (result.code == 20000) {
       userStore.setUserInfo(result.data, route.query.token as string);
-      console.log("用户信息", userStore.userInfo);
+      // console.log("用户信息", result.data);
       // 重新加载页面
       location.href = "/";
    }
@@ -230,7 +229,7 @@ async function getMostStudyVocList() {
          mostStudyVocList.value = result.data;
       }
    } else {
-      message.error("获取学习数量最多的词集列表失败");
+      message.error(result.message);
    }
 }
 // 获取学习数前5的用户列表
@@ -239,7 +238,7 @@ async function getMostStudyUserList() {
    if (result.code == 20000) {
       mostStudyUserList.value = result.data;
    } else {
-      message.error("获取学习数前5的用户列表失败");
+      message.error(result.message);
    }
 }
 </script>

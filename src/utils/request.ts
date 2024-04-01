@@ -18,7 +18,8 @@ const service = axios.create({
 
 // 请求拦截
 service.interceptors.request.use(config => {
-   let token = localStorage.getItem('token')
+   const userStore = useUserStore();
+   let token = userStore.token
    if (token != null) {
       config.headers['Authorization'] = token
    }

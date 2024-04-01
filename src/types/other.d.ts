@@ -13,8 +13,14 @@ export type UserMessage = {
    4发送的消息已读 5班级消息 */
    type?: 0 | 1 | 2 | 3 | 4;
 }
+// 邮箱验证码
+export type EmailCode = {
+   code: string;
+   email: string;
+   expireTime: string;
+}
 
-
+// OAuth登录类型
 export type OAuthLoginType = "github" | "gitee" | "qq" | "weixin";
 // github 用户数据
 export interface GithubUser {

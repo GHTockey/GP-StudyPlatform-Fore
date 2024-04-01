@@ -2,7 +2,12 @@
    <!-- 导航栏 -->
    <div class="navbar fixed top-0 left-0 z-50 transition-all duration-300" :class="y > 50 ? 'glass' : ''">
       <div class="flex-1">
-         <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a>
+         <!-- <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a> -->
+         <!-- <a class="btn btn-ghost text-xl" @click="router.push('/')">智词领航</a> -->
+         <a class="btn btn-ghost w-[150px] grid place-content-center text-[100px]" @click="router.push('/')">
+            <IconFont v-if="isDark" type="icon-tockey-logo-bai" />
+            <IconFont v-else type="icon-a-ziyuan1" />
+         </a>
       </div>
       <div class="flex-none gap-2">
          <div class="form-control">
@@ -205,8 +210,7 @@
             <p>主题切换</p>
          </div>
          <!-- 发布词集按钮 -->
-         <div class="size-[100px] relative btn p-0"
-            @click="$router.push('/vocabulary/add'); centerConsoleShow = false;">
+         <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false;">
             <!--图标 -->
             <span class="my-center-console-icon">📖</span>
             <p>发布词集</p>
@@ -218,12 +222,11 @@
             <p>创建班级</p>
          </div>
          <!-- 我的消息按钮 -->
-         <div @click="centerConsoleShow = false; chatWindowShow = true;"
-            class="size-[100px] relative btn p-0">
+         <div @click="centerConsoleShow = false; chatWindowShow = true;" class="size-[100px] relative btn p-0">
             <!-- 未读消息数 -->
             <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{
-      unreadMessage.length
-   }}</div>
+               unreadMessage.length
+            }}</div>
             <span class="my-center-console-icon">✉️</span>
             <p>我的消息</p>
          </div>
@@ -238,8 +241,7 @@
          <h3 class="font-bold text-lg">创建班级</h3>
          <p class="text-sm font-bold">与同学分享词集与在线交流</p>
          <div class="mt-5">
-            <input v-model="createClassForm.name" type="text" placeholder="输入班级名称"
-               class="input input-bordered w-full" />
+            <input v-model="createClassForm.name" type="text" placeholder="输入班级名称" class="input input-bordered w-full" />
             <input v-model="createClassForm.info" type="text" placeholder="输入班级描述"
                class="input input-bordered w-full mt-5" />
             <button @click="createClassSubmit" class="btn btn-primary mt-5 w-full">创建</button>
@@ -262,9 +264,10 @@ import { storeToRefs } from "pinia";
 import router from "@/router";
 import lodash from "lodash";
 import IconFont from "@/utils/iconFont";
-import { useWindowScroll } from "@vueuse/core";
+import { useWindowScroll, useStorage } from "@vueuse/core";
 import { MyUtils } from "@/utils";
 import { useSocketStore } from "@/stores/socketStore";
+
 
 // vueuse 获取滚动位置
 const { y } = useWindowScroll();
@@ -286,7 +289,8 @@ const searchClassesResult = ref<Classes[]>();
 // 中控台显示
 const centerConsoleShow = ref(false);
 // 主题
-const isDark = ref<boolean>(false);
+// const isDark = ref<boolean>(false);
+const isDark = useStorage("isDark", false);
 isDark.value = JSON.parse(localStorage.getItem("isDark") || "false")
 // console.log(isDark.value);
 // 班级创建表单
@@ -353,10 +357,11 @@ function logout() {
 }
 // 主题切换事件
 function themeChange(e: Event) {
-   centerConsoleShow.value = false;
+   centerConsoleShow.value = false; // 关闭中控台
    let checkEl = e.target as HTMLInputElement;
    // console.log(checkEl.checked);
-   localStorage.setItem("isDark", String(checkEl.checked))
+   // localStorage.setItem("isDark", String(checkEl.checked))
+   isDark.value = checkEl.checked;
 }
 </script>
 

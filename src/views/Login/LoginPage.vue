@@ -19,24 +19,63 @@
         class="w-[350px] flex flex-wrap content-center p-5 z-10 relative">
         <span class="absolute left-1/2 -translate-x-1/2 top-[50px]">LOGO ICON</span>
         <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来，{{ formState.username }}</p>
-        <p v-else class="font-bold text-2xl w-[100%]">Hi！新朋友，{{ formState.username }}</p>
-
-        <AForm :model="formState" class="w-[100%] mt-5" autocomplete="off" @finish="onFinish">
+        <p v-else class="font-bold text-2xl mt-16 w-[100%]">Hi！新朋友，{{ registerForm.username }}</p>
+        <!-- 登录表单 -->
+        <AForm :model="formState" v-if="!isRegister" class="w-[100%] mt-5" autocomplete="off" @finish="login">
           <AFormItem name="username" :rules="[{ message: '请输入您的用户名!', required: true }]">
             <input placeholder="用户名" v-model="formState.username" type="text"
               class="input input-bordered w-full max-w-xs" />
           </AFormItem>
-
           <AFormItem name="password" :rules="[{ message: '请输入您的密码!', required: true }]">
             <input placeholder="密码" v-model="formState.password" type="password"
               class="input input-bordered w-full max-w-xs" />
           </AFormItem>
-
           <AFormItem>
-            <a-button :loading="loading" type="primary" html-type="submit" class="btn submit-btn w-full rounded-lg">{{
-              isRegister ? "注册" : "登录" }}</a-button>
+            <a-button :loading="loading" type="primary" html-type="submit"
+              class="btn submit-btn w-full rounded-lg">登录</a-button>
           </AFormItem>
         </AForm>
+        <!-- 注册表单 -->
+        <a-form :model="registerForm" @finish="register" :rules="registerRules" v-else class="w-[100%] mt-2"
+          autocomplete="off">
+          <AFormItem name="username" :rules="[{ message: '请输入您的用户名!', required: true }]">
+            <input placeholder="用户名" v-model="registerForm.username" type="text"
+              class="input input-sm input-bordered w-full max-w-xs" />
+          </AFormItem>
+          <AFormItem name="password" :rules="[{ message: '请输入您的密码!', required: true }]">
+            <input placeholder="密码" v-model="registerForm.password" type="password"
+              class="input input-sm input-bordered w-full max-w-xs" />
+          </AFormItem>
+          <AFormItem name="password2">
+            <input placeholder="确认密码" v-model="registerForm.password2" type="password"
+              class="input input-sm input-bordered w-full max-w-xs" />
+          </AFormItem>
+          <AFormItem name="email" :rules="[{ message: '请输入您的邮箱!', required: true }]">
+            <input placeholder="邮箱" v-model="registerForm.email" class="input input-sm input-bordered w-full max-w-xs" />
+          </AFormItem>
+          <AFormItem name="code" :rules="[{ message: '请输入验证码!', required: true }]">
+            <div class="join w-full">
+              <input placeholder="邮箱验证码" v-model="registerForm.code"
+                class="input input-sm join-item input-bordered w-full max-w-xs" />
+              <button @click.prevent="sendCode" class="btn btn-sm join-item w-26" :class="{'pointer-events-none': flags.sendCode == 'success'}">
+                <template v-if="flags.sendCode == 'default'">发送验证码</template>
+                <template v-else-if="flags.sendCode == 'loading'">
+                  <span class="loading loading-spinner"></span>
+                  发送中
+                </template>
+                <template v-else-if="flags.sendCode == 'success'">
+                  {{ countDown }}
+                </template>
+              </button>
+            </div>
+          </AFormItem>
+
+          <AFormItem>
+            <!-- html-type="submit" 默认事件触发表单验证 -->
+            <a-button type="primary" html-type="submit" class="btn btn-sm submit-btn w-full rounded-lg">注册</a-button>
+          </AFormItem>
+        </a-form>
+
         <!-- OAuth 登录 -->
         <template v-if="!isRegister">
           <span class="w-full text-right">
@@ -44,18 +83,26 @@
           </span>
           <div class="divider text-gray-200 w-full">第三方登录</div>
           <div class="flex justify-center gap-1">
-            <button @click="toThirdLogin('github')" class="btn">
-              <IconFont type="icon-github" class="text-2xl" />
-            </button>
-            <button @click="toThirdLogin('gitee')" class="btn">
-              <IconFont type="icon-gitee-fill-round" class="text-2xl" />
-            </button>
-            <button class="btn">
-              <IconFont type="icon-QQ" class="text-2xl" />
-            </button>
-            <button class="btn">
-              <IconFont type="icon-weixin" class="text-2xl" />
-            </button>
+            <a-tooltip placement="top" title="GitHub 登录">
+              <button @click="toThirdLogin('github')" class="btn">
+                <IconFont type="icon-github" class="text-2xl" />
+              </button>
+            </a-tooltip>
+            <a-tooltip placement="top" title="Gitee 登录">
+              <button @click="toThirdLogin('gitee')" class="btn">
+                <IconFont type="icon-gitee-fill-round" class="text-2xl" />
+              </button>
+            </a-tooltip>
+            <a-tooltip placement="top" title="QQ 登录">
+              <button class="btn">
+                <IconFont type="icon-QQ" class="text-2xl" />
+              </button>
+            </a-tooltip>
+            <a-tooltip placement="top" title="微信登录">
+              <button class="btn">
+                <IconFont type="icon-weixin" class="text-2xl" />
+              </button>
+            </a-tooltip>
           </div>
         </template>
         <template v-else>
@@ -78,10 +125,12 @@ import { useUserStore } from "@/stores/userStore";
 import { useSocketStore } from "@/stores/socketStore";
 import IconFont from "@/utils/iconFont";
 import type { OAuthLoginType } from "@/types/other";
+import type { Rule } from "ant-design-vue/es/form";
 
 const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
+// 登录表单数据
 const formState = reactive({
   username: "admin",
   password: "114514",
@@ -89,24 +138,81 @@ const formState = reactive({
 // 登录 loading
 const loading = ref(false);
 // 是否注册
-const isRegister = ref(false);
+const isRegister = ref(true);
 // 显示的图片
 const imgName = ref("读书.png")
+// 注册表单数据
+const registerForm = reactive({
+  username: "1",
+  password: "1",
+  password2: "1",
+  email: "tockey@yeah.net",
+  code: "",
+});
+// 开关
+const flags = ref<{
+  sendCode: 'success' | 'error' | 'loading' | 'default',
+}>({
+  sendCode: 'default',
+});
+// 验证码发送倒计时
+const countDown = ref(0);
 
+
+// 注册
+async function register() {
+  console.log('register');
+}
+// 发送邮箱验证码
+async function sendCode() {
+  flags.value.sendCode = 'loading';
+  let result = await OtherAPI.sendEmailCode(registerForm.email);
+  console.log(result);
+  if (result.code == 20000) {
+    flags.value.sendCode = 'success';
+    // 根据接口返回的过期时间计算倒计时
+    let expireTime = new Date(result.data);
+    countDown.value = Math.floor((expireTime.getTime() - new Date().getTime()) / 1000);
+    // 倒计时
+    let timer = setInterval(() => {
+      countDown.value--;
+      console.log(countDown.value);
+      if (countDown.value <= 0) {
+        clearInterval(timer);
+        flags.value.sendCode = 'default';
+      }
+    }, 1000);
+  }
+}
+// 验证密码2
+const validatePass2 = async (_rule: Rule, value: string) => {
+  // console.log(value, registerForm.password);
+  if (value === '') {
+    return Promise.reject('请重新输入密码');
+  } else if (value !== registerForm.password) {
+    return Promise.reject("两个输入不匹配!");
+  } else {
+    return Promise.resolve();
+  }
+};
+// 注册表单校验规则
+const registerRules: Record<string, Rule[]> = {
+  password2: [{ validator: validatePass2, trigger: 'change' }]
+};
 
 // 跳转至第三方登录页面
 async function toThirdLogin(type: OAuthLoginType) {
   let result = await OtherAPI.getOAuthUrl(type);
   if (result.code === 20000) {
-    // window.location.href = result.data;
+    window.location.href = result.data;
     // 新窗口打开
-    window.open(result.data);
+    // window.open(result.data);
   } else {
     message.error(result.message);
   }
-}
+};
 
-const onFinish = async (loginUser: { username: string, password: string }) => {
+const login = async (loginUser: { username: string, password: string }) => {
   loading.value = true;
   if (isRegister.value) {
     message.warning("todo 注册功能待开发");
@@ -137,7 +243,7 @@ const onFinish = async (loginUser: { username: string, password: string }) => {
 watch(isRegister, () => {
   imgName.value = isRegister.value ? "工作.png" : "读书.png";
   // console.log(imgName.value);
-})
+}, { immediate: true });
 </script>
 
 <style lang="less" scoped>

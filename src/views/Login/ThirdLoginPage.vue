@@ -1,8 +1,7 @@
 <template>
    <div class="thirdLogin-box size-full grid place-content-center">
       <!-- 对话窗口容器 -->
-      <div class="w-[730px] h-[500px] shadow-tce-shadow rounded-xl 
-              text-white relative overflow-hidden bg-slate-800">
+      <div class="w-[730px] h-[500px] shadow-tce-shadow rounded-xl  text-white relative overflow-hidden bg-slate-800">
          <!-- 标题 -->
          <h1 class="text-center text-2xl font-bold mt-8">第三方账号绑定</h1>
          <!-- 双方图标 -->
