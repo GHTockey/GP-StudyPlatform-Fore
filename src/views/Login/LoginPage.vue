@@ -17,7 +17,7 @@
       <!-- 表单 -->
       <div :class="isRegister ? 'toLeft' : 'toLeft-back pt-20'"
         class="w-[350px] flex flex-wrap content-center p-5 z-10 relative">
-        <span class="absolute left-1/2 -translate-x-1/2 top-[50px]">LOGO ICON</span>
+        <span class="absolute left-1/2 -translate-x-1/2 top-[40px]">LOGO ICON</span>
         <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来，{{ formState.username }}</p>
         <p v-else class="font-bold text-2xl mt-16 w-[100%]">Hi！新朋友，{{ registerForm.username }}</p>
         <!-- 登录表单 -->
@@ -36,35 +36,35 @@
           </AFormItem>
         </AForm>
         <!-- 注册表单 -->
-        <a-form :model="registerForm" @finish="register" :rules="registerRules" v-else class="w-[100%] mt-2"
-          autocomplete="off">
-          <AFormItem name="username" :rules="[{ message: '请输入您的用户名!', required: true }]">
+        <a-form :model="registerForm" @finish="register" v-else class="w-[100%] mt-2" autocomplete="off">
+          <AFormItem name="username" :rules="formRules.registerUname">
             <input placeholder="用户名" v-model="registerForm.username" type="text"
               class="input input-sm input-bordered w-full max-w-xs" />
           </AFormItem>
-          <AFormItem name="password" :rules="[{ message: '请输入您的密码!', required: true }]">
+          <AFormItem name="password" :rules="formRules.registerPwd">
             <input placeholder="密码" v-model="registerForm.password" type="password"
               class="input input-sm input-bordered w-full max-w-xs" />
           </AFormItem>
-          <AFormItem name="password2">
+          <AFormItem name="password2" :rules="formRules.registerPwd2">
             <input placeholder="确认密码" v-model="registerForm.password2" type="password"
               class="input input-sm input-bordered w-full max-w-xs" />
           </AFormItem>
-          <AFormItem name="email" :rules="[{ message: '请输入您的邮箱!', required: true }]">
+          <AFormItem name="email" :rules="formRules.registerEmail">
             <input placeholder="邮箱" v-model="registerForm.email" class="input input-sm input-bordered w-full max-w-xs" />
           </AFormItem>
           <AFormItem name="code" :rules="[{ message: '请输入验证码!', required: true }]">
             <div class="join w-full">
               <input placeholder="邮箱验证码" v-model="registerForm.code"
                 class="input input-sm join-item input-bordered w-full max-w-xs" />
-              <button @click.prevent="sendCode" class="btn btn-sm join-item w-26" :class="{'pointer-events-none': flags.sendCode == 'success'}">
+              <button @click.prevent="sendCode" class="btn btn-sm join-item w-26"
+                :class="{ 'pointer-events-none': flags.sendCode == 'success' }">
                 <template v-if="flags.sendCode == 'default'">发送验证码</template>
                 <template v-else-if="flags.sendCode == 'loading'">
                   <span class="loading loading-spinner"></span>
                   发送中
                 </template>
                 <template v-else-if="flags.sendCode == 'success'">
-                  {{ countDown }}
+                  {{ countDown }}秒后重发
                 </template>
               </button>
             </div>
@@ -124,8 +124,9 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 import { useSocketStore } from "@/stores/socketStore";
 import IconFont from "@/utils/iconFont";
-import type { OAuthLoginType } from "@/types/other";
-import type { Rule } from "ant-design-vue/es/form";
+import type { OAuthLoginType, RequestStatus } from "@/types/other";
+import type { Rule, RuleObject } from "ant-design-vue/es/form";
+import { MyUtils } from "@/utils";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -142,33 +143,78 @@ const isRegister = ref(true);
 // 显示的图片
 const imgName = ref("读书.png")
 // 注册表单数据
-const registerForm = reactive({
-  username: "1",
-  password: "1",
-  password2: "1",
+const registerForm = ref({
+  username: "",
+  password: "",
+  password2: "",
   email: "tockey@yeah.net",
   code: "",
 });
 // 开关
 const flags = ref<{
-  sendCode: 'success' | 'error' | 'loading' | 'default',
+  sendCode: RequestStatus,
 }>({
   sendCode: 'default',
 });
 // 验证码发送倒计时
 const countDown = ref(0);
+// 表单校验规则
+const formRules: { [temporary: string]: RuleObject[] | RuleObject } = {
+  registerUname: [
+    { message: '请输入您的用户名!', required: true },
+    { min: 2, message: '最少输入两位' },
+    { max: 12, message: '最多输入12位' }
+  ],
+  registerPwd: [
+    { message: '请输入您的密码!', required: true },
+    { min: 5, message: '最少输入5位' }
+  ],
+  registerPwd2: [{
+    validator: async (_rule: Rule, value: string) => {
+      if (value === '') {
+        return Promise.reject('请输入确认密码');
+      } else if (value !== registerForm.value.password) {
+        return Promise.reject("两次输入不匹配!");
+      } else {
+        return Promise.resolve();
+      }
+    }
+  }],
+  registerEmail: [
+    { message: '请输入您的邮箱!', required: true },
+    { type: 'email', message: '请输入正确的邮箱格式' } // 组件内置的邮箱格式校验 (牛逼)
+  ]
+};
 
 
 // 注册
 async function register() {
   console.log('register');
+  let result = await UserAPI.register(registerForm.value);
+
+  if (result.code === 20000) {
+    MyUtils.alert(result.message, 'success', 5000);
+    formState.username = registerForm.value.username;
+    formState.password = '';
+    registerForm.value = {
+      username: '',
+      password: '',
+      password2: '',
+      email: '',
+      code: '',
+    };
+    isRegister.value = false;
+  } else {
+    MyUtils.alert(result.message, 'error');
+  }
 }
 // 发送邮箱验证码
 async function sendCode() {
   flags.value.sendCode = 'loading';
-  let result = await OtherAPI.sendEmailCode(registerForm.email);
-  console.log(result);
+  let result = await OtherAPI.sendEmailCode(registerForm.value.email);
+  // console.log(result);
   if (result.code == 20000) {
+    MyUtils.alert(result.message, 'success', 5000);
     flags.value.sendCode = 'success';
     // 根据接口返回的过期时间计算倒计时
     let expireTime = new Date(result.data);
@@ -176,7 +222,7 @@ async function sendCode() {
     // 倒计时
     let timer = setInterval(() => {
       countDown.value--;
-      console.log(countDown.value);
+      // console.log(countDown.value);
       if (countDown.value <= 0) {
         clearInterval(timer);
         flags.value.sendCode = 'default';
@@ -184,21 +230,6 @@ async function sendCode() {
     }, 1000);
   }
 }
-// 验证密码2
-const validatePass2 = async (_rule: Rule, value: string) => {
-  // console.log(value, registerForm.password);
-  if (value === '') {
-    return Promise.reject('请重新输入密码');
-  } else if (value !== registerForm.password) {
-    return Promise.reject("两个输入不匹配!");
-  } else {
-    return Promise.resolve();
-  }
-};
-// 注册表单校验规则
-const registerRules: Record<string, Rule[]> = {
-  password2: [{ validator: validatePass2, trigger: 'change' }]
-};
 
 // 跳转至第三方登录页面
 async function toThirdLogin(type: OAuthLoginType) {

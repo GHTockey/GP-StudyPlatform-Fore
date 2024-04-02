@@ -378,14 +378,18 @@ if (userStore.userInfo) {
    // onlineList.value.push(userStore.userInfo)
    // 连接
    socketStore.connect(userStore.userInfo.id)
-   // 获取班级成员
-   getUserListByCid(userStore.userInfo.classes!.id!)
+   if (userStore.userInfo.classes) {
+      // 获取班级成员
+      getUserListByCid(userStore.userInfo.classes.id!)
+      // 获取班级数据
+      getClasses()
+   } else {
+      console.log("未加入班级");
+   }
    // 获取未读消息
    getUnreadMsg()
    // 获取用户词集列表
    getUserAllVocListByUid()
-   // 获取班级数据
-   getClasses()
 } else {
    // MyUtils.alert("请先登录")
    // router.push("/login")

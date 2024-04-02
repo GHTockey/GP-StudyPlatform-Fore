@@ -19,6 +19,8 @@ export type EmailCode = {
    email: string;
    expireTime: string;
 }
+// 请求状态
+export type RequestStatus = 'success' | 'error' | 'loading' | 'default';
 
 // OAuth登录类型
 export type OAuthLoginType = "github" | "gitee" | "qq" | "weixin";

@@ -1,5 +1,5 @@
 import type { UserMessage } from "@/types/other";
-import type { User } from "@/types/user";
+import type { User, UserRegisterVo } from "@/types/user";
 import { request } from "@/utils/request";
 
 // let cloudServiceURL = "/user-service";
@@ -79,5 +79,9 @@ export class UserAPI {
       password: string;
    }, oKey: string, type: string) {
       return request<User>(`${cloudServiceURL}/user/oauth/register/login?type=${type}&oKey=${oKey}`, "POST", oAuthUser);
+   }
+   /* 用户注册 API */
+   static register(userRegister: UserRegisterVo) {
+      return request<string>(`${cloudServiceURL}/user/register`, "POST", userRegister);
    }
 }

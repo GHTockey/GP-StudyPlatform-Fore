@@ -21,6 +21,14 @@ export type User = {
    studyTotal?: number,
 }
 
+// 用户注册
+export type UserRegisterVo = {
+   username: string,
+   password: string,
+   email: string,
+   code: string
+}
+
 export type Permission = {
    id?: number,
    name: string,
