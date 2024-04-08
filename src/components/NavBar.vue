@@ -4,9 +4,11 @@
       <div class="flex-1">
          <!-- <a class="btn btn-ghost text-xl" @click="router.push('/')">LOGO ICON</a> -->
          <!-- <a class="btn btn-ghost text-xl" @click="router.push('/')">智词领航</a> -->
-         <a class="btn btn-ghost w-[150px] grid place-content-center text-[100px]" @click="router.push('/')">
-            <IconFont v-if="isDark" type="icon-tockey-logo-bai" />
-            <IconFont v-else type="icon-a-ziyuan1" />
+         <a class="btn btn-ghost w-[150px] grid place-content-center" @click="router.push('/')">
+            <!-- <IconFont v-if="isDark" type="icon-tockey-logo-bai" />
+            <IconFont v-else type="icon-a-ziyuan1" /> -->
+            <!-- <IconFont type="icon-logo" class="text-[100px]" /> -->
+            <span class="text-2xl">窥屏?</span>
          </a>
       </div>
       <div class="flex-none gap-2">

@@ -1,4 +1,4 @@
-import type { EmailCode, GiteeUser, GithubUser } from "@/types/other";
+import type { EmailCode, GiteeUser, GithubUser, Website } from "@/types/other";
 import type { User } from "@/types/user";
 import { request } from "@/utils/request";
 import type { AxiosProgressEvent } from "axios";
@@ -21,6 +21,20 @@ export class OtherAPI {
    }
    /* 发送邮箱验证码 API*/
    static sendEmailCode(email: string) {
-      return request<EmailCode['expireTime']>(`${cloudServiceURL}/other/mail/send?to=${email}`,"POST")
+      return request<EmailCode['expireTime']>(`${cloudServiceURL}/other/mail/send?to=${email}`, "POST")
    }
+
+
+
+
+
+   
+   /* 修改网站信息 API */
+   static updateWebsiteInfo(data: Website) {
+      return request(`${cloudServiceURL}/website`, "PUT", data)
+   };
+   /* 获取网站信息 API */
+   static getWebsiteInfo() {
+      return request<Website>(`${cloudServiceURL}/website`, 'GET')
+   };
 }

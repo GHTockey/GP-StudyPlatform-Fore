@@ -21,10 +21,17 @@
                   <!-- 输入 -->
                   <div class="flex flex-wrap justify-between">
                      <!-- 输入答案 -->
-                     <div v-show="isCorrect" class="flex w-full h-[50px]">
-                        <input ref="inputRef" v-model="userAnswer" type="text" placeholder="输入答案"
-                           class="mr-3 text-center border-b-2 border-gray-500 bg-base-100 focus:outline-none w-full" />
+                     <div v-show="isCorrect" class="flex flex-wrap w-full h-[50px]">
+                        <!-- <input ref="inputRef" v-model="userAnswer" type="text" placeholder="输入答案"
+                           class="mr-3 text-center border-b-2 border-gray-500 bg-base-100 focus:outline-none w-full" /> -->
+                        <textarea ref="inputRef" v-model="userAnswer" placeholder="输入答案"
+                           oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
+                           class="mr-3 border-2 border-gray-500 bg-base-100 rounded-md px-2 focus:outline-none flex-1 place-content-center"></textarea>
                         <button @click="isRight" ref="okBtnRef" class="btn btn-success">确定</button>
+                        <div class="text-xs text-gray-500 w-full mt-2">
+                           <p>提示：按下 <kbd class="kbd kbd-xs">Enter</kbd> 或者 <kbd class="kbd kbd-xs">空格</kbd> 确定；按下 <kbd
+                                 class="kbd kbd-xs">Shift</kbd>+<kbd class="kbd kbd-xs">Enter</kbd> 换行</p>
+                        </div>
                      </div>
                      <!-- 复写 答错显示正确答案 -->
                      <div v-show="!isCorrect" class="bg-pink-300x w-full">
@@ -32,17 +39,23 @@
                         <div class="flex justify-between gap-5">
                            <div class="border-b-2 flex-1">
                               <p class="text-xs font-bold text-green-500">正确答案：</p>
-                              <p class="text-lg my-2">{{ currentWord?.word }}</p>
+                              <p class="text-md my-2">{{ currentWord?.word }}</p>
                            </div>
                            <div class="border-b-2 flex-1">
                               <p class="text-xs font-bold text-red-500">您的答案：</p>
-                              <p class="text-lg my-2">{{ tempUserAnswer }}</p>
+                              <p class="text-md my-2">{{ tempUserAnswer }}</p>
                            </div>
                         </div>
                         <!-- 复写 -->
-                        <div class="h-[50px] flex mt-5">
-                           <input ref="duplicateRef" type="text" placeholder="复写答案"
-                              class="text-center border-b-2 bg-base-100 focus:outline-none w-full" />
+                        <div class="h-[50px] flex flex-wrap mt-5">
+                           <!-- <input ref="duplicateRef" type="text" placeholder="复写答案"
+                              class="text-center border-b-2 bg-base-100 focus:outline-none w-full" /> -->
+                           <textarea ref="duplicateRef" v-model="userAnswer" placeholder="复写答案" oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
+                              class="border-2 border-primary/80 border-dashed bg-base-100 rounded-md px-2 focus:outline-none w-full place-content-center"></textarea>
+                              <div class="text-xs text-gray-500 w-full mt-2">
+                           <p>提示：按下 <kbd class="kbd kbd-xs">Enter</kbd> 或者 <kbd class="kbd kbd-xs">空格</kbd> 确定；按下 <kbd
+                                 class="kbd kbd-xs">Shift</kbd>+<kbd class="kbd kbd-xs">Enter</kbd> 换行</p>
+                        </div>
                         </div>
                      </div>
                      <!-- <button class="btn btn-primary" @click="startLearn">开始</button>
@@ -199,7 +212,11 @@ const nextEvent = (e: KeyboardEvent) => {
 // 监听键盘事件 【确定】
 const isRightEvent = (e: KeyboardEvent) => {
    console.log('isRightEvent');
-   if (e.key == 'Enter' || e.key == ' ') {
+   // if (e.key == 'Enter' || e.key == ' ') {
+   //    isRight();
+   // }
+   // 排除 shift + enter
+   if (e.key == 'Enter' && !e.shiftKey) {
       isRight();
    }
 };

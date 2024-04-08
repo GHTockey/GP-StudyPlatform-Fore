@@ -7,7 +7,7 @@
                OnlineChat
                <span v-if="currentChatUser" class="text-xs font-[500]">当前与 {{ currentChatUser.username }} 聊天中</span>
             </h3>
-            <div class="border h-[600px] flex overflow-hidden relative">
+            <div class="h-[600px] flex overflow-hidden relative">
                <!-- 切换按钮 -->
                <div class="tooltip tooltip-right transition-all absolute z-10 top-1/2 -translate-x-1/2 hover:translate-x-0"
                   data-tip="用户列表">
@@ -204,11 +204,14 @@
             <button @click="socketStore.chatWindowShow = false"
                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
          </div>
+         <Teleport to="body">
+            <!-- 预览图片 -->
+            <a-image :style="{ display: 'none' }" :preview="{
+               visible: previewVisible, onVisibleChange: setVisible
+            }" :src="previewImage" />
+         </Teleport>
       </div>
    </Transition>
-   <a-image :width="200" :style="{ display: 'none' }" :preview="{
-      visible: previewVisible, onVisibleChange: setVisible
-   }" :src="previewImage" />
 </template>
 
 <script setup lang="ts">

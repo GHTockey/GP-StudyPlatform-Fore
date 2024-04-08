@@ -119,12 +119,12 @@
       <div class="divider divider-start font-bold">词条列表</div>
       <div>
         <div v-for="(words, i) in vocabulary.wordsList" :key="i"
-          class="bg-base-200/60 rounded-lg mb-2 flex justify-between items-center h-[100px]">
+          class="bg-base-200/60 rounded-lg mb-2 flex justify-between items-center min-h-[100px]">
           <div class="pl-3 text-xl italic text-gray-400/50">{{ i + 1 }}</div>
-          <div class="flex-1 ml-2 p-2 pb-3">
+          <div class="flex-1 ml-2 p-2 pb-3 mb-2">
             <p class="my-word-item-edit before:content-['词语'] border-b">{{ words.word }}</p>
           </div>
-          <div class="flex-1 p-2 pb-3">
+          <div class="flex-1 p-2 pb-3  mb-1">
             <p class="my-word-item-edit before:content-['定义'] border-b">{{ words.definition }}</p>
           </div>
         </div>

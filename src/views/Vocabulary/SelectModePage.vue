@@ -234,7 +234,7 @@ function selectRight(selectWord: string) {
 function getRandomWord() {
    // console.log(vocabulary.value.wordsList!.length);
    // 如果词语不足四个 则不执行
-   if (vocabulary.value.wordsList!.length <= 4) {
+   if (vocabulary.value.wordsList!.length < 4) {
       MyUtils.alert("词语不足四个", "error");
       return
    };

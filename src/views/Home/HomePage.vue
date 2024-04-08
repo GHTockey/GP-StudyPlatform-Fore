@@ -151,19 +151,20 @@ const socketStore = useSocketStore();
 const carouselData = [
    {
       title: "在线交流",
-      desc: "随时随地，的点点滴滴的点点滴滴哒哒",
+      desc: "与他人交流，学习更轻松",
       img: "src/assets/img/online2.webp",
    },
    {
       title: "发布词集",
-      desc: "随时随地，的点点滴滴的点点滴滴哒哒",
+      desc: "发布自己的词集，与他人分享",
       img: "src/assets/img/book.webp",
    },
    {
       title: "学习词集",
-      desc: "随时随地，的点点滴滴的点点滴滴哒哒",
+      desc: "丰富的词集，助你学习更轻松",
       img: "src/assets/img/study.webp",
    },
+
 ];
 // 用户学习的词集列表
 const vocStudyList = ref<Vocabulary[]>([]);

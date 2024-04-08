@@ -17,7 +17,10 @@
       <!-- 表单 -->
       <div :class="isRegister ? 'toLeft' : 'toLeft-back pt-20'"
         class="w-[350px] flex flex-wrap content-center p-5 z-10 relative">
-        <span class="absolute left-1/2 -translate-x-1/2 top-[40px]">LOGO ICON</span>
+        <span class="absolute left-1/2 -translate-x-1/2 top-[0px]">
+          <IconFont type="icon-logo" class="text-[100px]" />
+        </span>
+        <!-- <img :src="websiteStore.logoUrl" alt="logo" class="w-32 absolute top-8 left-1/2 -translate-x-1/2"> -->
         <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来，{{ formState.username }}</p>
         <p v-else class="font-bold text-2xl mt-16 w-[100%]">Hi！新朋友，{{ registerForm.username }}</p>
         <!-- 登录表单 -->
@@ -81,7 +84,7 @@
           <span class="w-full text-right">
             <span class="text-xs hover:text-blue-400 cursor-pointer" @click="isRegister = !isRegister">注册账号</span>
           </span>
-          <div class="divider text-gray-200 w-full">第三方登录</div>
+          <div class="divider text-gray-200 w-full">联合登录</div>
           <div class="flex justify-center gap-1">
             <a-tooltip placement="top" title="GitHub 登录">
               <button @click="toThirdLogin('github')" class="btn">
@@ -127,7 +130,9 @@ import IconFont from "@/utils/iconFont";
 import type { OAuthLoginType, RequestStatus } from "@/types/other";
 import type { Rule, RuleObject } from "ant-design-vue/es/form";
 import { MyUtils } from "@/utils";
+import { useWebsiteStore } from "@/stores/websiteStore";
 
+const websiteStore = useWebsiteStore();
 const route = useRoute();
 const userStore = useUserStore();
 const router = useRouter();
@@ -139,7 +144,7 @@ const formState = reactive({
 // 登录 loading
 const loading = ref(false);
 // 是否注册
-const isRegister = ref(true);
+const isRegister = ref(false);
 // 显示的图片
 const imgName = ref("读书.png")
 // 注册表单数据
@@ -187,9 +192,15 @@ const formRules: { [temporary: string]: RuleObject[] | RuleObject } = {
 };
 
 
+
+getWebsiteInfo();
+
+
+
+
 // 注册
 async function register() {
-  console.log('register');
+  // console.log('register');
   let result = await UserAPI.register(registerForm.value);
 
   if (result.code === 20000) {
@@ -242,7 +253,7 @@ async function toThirdLogin(type: OAuthLoginType) {
     message.error(result.message);
   }
 };
-
+// 登录
 const login = async (loginUser: { username: string, password: string }) => {
   loading.value = true;
   if (isRegister.value) {
@@ -270,6 +281,16 @@ const login = async (loginUser: { username: string, password: string }) => {
     }
   }
 };
+
+// 获取网站信息
+async function getWebsiteInfo() {
+  let result = await OtherAPI.getWebsiteInfo();
+  if (result.code == 20000) {
+    websiteStore.setWebsiteInfo(result.data);
+  } else {
+    message.error(result.message);
+  }
+}
 
 watch(isRegister, () => {
   imgName.value = isRegister.value ? "工作.png" : "读书.png";

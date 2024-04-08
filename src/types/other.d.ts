@@ -91,3 +91,11 @@ export interface GiteeUser {
    updated_at: string; // ISO 8601 format
    email: string;
 }
+
+// 网站信息
+export type Website = {
+   id: number;
+   logoUrl: string;
+   name: string;
+   info: string;
+}
