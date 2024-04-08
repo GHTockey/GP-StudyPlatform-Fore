@@ -8,7 +8,7 @@
             <!-- <IconFont v-if="isDark" type="icon-tockey-logo-bai" />
             <IconFont v-else type="icon-a-ziyuan1" /> -->
             <!-- <IconFont type="icon-logo" class="text-[100px]" /> -->
-            <span class="text-2xl">窥屏?</span>
+            <span class="text-2xl">禁止窥屏</span>
          </a>
       </div>
       <div class="flex-none gap-2">

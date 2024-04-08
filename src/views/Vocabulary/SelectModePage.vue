@@ -15,15 +15,15 @@
                      <span class="text-md">第 {{ learnNum }} 轮</span>
                   </div>
                   <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
-                     <p class="">{{ currentWord?.definition }}</p>
+                     <p class="font-bold">{{ currentWord?.definition }}</p>
                   </div>
                   <!-- 选项 -->
                   <div class="flex flex-wrap justify-between">
                      <button ref="optionsRef" :data-key="item" v-for="(item, index) in options" :key="index"
-                        @click="selectRight(item)" class="w-[calc((100%-0.5rem)/2)] mt-2 h-[50px] rounded-lg
+                        @click="selectRight(item)" class="w-[calc((100%-0.5rem)/2)] mt-2 min-h-[50px] pl-12 py-3 h-auto rounded-lg
                      btn btn-info relative">
                         <kbd class="kbd text-gray-400 absolute left-2">{{ index + 1 }}</kbd>
-                        <div>{{ item }}</div>
+                        <div class="text-sm font-normal">{{ item }}</div>
                      </button>
                   </div>
                   <div class="text-right mt-1">
