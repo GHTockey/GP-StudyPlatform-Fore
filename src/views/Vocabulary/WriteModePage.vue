@@ -146,6 +146,12 @@ import { UserAPI } from "@/api/user";
 
 const route = useRoute();
 
+/**
+ * TODO: 已知bug
+ * 1. 如果答案是纯数字，相似度检查会直接返回true，因为没有中文;  (450行, 影响较小，暂时不处理)
+ * 
+ */
+
 // 词集数据
 const vocabulary = ref<Vocabulary>({
    // 单词id
@@ -201,6 +207,7 @@ const okBtnRef = ref<HTMLButtonElement | null>(null);
 const nextEvent = (e: KeyboardEvent) => {
    console.log('nextEvent');
    if (e.key == 'Enter' || e.key == ' ') {
+      e.preventDefault(); // 阻止回车或空格的输入
       if (isCorrect.value) { // 正确
          startLearn();
       } else { // 错误
@@ -218,17 +225,14 @@ const isRightEvent = (e: KeyboardEvent) => {
    // }
    // 排除 shift + enter
    if (e.key == 'Enter' && !e.shiftKey) {
-      isRight();
       e.preventDefault();
+      isRight();
    }
 };
 // 是否结束(学完了)
 const isEnd = ref(false);
 // 切换动画 flag
 const transitionFlag = ref(false);
-
-
-// TODO: 已知bug：如果学习到最后一个但是是重新学习模式且输入错误进行复写时会一直是复写模式，不会结束
 
 
 getVocabulary(route.params.vid as string);
@@ -260,6 +264,7 @@ function showTip() {
 }
 // 学习 随机获取一个词语
 function startLearn() {
+
    if (wordsList.value.length <= 0 && forgetWords.value.length == 0) {
       isEnd.value = true;
       MyUtils.fire();
@@ -282,15 +287,22 @@ function startLearn() {
    }
    // 随机获取一个词语 且不是已经学习过的 且不是当前词语
    let newWord = lodash.sample(wordsList.value);
+   /*
+      这里产生内存泄漏：如果学习到最后一项但是答案错误，进行复写
+      复写完后要开始学习下一个词语(条件是非当前词语且不是已经学习过的词语)，因为已是最后一个词语了没有下一个词语导致一直递归
+      解决办法：如果剩余词语 <= 1 则取消限制条件：非当前词语
+   */
    // 是否是已经学习过的
    if (learnedWords.value.find(word => word.id == newWord?.id)) {
       startLearn();
       return;
    }
-   // 是否是当前词语
-   if (currentWord.value?.id == newWord?.id) {
-      startLearn();
-      return;
+   if(wordsList.value.length > 1){
+      // 是否是当前词语
+      if (currentWord.value?.id == newWord?.id) {
+         startLearn();
+         return;
+      }
    }
    // 切换动画
    transitionFlag.value = false;
@@ -312,6 +324,11 @@ function isRight() {
       return message.success('学完了2');
    }
    if (!userAnswer.value.trim()) return message.error('请输入答案');
+
+   // 去除空格回车; 其实这一步可以省略，因为在添加或编辑词集的保存阶段已经去除了, 但是为了保险起见还是加上
+   userAnswer.value = userAnswer.value.replace(/\s+/g, '');
+
+   // targetAnswer = targetAnswer.replace(/\s+/g, '');
    // 严格模式
    if (mode.value) {
       // 完全一致
@@ -324,8 +341,6 @@ function isRight() {
          learnedWords.value.push(currentWord.value);
          // 移除原列表中的词语
          wordsList.value = wordsList.value.filter(word => word.id != currentWord.value?.id);
-         // // 开始学习下一个词语
-         // startLearn();
          // 解除监听【确定】键盘事件
          window.removeEventListener('keydown', isRightEvent);
          // 监听【继续】键盘事件
@@ -418,11 +433,6 @@ function forgetWord() {
 };
 // 检查输入的答案和目标答案是否相似
 function checkAnswer(userAnswer: string, targetAnswer: string, strength: number = .8): boolean {
-   // 去除用户输入的空格回车
-   userAnswer = userAnswer.replace(/\s+/g, '');
-   // 去除目标答案的空格回车
-   targetAnswer = targetAnswer.replace(/\s+/g, ''); // 其实这一步可以省略，因为在添加或编辑词集的保存阶段已经去除了, 但是为了保险起见还是加上
-
    console.log("用户答案：", userAnswer, "目标答案：", targetAnswer);
    // 判断用户答案中的英文和目标答案中的英文是否【完全一致】
    let userAnswerEn = userAnswer.match(/[a-zA-Z]+/g)?.join('');
@@ -439,7 +449,7 @@ function checkAnswer(userAnswer: string, targetAnswer: string, strength: number 
    let userAnswerZh = userAnswer.match(/[\u4e00-\u9fa5]+/g);
    let targetAnswerZh = targetAnswer.match(/[\u4e00-\u9fa5]+/g);
 
-   // 如果目标答案中没有中文，直接返回true [因为可能是英文单词]
+   // 如果目标答案中没有中文，直接返回true [因为可能是英文单词] [纯数字bug]
    if (targetAnswerZh == null) return true;
 
    // 如果用户答案中没有中文，直接返回false
