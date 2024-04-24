@@ -14,7 +14,7 @@
                      <span class="text-xl">选择正确选项</span>
                      <span class="text-md">第 {{ learnNum }} 轮</span>
                   </div>
-                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
+                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center px-4">
                      <p class="font-bold">{{ currentWord?.definition }}</p>
                   </div>
                   <!-- 选项 -->

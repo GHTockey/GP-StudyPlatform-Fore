@@ -15,7 +15,7 @@
                      <span class="text-xl">输入正确答案</span>
                      <span class="text-md">第 {{ learnNum }} 轮</span>
                   </div>
-                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center">
+                  <div class="min-h-[200px] my-2 bg-base-200/50 rounded-lg flex justify-center items-center px-5">
                      <p class="">{{ currentWord?.definition }}</p>
                   </div>
                   <!-- 输入 -->
@@ -50,12 +50,13 @@
                         <div class="h-[50px] flex flex-wrap mt-5">
                            <!-- <input ref="duplicateRef" type="text" placeholder="复写答案"
                               class="text-center border-b-2 bg-base-100 focus:outline-none w-full" /> -->
-                           <textarea ref="duplicateRef" v-model="userAnswer" placeholder="复写答案" oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
+                           <textarea ref="duplicateRef" v-model="userAnswer" placeholder="复写答案"
+                              oninput="this.rows = (this.value.match(/\n/g) || []).length+1"
                               class="border-2 border-primary/80 border-dashed bg-base-100 rounded-md px-2 focus:outline-none w-full place-content-center"></textarea>
-                              <div class="text-xs text-gray-500 w-full mt-2">
-                           <p>提示：按下 <kbd class="kbd kbd-xs">Enter</kbd> 或者 <kbd class="kbd kbd-xs">空格</kbd> 确定；按下 <kbd
-                                 class="kbd kbd-xs">Shift</kbd>+<kbd class="kbd kbd-xs">Enter</kbd> 换行</p>
-                        </div>
+                           <div class="text-xs text-gray-500 w-full mt-2">
+                              <p>提示：按下 <kbd class="kbd kbd-xs">Enter</kbd> 或者 <kbd class="kbd kbd-xs">空格</kbd> 确定；按下 <kbd
+                                    class="kbd kbd-xs">Shift</kbd>+<kbd class="kbd kbd-xs">Enter</kbd> 换行</p>
+                           </div>
                         </div>
                      </div>
                      <!-- <button class="btn btn-primary" @click="startLearn">开始</button>
@@ -134,7 +135,7 @@
 
 <script setup lang="ts">
 import type { Vocabulary, Word } from "@/types/vocabulary";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import lodash from "lodash";
 import { message } from "ant-design-vue";
@@ -218,6 +219,7 @@ const isRightEvent = (e: KeyboardEvent) => {
    // 排除 shift + enter
    if (e.key == 'Enter' && !e.shiftKey) {
       isRight();
+      e.preventDefault();
    }
 };
 // 是否结束(学完了)
@@ -226,6 +228,7 @@ const isEnd = ref(false);
 const transitionFlag = ref(false);
 
 
+// TODO: 已知bug：如果学习到最后一个但是是重新学习模式且输入错误进行复写时会一直是复写模式，不会结束
 
 
 getVocabulary(route.params.vid as string);
@@ -234,7 +237,10 @@ onMounted(() => {
    // 显示难度选择对话框
    modeDialogRef.value?.showModal();
 });
-
+onBeforeUnmount(() => {
+   // 移除监听
+   window.removeEventListener('keydown', isRightEvent);
+});
 
 
 
@@ -309,6 +315,8 @@ function isRight() {
    // 严格模式
    if (mode.value) {
       // 完全一致
+      // console.log(currentWord.value?.word ,userAnswer.value);
+      // console.log(currentWord.value?.word == userAnswer.value);
       if (currentWord.value?.word == userAnswer.value) {
          // 正确
          message.success('正确');
@@ -316,8 +324,12 @@ function isRight() {
          learnedWords.value.push(currentWord.value);
          // 移除原列表中的词语
          wordsList.value = wordsList.value.filter(word => word.id != currentWord.value?.id);
-         // 开始学习下一个词语
-         startLearn();
+         // // 开始学习下一个词语
+         // startLearn();
+         // 解除监听【确定】键盘事件
+         window.removeEventListener('keydown', isRightEvent);
+         // 监听【继续】键盘事件
+         window.addEventListener('keydown', nextEvent);
       } else {
          // 错误
          message.error('忘记啦！');
@@ -326,7 +338,12 @@ function isRight() {
       }
    } else {
       // 常规模式
-      let checkResult = checkAnswer(userAnswer.value, <string>currentWord.value?.word);
+      if (!(currentWord.value && currentWord.value.word)) {
+         message.warning('当前词语不存在');
+         return;
+      }
+      // 进行相似度匹配
+      let checkResult = checkAnswer(userAnswer.value, currentWord.value.word);
       console.log(checkResult);
       if (!currentWord.value) return message.warning('当前词语不存在');
       if (checkResult) {
@@ -370,7 +387,7 @@ function forgetWord() {
    isCorrect.value = false; // 不正确
    tempUserAnswer.value = userAnswer.value; // 保存用户输入的答案
    userAnswer.value = ''; // 清空用户输入的答案
-   console.log(duplicateRef.value);
+   // console.log(duplicateRef.value);
    // duplicateRef.value!.focus(); // 聚焦复写输入框 (这里必须延迟一下，否则无法聚焦) 因为这里的复写输入框是动态渲染的
    setTimeout(() => {
       duplicateRef.value?.focus()
@@ -401,30 +418,49 @@ function forgetWord() {
 };
 // 检查输入的答案和目标答案是否相似
 function checkAnswer(userAnswer: string, targetAnswer: string, strength: number = .8): boolean {
-   // console.log("用户答案：", userAnswer, "目标答案：", targetAnswer);
+   // 去除用户输入的空格回车
+   userAnswer = userAnswer.replace(/\s+/g, '');
+   // 去除目标答案的空格回车
+   targetAnswer = targetAnswer.replace(/\s+/g, ''); // 其实这一步可以省略，因为在添加或编辑词集的保存阶段已经去除了, 但是为了保险起见还是加上
+
+   console.log("用户答案：", userAnswer, "目标答案：", targetAnswer);
    // 判断用户答案中的英文和目标答案中的英文是否【完全一致】
    let userAnswerEn = userAnswer.match(/[a-zA-Z]+/g)?.join('');
    let targetAnswerEn = targetAnswer.match(/[a-zA-Z]+/g)?.join('');
    console.log("用户答案中的英文：", userAnswerEn, "\n目标答案中的英文：", targetAnswerEn);
-   if (userAnswerEn != targetAnswerEn) return false;
+
+   if (userAnswerEn != targetAnswerEn) {
+      console.log("英文匹配不通过");
+      return false;
+   }
 
    // 判断用户答案中的中文和目标答案中的中文是否【相似】
    // "文字abc文字" => ["文", "字", "文", "字"]
-   let userAnswerZh = userAnswer.split(/[a-zA-Z]+/g).join('').split('');
-   let targetAnswerZh = targetAnswer.split(/[a-zA-Z]+/g).join('').split('');
+   let userAnswerZh = userAnswer.match(/[\u4e00-\u9fa5]+/g);
+   let targetAnswerZh = targetAnswer.match(/[\u4e00-\u9fa5]+/g);
+
+   // 如果目标答案中没有中文，直接返回true [因为可能是英文单词]
+   if (targetAnswerZh == null) return true;
+
+   // 如果用户答案中没有中文，直接返回false
+   if (userAnswerZh == null) return false;
+
+   let userAnswerZhArr = userAnswerZh.join('').split('');
+   let targetAnswerZhArr = targetAnswerZh.join('').split('');
    console.log("用户答案中的中文：", userAnswerZh, "\n目标答案中的中文：", targetAnswerZh);
+
    // 用户答案中的中文至少和目标答案中的80%相似
    let similarVal = 0;
    // 目标中文数
-   let tarZhNum = targetAnswerZh.length;
+   let tarZhNum = targetAnswerZhArr.length;
    // 匹配的中文
    let zhs: string[] = [];
-   userAnswerZh.forEach(userZh => {
-      let findResult = targetAnswerZh.findIndex(tagZh => tagZh == userZh);
+   userAnswerZhArr.forEach(userZh => {
+      let findResult = targetAnswerZhArr.findIndex(tagZh => tagZh == userZh);
       if (findResult != -1) {
          similarVal++;
          // 删除匹配的中文(防止重复匹配,该方法返回的是删除的元素数组)
-         let delZh = lodash.pullAt(targetAnswerZh, findResult);
+         let delZh = lodash.pullAt(targetAnswerZhArr, findResult);
          zhs.push(delZh[0]); // 添加到匹配的中文数组中(用于显示)
       };
    });
@@ -433,7 +469,7 @@ function checkAnswer(userAnswer: string, targetAnswer: string, strength: number 
    console.log("相似度：", similarVal / tarZhNum, "阈值：", strength);
    console.log("匹配的中文：", zhs);
 
-   // 相似度
+   // 相似度 (如果相似度小于阈值，返回false)
    if (similarVal / tarZhNum < strength) return false;
 
    return true;

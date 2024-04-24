@@ -291,6 +291,13 @@ async function submitForm() {
         words.id = null;
       }
     });
+    // 去除回车符和空格
+    vocabulary.value.wordsList = vocabulary.value.wordsList?.map(words => {
+      words.word = words.word.trim();
+      words.definition = words.definition.trim();
+      return words;
+    });
+
     if (isEdit.value) {
       // 编辑
       result = await VocabularyAPI.updVocabulary(vocabulary.value);

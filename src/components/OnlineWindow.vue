@@ -204,12 +204,10 @@
             <button @click="socketStore.chatWindowShow = false"
                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
          </div>
-         <Teleport to="body">
             <!-- 预览图片 -->
             <a-image :style="{ display: 'none' }" :preview="{
                visible: previewVisible, onVisibleChange: setVisible
             }" :src="previewImage" />
-         </Teleport>
       </div>
    </Transition>
 </template>
