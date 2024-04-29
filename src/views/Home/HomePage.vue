@@ -10,7 +10,7 @@
                <img class="w-[400px] absolute top-1/2 -translate-y-1/2 -right-10 blur-lg rotate-45" :src="item.img">
             </div>
             <!-- 图标展示 -->
-            <div :style="`background-image: url(${item.img});`"
+            <div :style="`background-image: url(${getAssetsImg(item.img)});`"
                class="absolute size-[200px] top-1/2 -translate-y-1/2 md:left-10 left-2 bg-cover">
                <!-- <img class="absolute bottom-0 left-1/2 -translate-x-1/2" :src="item.img"> -->
             </div>
@@ -142,6 +142,7 @@ import { message } from "ant-design-vue";
 import { UserAPI } from "@/api/user";
 import type { User } from "@/types/user";
 import { useRoute } from "vue-router";
+// import { MyUtils } from "@/utils";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -152,17 +153,17 @@ const carouselData = [
    {
       title: "在线交流",
       desc: "与他人交流，学习更轻松",
-      img: "src/assets/img/online2.webp",
+      img: "online2.webp",
    },
    {
       title: "发布词集",
       desc: "发布自己的词集，与他人分享",
-      img: "src/assets/img/book.webp",
+      img: "book.webp",
    },
    {
       title: "学习词集",
       desc: "丰富的词集，助你学习更轻松",
-      img: "src/assets/img/study.webp",
+      img: "study.webp",
    },
 
 ];
@@ -191,6 +192,13 @@ if (userStore.userInfo && userStore.userInfo.id) {
    isNormalUser.value = userStore.userInfo.roleList?.findIndex((item) => item.id == 1 || item.id == 2) == -1;
 }
 
+
+   // 获取图片路径
+   function getAssetsImg(name: string) {
+      let data = new URL(`../../assets/img/${name}`, import.meta.url).href
+      console.log(data)
+      return data;
+   }
 
 // 通过 token 获取用户信息
 async function getUserInfoByToken() {

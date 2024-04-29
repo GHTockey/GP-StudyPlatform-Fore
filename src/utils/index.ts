@@ -103,4 +103,11 @@ export class MyUtils {
       }
       return true;
    }
+   // // 获取图片路径
+   // static getAssetsImg(name: string) {
+   //    let data = new URL(`../../assets/img/${name}`, import.meta.url).href
+   //    console.log(data)
+   //    return data;
+   // }
+
 }

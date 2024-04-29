@@ -18,7 +18,8 @@ export const useSocketStore = defineStore("socket", () => {
    // 连接
    function connect(uid: string | number) {
       if (socket.value != null) return; // 已连接，直接返回
-      socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
+      socket.value = new WebSocket(`ws://${import.meta.env.VITE_BASE_URL}}/webSocket/` + uid)
+      // socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
 
       socket.value.onopen = async () => {
          console.log("[socket-store 主程序] 连接成功:" + uid);

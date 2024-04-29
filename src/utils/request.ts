@@ -5,13 +5,14 @@ import { useUserStore } from "@/stores/userStore";
 import router from "@/router";
 import { MyUtils } from "@/utils";
 
-// let baseURL: string = "http://localhost:10010";
 // let baseURL: string = "http://192.168.0.108:10010";
+let baseURL: string = import.meta.env.VITE_BASE_URL;
 // let baseURL: string = "http://localhost:8080"; // 已在 vite 开启代理
 let cancelToken = axios.CancelToken.source() // 用于中断请求
 
 const service = axios.create({
-   baseURL: '/api',
+   // baseURL: '/api',
+   baseURL,
    // timeout: 3000,
    cancelToken: cancelToken.token
 });
@@ -29,7 +30,14 @@ service.interceptors.request.use(config => {
 // 响应拦截
 service.interceptors.response.use(res => {
    // console.log("响应拦截：" + res.config.url, res.data);
-   if (res.data.code == 11012) { // https://sa-token.cc/doc.html#/fun/exception-code
+   // https://sa-token.cc/doc.html#/fun/exception-code
+   if (
+      res.data.code == 11012 || // token 无效
+      res.data.code == 11013 || // token 过期
+      res.data.code == 11014 || // token 被顶下线
+      res.data.code == 11015 || // token 被踢下线
+      res.data.code == 11016 // token 被冻结
+   ) {
       console.log("认证信息已失效");
       cancelToken.cancel("中断")
       // 提示框

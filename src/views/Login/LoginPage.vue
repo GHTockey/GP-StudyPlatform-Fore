@@ -10,8 +10,10 @@
       <!-- 图片 -->
       <div class="flex-1 p-2" :class="isRegister ? 'toRight' : 'toRight-back'">
         <div class="w-full h-full rounded-lg relative bg-[#fff]">
-          <img :src="`src/assets/img/${imgName}`" class="absolute 
+          <img :src="getAssetsImg(imgName)" class="absolute 
             top-1/2 -translate-y-1/2 scale-110" />
+          <!-- <img :src="`src/assets/img/${imgName}`" class="absolute 
+            top-1/2 -translate-y-1/2 scale-110" /> -->
         </div>
       </div>
       <!-- 表单 -->
@@ -193,9 +195,14 @@ const formRules: { [temporary: string]: RuleObject[] | RuleObject } = {
 
 
 
+
 getWebsiteInfo();
 
 
+// 获取图片路径
+function getAssetsImg(name: string) {
+  return new URL(`../../assets/img/${name}`, import.meta.url).href;
+}
 
 
 // 注册

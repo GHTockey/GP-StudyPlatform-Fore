@@ -20,3 +20,5 @@ app.use(pinia)
 app.use(router)
 
 app.mount('#app')
+
+console.log("模式:", import.meta.env.VITE_NAME);

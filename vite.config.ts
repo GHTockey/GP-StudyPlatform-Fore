@@ -7,7 +7,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 
-export const baseURL = "http://localhost:8080"
+// export const baseURL = "http://localhost:8080"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -28,12 +28,12 @@ export default defineConfig({
   server: {
     port: 5173,
     // host: '0.0.0.0',
-    proxy: {
-      '/api': {
-        target: baseURL, // 后端接口地址
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: baseURL, // 后端接口地址
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, '')
+    //   }
+    // }
   },
 })
