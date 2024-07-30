@@ -41,7 +41,7 @@
             聊天消息
          </button>
          <!-- 后台管理 -->
-         <button v-show="!isNormalUser" @click="$router.push('/admin')" class="btn btn-warning">
+         <button v-show="!isNormalUser" @click="adminBtnHandler" class="btn btn-warning">
             <IconFont type="icon-houtaiguanli-houtaiguanli" class="text-xl" />
             后台管理
          </button>
@@ -196,6 +196,10 @@ if (userStore.userInfo && userStore.userInfo.id) {
    isNormalUser.value = userStore.userInfo.roleList?.findIndex((item) => item.id == 1 || item.id == 2) == -1;
 }
 
+// 后台管理按钮点击事件
+function adminBtnHandler() {
+   MyUtils.alert("暂未开放", "warning")
+}
 
 // 我的班级按钮点击事件
 function myClassBtnHandler(){
