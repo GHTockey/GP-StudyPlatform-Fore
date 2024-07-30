@@ -31,7 +31,7 @@
             个人中心
          </button>
          <!-- 班级 -->
-         <button @click="$router.push('/classes/' + userStore.userInfo?.classes?.id)" class="btn btn-secondary">
+         <button @click="myClassBtnHandler" class="btn btn-secondary">
             <IconFont type="icon-banjixinxi" class="text-xl" />
             我的班级
          </button>
@@ -144,6 +144,8 @@ import { message } from "ant-design-vue";
 import { UserAPI } from "@/api/user";
 import type { User } from "@/types/user";
 import { useRoute } from "vue-router";
+import router from "@/router";
+import { MyUtils } from "@/utils";
 // import { MyUtils } from "@/utils";
 
 const route = useRoute();
@@ -195,12 +197,24 @@ if (userStore.userInfo && userStore.userInfo.id) {
 }
 
 
-   // 获取图片路径
-   function getAssetsImg(name: string) {
-      let data = new URL(`../../assets/img/${name}`, import.meta.url).href
-      console.log(data)
-      return data;
+// 我的班级按钮点击事件
+function myClassBtnHandler(){
+   // 检查是否加入了班级
+   if(userStore.userInfo?.classes){
+      // 跳转到班级页面
+      router.push('/classes/' + userStore.userInfo?.classes.id)
+   } else {
+      MyUtils.alert("您还没有加入班级", "warning")
    }
+
+}
+
+// 获取图片路径
+function getAssetsImg(name: string) {
+   let data = new URL(`../../assets/img/${name}`, import.meta.url).href
+   console.log(data)
+   return data;
+}
 
 // 通过 token 获取用户信息
 async function getUserInfoByToken() {
