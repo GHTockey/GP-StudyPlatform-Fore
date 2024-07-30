@@ -1,5 +1,5 @@
 <template>
-   <div class="home-container my-type-center">
+   <div class="home-container my-type-center px-2">
 
       <a-carousel effect="fade" autoplay class="transition-all">
          <!-- 主功能模式介绍轮播 -->
@@ -24,7 +24,7 @@
       </a-carousel>
 
       <!-- 快捷入口 -->
-      <div class="flex gap-3 my-10">
+      <div class="flex gap-3 my-10 flex-wrap justify-center sm:justify-start">
          <!-- 个人中心 -->
          <button @click="$router.push('/user')" class="btn btn-primary">
             <IconFont type="icon-yonghu" class="text-lg" />
@@ -76,15 +76,15 @@
             </a-col>
          </a-row>
       </div>
-      <div v-else class="text-center text-xl text-gray-500 py-5">暂无数据</div>
+      <div v-else class="text-center text-gray-500 py-5">暂无数据</div>
 
       <!-- 热门词集和活跃者 -->
-      <div class="min-h-[200px] mt-5">
+      <div class="min-h-[200px] mt-5"> 
          <div class="flex justify-between gap-2">
             <div class="w-1/2">
                <h2 class="font-bold">热门词集</h2>
                <!-- 项 -->
-               <div v-for="(voc, index) in mostStudyVocList" :key="index" @click="$router.push('/vocabulary/' + voc.id)"
+               <div v-if="mostStudyVocList.length" v-for="(voc, index) in mostStudyVocList" :key="index" @click="$router.push('/vocabulary/' + voc.id)"
                   class="my-1 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative hover:bg-base-300 cursor-pointer">
                   <!-- 标题 -->
                   <p class="font-bold w-full">{{ voc.title }}</p>
@@ -103,13 +103,14 @@
                      <p class="text-sm">用户学习</p>
                   </div>
                </div>
+               <div v-else class="text-center text-gray-500 py-10">暂无数据</div>
             </div>
             <div class="w-1/2">
-               <h2 class="font-bold">学霸</h2>
+               <h2 class="font-bold">学霸榜</h2>
                <!-- 项 -->
-               <div v-for="(user, i) in mostStudyUserList" :key="i" @click="$router.push('/user/' + user.id)"
-                  class="bg-base-200 my-1 rounded-lg h-[80px] relative hover:bg-base-300 cursor-pointer">
-                  <div class="flex items-center h-full pl-3 gap-3">
+               <div v-if="mostStudyUserList.length" v-for="(user, i) in mostStudyUserList" :key="i" @click="$router.push('/user/' + user.id)"
+                  class="bg-base-200 my-1 rounded-lg h-[120px] sm:h-[80px] relative hover:bg-base-300 cursor-pointer pb-3 sm:pb-0">
+                  <div class="flex items-end sm:items-center h-full pl-3 gap-3">
                      <!-- 头像 -->
                      <div class="avatar">
                         <div class="w-12 rounded-full">
@@ -121,10 +122,11 @@
                         <p class="text-sm">学习了 {{ user.studyTotal }} 次词集</p>
                      </div>
                   </div>
-                  <div class=" absolute top-1/2 -translate-y-1/2 right-5">
-                     <div>No. <span class="font-bold text-3xl">{{ i + 1 }}</span> </div>
+                  <div class="absolute top-3 left-1/2 -translate-x-1/2 sm:-translate-x-0 sm:left-auto sm:top-1/2 sm:-translate-y-1/2 sm:right-5">
+                     <div>No.<span class="font-bold text-3xl">{{ i + 1 }}</span> </div>
                   </div>
                </div>
+               <div v-else class="text-center text-gray-500 py-10">暂无数据</div>
             </div>
          </div>
       </div>

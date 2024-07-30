@@ -249,27 +249,26 @@ withDefaults(
       chatWindowShow: false,
    }
 );
-console.log("online-window 程序已加载");
 onBeforeUnmount(() => {
    console.log("online-window 程序已卸载");
    // 关闭连接
-   socketStore.close()
-})
+   // socketStore.close()
+});
 // 当前聊天的用户
 const currentChatUser = ref<User>();
 // 隐藏用户列表 flag
 const hideUserList = ref(false);
 // 在线用户列表
-const onlineList = ref<User[]>([])
+const onlineList = ref<User[]>([]);
 // 班级成员列表
-const classesUserList = ref<User[]>([])
+const classesUserList = ref<User[]>([]);
 // 计算属性：在线用户列表和班级成员列表的合并
 const userListMerge = computed(() => {
    let data = _.uniqBy(onlineList.value.concat(classesUserList.value), "id")
    // 排除自己
    data = data.filter(u => u.id != userStore.userInfo!.id)
    return data
-})
+});
 // 计算属性：与当前选中用户的聊天信息 【聊天记录数据处理】
 const targetChat = computed(() => {
    // 滚动到底部 [TODO:临时解决方案，后续优化]
@@ -330,11 +329,11 @@ const targetChat = computed(() => {
       }
    })
    return data;
-})
+});
 // 计算属性：当前选中用户的状态
 const targetUserStatus = computed(() => {
    return onlineUidList.value.includes(currentChatUser.value!.id)
-})
+});
 // 聊天内容输入框
 // const inputMsg = ref("")
 // 聊天内容 (总)
@@ -372,39 +371,41 @@ const inputBoxUpBtns = ref<0 | 1 | 2 | 3 | 4>(0)
 // 班级
 const classes = ref<Classes>()
 
+onlineWindowInit();
 
 
-if (userStore.userInfo) {
-   // 添加自己到在线用户列表中
-   // onlineList.value.push(userStore.userInfo)
-   // 连接
-   socketStore.connect(userStore.userInfo.id)
-   if (userStore.userInfo.classes) {
-      // 获取班级成员
-      getUserListByCid(userStore.userInfo.classes.id!)
-      // 获取班级数据
-      getClasses()
+
+// 组件数据初始化
+function onlineWindowInit(){
+   console.log("online-window 程序已加载");
+   if (userStore.userInfo) {
+      // 添加自己到在线用户列表中
+      // onlineList.value.push(userStore.userInfo)
+      // 连接
+      socketStore.connect(userStore.userInfo.id)
+      if (userStore.userInfo.classes) {
+         // 获取班级成员
+         getUserListByCid(userStore.userInfo.classes.id!)
+         // 获取班级数据
+         getClasses()
+      } else {
+         console.log("未加入班级");
+      }
+      // 获取未读消息
+      getUnreadMsg()
+      // 获取用户词集列表
+      getUserAllVocListByUid()
    } else {
-      console.log("未加入班级");
+      MyUtils.alert("请先登录") // 24.07.18 未登录跳转登录页；HR面试
+      router.push("/login")
    }
-   // 获取未读消息
-   getUnreadMsg()
-   // 获取用户词集列表
-   getUserAllVocListByUid()
-} else {
-   // MyUtils.alert("请先登录")
-   // router.push("/login")
 }
-
-
-
-
 // 获取班级数据
 async function getClasses() {
    let result = await ClassesAPI.getClasses(userStore.userInfo!.classes!.id!)
    classes.value = result.data
 }
-// 词集点击事件 【发送】
+// 词集点击事件【发送】
 function handleVocClick(voc: Vocabulary) {
    let userMessage: UserMessage = {
       id: 0,

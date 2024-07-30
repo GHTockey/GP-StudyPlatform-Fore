@@ -14,15 +14,19 @@ export const useSocketStore = defineStore("socket", () => {
    const unreadMessage = ref<UserMessage[]>([]);
    // 聊天窗口的显示
    const chatWindowShow = ref(false);
+   // 在线窗口的key; 用于重载组件
+   const onlineWindowKey = ref(0);
 
    // 连接
    function connect(uid: string | number) {
       if (socket.value != null) return; // 已连接，直接返回
-      socket.value = new WebSocket(`ws://${import.meta.env.VITE_BASE_URL}}/webSocket/` + uid)
+      socket.value = new WebSocket(`${import.meta.env.VITE_SOCKET_BASE_URL}/webSocket/` + uid)
       // socket.value = new WebSocket("ws://localhost:8080/webSocket/" + uid)
 
       socket.value.onopen = async () => {
          console.log("[socket-store 主程序] 连接成功:" + uid);
+         console.log("正在重载 onlineWindow");
+         onlineWindowKey.value++;
 
          // 【用户登录未读消息的提示】
          await overallSituationUnreadMsgHandler();
@@ -96,6 +100,7 @@ export const useSocketStore = defineStore("socket", () => {
       receiveMsgNotification,
       unreadMessage,
       overallSituationUnreadMsgHandler,
-      chatWindowShow
+      chatWindowShow,
+      onlineWindowKey
    }
 });

@@ -11,14 +11,15 @@
   }">
     <RouterView />
     <!-- 聊天窗口 (限定与token是为了登录后再连接socket服务) -->
-    <OnlineWindow  :chat-window-show="socketStore.chatWindowShow" />
+    <!-- 当 key 属性发生变化时，Vue 会认为这是一个新的组件实例，从而销毁旧的实例并创建一个新的实例 -->
+    <OnlineWindow :chat-window-show="socketStore.chatWindowShow" :key="socketStore.onlineWindowKey"  />
   </a-config-provider>
 </template>
 
 
 <script setup lang="ts">
 import OnlineWindow from "@/components/OnlineWindow.vue";
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 import { useUserStore } from "@/stores/userStore";
 import { useSocketStore } from "@/stores/socketStore";
 // antd 组件国际化
@@ -26,7 +27,7 @@ import zhCN from "ant-design-vue/es/locale/zh_CN";
 // antd 日期选择器
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
-dayjs.locale("zh_CN")
+dayjs.locale("zh_CN");
 
 // const myColorPrimary = "#a991f7";
 
