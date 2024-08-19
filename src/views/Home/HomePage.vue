@@ -198,7 +198,8 @@ if (userStore.userInfo && userStore.userInfo.id) {
 
 // 后台管理按钮点击事件
 function adminBtnHandler() {
-   MyUtils.alert("暂未开放", "warning")
+   // MyUtils.alert("暂未开放", "warning")
+   window.open("http://gp-admin.tockey.cn/")
 }
 
 // 我的班级按钮点击事件
