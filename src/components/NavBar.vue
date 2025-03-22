@@ -215,45 +215,59 @@
       </div>
    </dialog>
    <!-- 中控台抽屉 -->
-   <a-drawer :placement="'top'" forceRender :closable="false" v-model:open="centerConsoleShow" height="300px"
+   <a-drawer :placement="'top'" forceRender :closable="false" v-model:open="centerConsoleShow" height="auto"
       class="rounded-b-lg" :body-style="{ padding: 0 }">
-      <div class="h-full flex justify-center items-center gap-3 bg-base-100 p-7">
-         <div class="w-[300px] h-full bg-base-200 rounded-lg">
-            123
+      <div class="h-full bg-base-100 p-7 flex flex-col items-center gap-y-[10px]">
+         <div class="flex gap-[10px]">
+            <!-- 个人信息 card -->
+            <div class="h-[150px] w-[250px] bg-base-200 rounded-lg p-3">
+               <!-- 头像 -->
+               <img :src="userInfo?.avatar" alt="avatar" width="60" class="rounded-full">
+               <!-- 其它信息 -->
+               <div>
+                  <div>{{ userInfo?.username }}</div>
+                  <div>{{ dayjs(userInfo?.createTime).format() }}</div>
+               </div>
+            </div>
+            <div class="h-[150px] bg-base-200 rounded-lg p-3">
+               学习词集的饼图（打开数）
+            </div>
          </div>
-         <!-- 昼夜切换按钮 -->
-         <div class="size-[100px] relative btn p-0">
-            <label class="swap swap-rotate size-full">
-               <!-- 这个隐藏的复选框控制状态 -->
-               <input type="checkbox" class="theme-controller" value="dark" :checked="isDark" @change="themeChange" />
-               <!--太阳图标 -->
-               <!-- <IconFont type="icon-Sunny" class="swap-on fill-current size-[50px]" /> -->
-               <span class="swap-on fill-current text-[2.5rem]">🌞</span>
-               <!-- 月亮图标 -->
-               <span class="swap-off fill-current text-[2.5rem]">🌚</span>
-            </label>
-            <p>主题切换</p>
-         </div>
-         <!-- 发布词集按钮 -->
-         <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false;">
-            <!--图标 -->
-            <span class="my-center-console-icon">📖</span>
-            <p>发布词集</p>
-         </div>
-         <!-- 创建班级按钮 -->
-         <div onclick="document.querySelector('#createClassDialog').showModal()" @click="centerConsoleShow = false;"
-            class="size-[100px] relative btn p-0">
-            <span class="my-center-console-icon">🏫</span>
-            <p>创建班级</p>
-         </div>
-         <!-- 我的消息按钮 -->
-         <div @click="centerConsoleShow = false; chatWindowShow = true;" class="size-[100px] relative btn p-0">
-            <!-- 未读消息数 -->
-            <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{
-               unreadMessage.length
-            }}</div>
-            <span class="my-center-console-icon">✉️</span>
-            <p>我的消息</p>
+         <div class="flex justify-center items-center gap-3 mb-[15px]">
+            <!-- 昼夜切换按钮 -->
+            <div class="size-[100px] relative btn p-0">
+               <label class="swap swap-rotate size-full">
+                  <!-- 这个隐藏的复选框控制状态 -->
+                  <input type="checkbox" class="theme-controller" value="dark" :checked="isDark" @change="themeChange" />
+                  <!--太阳图标 -->
+                  <!-- <IconFont type="icon-Sunny" class="swap-on fill-current size-[50px]" /> -->
+                  <span class="swap-on fill-current text-[2.5rem]">🌞</span>
+                  <!-- 月亮图标 -->
+                  <span class="swap-off fill-current text-[2.5rem]">🌚</span>
+               </label>
+               <p>主题切换</p>
+            </div>
+            <!-- 发布词集按钮 -->
+            <div class="size-[100px] relative btn p-0" @click="$router.push('/vocabulary/add'); centerConsoleShow = false;">
+               <!--图标 -->
+               <span class="my-center-console-icon">📖</span>
+               <p>发布词集</p>
+            </div>
+            <!-- 创建班级按钮 -->
+            <div onclick="document.querySelector('#createClassDialog').showModal()" @click="centerConsoleShow = false;"
+               class="size-[100px] relative btn p-0">
+               <span class="my-center-console-icon">🏫</span>
+               <p>创建班级</p>
+            </div>
+            <!-- 我的消息按钮 -->
+            <div @click="centerConsoleShow = false; chatWindowShow = true;" class="size-[100px] relative btn p-0">
+               <!-- 未读消息数 -->
+               <div v-show="unreadMessage.length" class="badge badge-error absolute -top-2 -right-3">{{
+                  unreadMessage.length
+               }}</div>
+               <span class="my-center-console-icon">✉️</span>
+               <p>我的消息</p>
+            </div>
          </div>
       </div>
    </a-drawer>
@@ -292,6 +306,7 @@ import IconFont from "@/utils/iconFont";
 import { useWindowScroll, useStorage } from "@vueuse/core";
 import { MyUtils } from "@/utils";
 import { useSocketStore } from "@/stores/socketStore";
+import dayjs from "dayjs";
 
 
 // vueuse 获取滚动位置

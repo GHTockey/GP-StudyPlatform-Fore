@@ -11,6 +11,7 @@ export type User = {
    giteeAccountBingId?: string | null,
    weixinAccountBingId?: string | null,
    qqAccountBingId?: string | null,
+   createTime: string,
 
    classes?: Classes
    permissionList?: Permission[],

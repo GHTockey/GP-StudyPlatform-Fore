@@ -110,4 +110,9 @@ export class MyUtils {
    //    return data;
    // }
 
+   // 格式化时间
+   // static formatTime(time: string, format: string = 'YYYY-MM-DD HH:mm:ss') {
+   //    return dayjs(time).format(format)
+   // }
+
 }

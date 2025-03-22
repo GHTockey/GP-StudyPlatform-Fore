@@ -58,7 +58,7 @@
                   <p>{{ voc.title }}</p>
                   <p>{{ voc.count }} 个词条</p>
                   <!-- 右下角 时间 -->
-                  <span>{{ voc.updateTime }}</span>
+                  <span>{{ dayjs(voc.updateTime).format('YYYY-MM-DD') }}</span>
                   <div class="userd">
                      <!-- 头像 -->
                      <div class="avatar">
@@ -146,7 +146,7 @@ import type { User } from "@/types/user";
 import { useRoute } from "vue-router";
 import router from "@/router";
 import { MyUtils } from "@/utils";
-// import { MyUtils } from "@/utils";
+import dayjs from "dayjs";
 
 const route = useRoute();
 const userStore = useUserStore();
