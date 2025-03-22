@@ -56,7 +56,8 @@ service.interceptors.response.use(res => {
       })
    }
    if (res.data.code != 20000) {
-      message.error("响应拦截：" + res.data.message)
+      console.log("响应拦截：" + res.data.message);
+      // message.error("响应拦截：" + res.data.message)
    }
 
    // 业务逻辑成功，返回响应数据，作为 axios 成功的结果

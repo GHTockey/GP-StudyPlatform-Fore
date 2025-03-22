@@ -70,19 +70,35 @@
    </div>
 
    <!-- 搜索弹框 -->
-   <dialog id="searchDialog" class="modal" ref="searchDialog">
-      <div class="modal-box transition-all duration-300 ">
+   <dialog id="searchDialog" class="modal" ref="searchDialog" @close="searchOptionClick()">
+      <div class="modal-box transition-all duration-300 fixed top-[100px] left-1/2 -translate-x-1/2 overflow-y-hidden">
          <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
          </form>
          <h3 class="font-bold text-lg">搜索</h3>
-         <div class="mt-5">
+         <div class="mt-5 p-2 max-h-[500px] overflow-y-auto">
             <input type="text" placeholder="输入关键词" class="input input-bordered w-full"
                :oninput="lodash?.debounce(searchHandler, 300)" />
+            <!-- 搜索条件 -->
+             <div class="text-sm flex gap-4 my-2">
+               <label class="flex items-center gap-x-1">
+                  <input type="checkbox" v-model="searchCondition.vocabulary" class="checkbox checkbox-xs" />
+                  <span class=" cursor-pointer">词集</span>
+               </label>
+               <label class="flex items-center gap-x-1">
+                  <input type="checkbox" v-model="searchCondition.user" class="checkbox checkbox-xs" />
+                  <span class=" cursor-pointer">用户</span>
+               </label>
+               <label class="flex items-center gap-x-1">
+                  <input type="checkbox" v-model="searchCondition.classes" class="checkbox checkbox-xs" />
+                  <span class=" cursor-pointer">班级</span>
+               </label>
+             </div>
+
             <!-- 用户搜索结果 -->
             <Transition>
-               <ul class="mt-5" v-show="searchUserResult?.length">
-                  <div class="divider font-semibold">🧑‍🚀来自用户</div>
+               <ul class="mt-5" v-show="searchUserResult?.length && searchCondition.user">
+                  <div class="divider font-semibold">🧑来自用户</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
                      v-for=" user in searchUserResult" @click="$router.push(`/user/${user.id}`); searchOptionClick()">
                      <div class="h-14 flex relative">
@@ -107,7 +123,7 @@
             </Transition>
             <!-- 词集搜索结果 -->
             <Transition>
-               <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length">
+               <ul class="bg-base-100 mt-5" v-show="searchVocabularyResult?.length && searchCondition.vocabulary">
                   <div class="divider font-semibold">📖来自词集</div>
 
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
@@ -149,7 +165,7 @@
             </Transition>
             <!-- 班级搜索结果 -->
             <Transition>
-               <ul class="bg-base-100 mt-5" v-show="searchClassesResult?.length">
+               <ul class="bg-base-100 mt-5" v-show="searchClassesResult?.length && searchCondition.classes ">
                   <div class="divider font-semibold">🏫来自班级</div>
                   <li class="bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer mb-1"
                      @click="$router.push(`/classes/${classes.id}`); searchOptionClick()"
@@ -184,9 +200,17 @@
                </ul>
             </Transition>
 
-            <p class="text-center text-gray-500 p-10"
-               v-show="!searchVocabularyResult?.length && !searchUserResult?.length && !searchClassesResult?.length && searchKey">
-               没有数据</p>
+            <Transition>
+               <p v-if="loadingObj.isSearch" class="p-10 flex items-center justify-center gap-2">
+                  <span class="loading loading-ring loading-md"></span>
+                  <span class="text-gray-500">正在搜索</span>
+               </p>
+               <template v-else>
+                  <p class="text-center text-gray-500 p-10"
+                     v-show="!searchVocabularyResult?.length && !searchUserResult?.length && !searchClassesResult?.length && searchKey">
+                     没有数据</p>
+               </template>
+            </Transition>
          </div>
       </div>
    </dialog>
@@ -254,7 +278,7 @@
 <script setup lang="ts">
 import { UserOutlined, LogoutOutlined, LoginOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { useUserStore } from "@/stores/userStore";
-import { ref } from "vue";
+import { ref, effect } from "vue";
 import { ClassesAPI } from "@/api/classes";
 import { UserAPI } from "@/api/user";
 import { VocabularyAPI } from "@/api/vocabulary";
@@ -304,6 +328,16 @@ const createClassForm = ref<Classes>({
 });
 
 
+const loadingObj = ref({
+   isSearch: false,
+});
+// 搜索条件
+const searchCondition = ref({
+   vocabulary: true,
+   user: true,
+   classes: true,
+})
+
 
 
 // 创建班级 【提交】
@@ -343,13 +377,21 @@ async function searchHandler(e: Event) {
    // 获取搜索关键词
    searchKey.value = (<HTMLInputElement>e.target).value;
    // 如果搜索关键词为空，不进行搜索
-   if (!searchKey.value) return;
+   if (!searchKey.value.trim()) return;
+   loadingObj.value.isSearch = true;
    // 词集搜索
-   searchVocabularyResult.value = (await VocabularyAPI.searchVocabulary(searchKey.value)).data;
+   if (searchCondition.value.vocabulary) {
+      searchVocabularyResult.value = (await VocabularyAPI.searchVocabulary(searchKey.value)).data;
+   }
    // 用户搜索
-   searchUserResult.value = (await UserAPI.searchUser(searchKey.value)).data;
+   if (searchCondition.value.user) {
+      searchUserResult.value = (await UserAPI.searchUser(searchKey.value)).data;
+   }
    // 班级搜索
-   searchClassesResult.value = (await ClassesAPI.searchClasses(searchKey.value)).data;
+   if (searchCondition.value.classes) {
+      searchClassesResult.value = (await ClassesAPI.searchClasses(searchKey.value)).data;
+   }
+   loadingObj.value.isSearch = false;
 }
 // 退出登录
 function logout() {
