@@ -155,21 +155,20 @@ const socketStore = useSocketStore();
 // 轮播数据
 const carouselData = [
    {
-      title: "在线交流",
-      desc: "与他人交流，学习更轻松",
+      title: "实时互动交流",
+      desc: "随时发起讨论，快速解决学习难题",
       img: "online2.webp",
    },
    {
-      title: "发布词集",
-      desc: "发布自己的词集，与他人分享",
+      title: "创作共享词集",
+      desc: "专业编辑工具，打造高质量学习资源",
       img: "book.webp",
    },
    {
-      title: "学习词集",
-      desc: "丰富的词集，助你学习更轻松",
+      title: "智能学习模式",
+      desc: "科学记忆算法，个性化提升学习效率",
       img: "study.webp",
-   },
-
+   }
 ];
 // 用户学习的词集列表
 const vocStudyList = ref<Vocabulary[]>([]);

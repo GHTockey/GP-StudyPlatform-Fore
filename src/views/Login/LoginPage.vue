@@ -140,8 +140,8 @@ const userStore = useUserStore();
 const router = useRouter();
 // 登录表单数据
 const formState = reactive({
-  username: "admin",
-  password: "114514",
+  username: "",
+  password: "",
 });
 // 登录 loading
 const loading = ref(false);
@@ -154,7 +154,7 @@ const registerForm = ref({
   username: "",
   password: "",
   password2: "",
-  email: "tockey@yeah.net",
+  email: "",
   code: "",
 });
 // 开关
