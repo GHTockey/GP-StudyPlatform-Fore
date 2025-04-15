@@ -265,6 +265,7 @@ async function getMostStudyVocList() {
 async function getMostStudyUserList() {
    let result = await UserAPI.getActiveUserList();
    if (result.code == 20000) {
+      userStore
       mostStudyUserList.value = result.data;
    } else {
       message.error(result.message);

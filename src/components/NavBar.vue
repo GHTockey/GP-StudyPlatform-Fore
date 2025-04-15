@@ -235,20 +235,22 @@
                      <p class="text-[10px]">学习热力</p>
                   </div>
                   <div class="btn flex flex-col font-[500]" @click="chartSwitch(2)">
-                     <p class="text-[16px]">123</p>
+                     <p class="text-[16px]">3</p>
                      <p class="text-[10px]">词集掌握</p>
                   </div>
                </div>
             </div>
             <!-- 图表切换 -->
             <div class="h-[160px] bg-base-200 rounded-lg p-3 transition-all">
-               <!-- <Transition> -->
-               <!-- 日历图 -->
-               <div v-show="chartIndex === 1" id="chart1" ref="chart1" class="w-[500px] h-full"></div>
-               <!-- 雷达图 -->
-               <div v-show="chartIndex === 2" id="chart2" ref="chart2" class="w-[300px] h-full">
-               </div>
-               <!-- </Transition> -->
+               <Transition>
+                  <!-- 日历图 -->
+                  <div v-show="chartIndex === 1" id="chart1" ref="chart1" class="w-[500px] h-full"></div>
+               </Transition>
+               <Transition>
+                  <!-- 雷达图 -->
+                  <div v-show="chartIndex === 2" id="chart2" ref="chart2" class="w-[300px] h-full">
+                  </div>
+               </Transition>
             </div>
          </div>
          <div class="flex justify-center items-center gap-3 mb-[15px]">
