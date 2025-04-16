@@ -331,7 +331,7 @@ import { MyUtils } from "@/utils";
 import { useSocketStore } from "@/stores/socketStore";
 import * as echarts from 'echarts';
 
-// vueuse 获取滚动位置;你博客文章能不能
+// vueuse 获取滚动位置
 const { y } = useWindowScroll();
 
 const userStore = useUserStore();
@@ -376,7 +376,7 @@ const searchCondition = ref({
 })
 
 // 中控台图表索引
-const chartIndex = ref(2);
+const chartIndex = ref(1);
 
 
 const chart1 = ref<HTMLDivElement | null>(null);
@@ -386,6 +386,13 @@ const chart2Instance = shallowRef<echarts.ECharts | null>(null);
 
 
 onMounted(() => {
+   drawChart1();
+   drawChart2();
+})
+
+watch(isDark, () => {
+   chart1Instance.value?.dispose();
+   chart2Instance.value?.dispose();
    drawChart1();
    drawChart2();
 })
@@ -459,6 +466,7 @@ function themeChange(e: Event) {
 }
 // 绘制日历图
 function drawChart1() {
+   // TODO: temp
    function getVirtualData(year: any) {
       const date = +echarts.time.parse(year + '-01-01');
       const end = +echarts.time.parse(+year + 1 + '-01-01');
@@ -483,6 +491,9 @@ function drawChart1() {
          type: 'piecewise',
          orient: 'horizontal',
          left: 'center',
+         textStyle: {
+            color: isDark.value ? '#d1d5db' : '#000'
+         },
          inRange: {
             // color: ['#87CEEB', '#4682B4', '#3B5998', '#2F4F7F', '#1F3A93']
             color: ['white', '#2563eb']
@@ -495,16 +506,22 @@ function drawChart1() {
          left: 20,
          right: 0,
          cellSize: ['auto', 12],
-         range: '2016',
+         range: '2025',
          itemStyle: {
             borderWidth: 1
          },
-         yearLabel: { show: false }
+         yearLabel: { show: false },
+         dayLabel: {
+            color: isDark.value ? '#d1d5db' : '#000'
+         },
+         monthLabel: {
+            color: isDark.value ? '#d1d5db' : '#000'
+         }
       },
       series: {
          type: 'heatmap',
          coordinateSystem: 'calendar',
-         data: getVirtualData('2016'),
+         data: getVirtualData('2025'),
          // itemStyle: {
          //    borderWidth: 0,
          //    color: (p: any) => {
@@ -584,6 +601,10 @@ watch(centerConsoleShow, () => {
       }, 0);
    }
 })
+
+// watch(isDark, () => {
+//    console.log('isDark watch', isDark.value);
+// })
 </script>
 
 <style lang="less" scoped>
