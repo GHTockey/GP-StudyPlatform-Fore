@@ -77,3 +77,10 @@
       transition:  width 0.3s, height 0.3s, margin 0.3s, padding 0.3s, background-color 0.3s;
    }
 }
+
+
+/* 不要滚动条 */
+::-webkit-scrollbar {
+   display: none;
+}
+

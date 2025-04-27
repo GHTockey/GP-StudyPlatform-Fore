@@ -31,7 +31,7 @@
          <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                <!-- 头像 -->
-               <div v-if="userInfo" class="avatar online">
+               <div v-if="userInfo" class="avatar">
                   <div class="w-[40px] rounded-full">
                      <img :src="userInfo?.avatar" />
                   </div>
