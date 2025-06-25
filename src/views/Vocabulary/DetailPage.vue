@@ -8,7 +8,8 @@
     <div class="stack size-full md:w-[80%] lg:w-[60%] xl:w-[70%] xl:h-[380px] max-w-[850px]">
       <div class="tce-card-box p-2 size-full overflow-hidden md:overflow-visible">
         <!--翻转卡片-->
-        <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full" @click="turnCard">
+        <div ref="turnCardRef" class="transition-all select-none duration-300 cursor-pointer size-full"
+          @click="turnCard">
           <div class="my-card-child">{{ vocabulary.wordsList?.[currentWordIndex]?.word }}</div>
           <div class="my-card-child size-full absolute top-0">{{
             vocabulary.wordsList?.[currentWordIndex].definition }}</div>
@@ -72,9 +73,10 @@
       <div class="flex items-center gap-4">
         <button @click="userLearnVocabulary" :disabled="isLearn" class="btn btn-sm btn-info">{{ isLearn ? '已加入学习清单' :
           '添加至学习清单'
-        }}</button>
+          }}</button>
         <template v-if="isSelf">
-          <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)" class="btn btn-sm btn-secondary">编辑</button>
+          <button @click="$router.push(`/vocabulary/edit/${vocabulary.id}`)"
+            class="btn btn-sm btn-secondary">编辑</button>
           <button @click="MyUtils.modal('操作确认', `您确定将词集 【${vocabulary.title}】 删除吗？`, () => delVocabularyConfirm())"
             class="btn btn-sm btn-error">删除</button>
         </template>
@@ -85,11 +87,11 @@
     </div>
 
     <!-- 模式选择 -->
-    <div
+    <div 
       class="my-4 flex flex-wrap md:absolute md:right-0 md:top-8 md:w-[20%] md:h-[calc(320px+72px)] lg:w-[40%] xl:w-[300px] xl:h-[calc(385px+72px)]">
       <!--  border-2 border-transparent hover:border-2 hover:border-primary -->
       <div class="tce-mode-select-btn my-voc-mode-box">
-        <div @click="MyUtils.alert('qp待开发')" class="tce-bg-gradient1 my-voc-mode-item">
+        <div @click="$router.push(`/vocabulary/fullscreenMode/${vocabulary.id}`)" class="tce-bg-gradient1 my-voc-mode-item">
           <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">全屏</p>
           <IconFont class="my-voc-mode-icon" type="icon-quanping" />
         </div>
@@ -107,8 +109,8 @@
         </div>
       </div>
       <div class="tce-mode-select-btn my-voc-mode-box">
-        <div @click="MyUtils.alert('XX待开发')" class="tce-bg-gradient4 my-voc-mode-item">
-          <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">XX</p>
+        <div @click="MyUtils.alert('待开发')" class="tce-bg-gradient4 my-voc-mode-item">
+          <p class="ml-5 font-bold absolute top-1/2 -translate-y-1/2">复习</p>
           <IconFont class="my-voc-mode-icon" type="icon-peidui" />
         </div>
       </div>
@@ -142,16 +144,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { VocabularyAPI } from "@/api/vocabulary";
 import type { Vocabulary, Word } from "@/types/vocabulary";
 import { MyUtils } from "@/utils";
 import IconFont from "@/utils/iconFont"
 import { useUserStore } from "@/stores/userStore";
+import { useStorage } from '@vueuse/core';
 
 const userStore = useUserStore();
 const route = useRoute();
+
+const isDark = useStorage("isDark", false);
 
 // 词集数据
 const vocabulary = ref<Vocabulary>({
@@ -234,6 +239,11 @@ async function getVocabularyDetail() {
   }
   MyUtils.alert(result.message, "error")
 }
+
+
+// watch(isDark, (newVal) => {
+//   console.log('isDark', isDark.value);
+// })
 </script>
 
 <style scoped lang="less">
@@ -323,6 +333,23 @@ async function getVocabularyDetail() {
 
 .tce-bg-gradient4 {
   background-image: linear-gradient(to right, #1dae4d 0%, #17c134 0%, #8bd1bd 100%);
+}
+
+// 暗黑模式下的渐变色
+.dark .tce-bg-gradient1 {
+  background-image: linear-gradient(to right, #071a3a 0%, #3a4a6b 100%, #4a5a6d 100%);
+}
+
+.dark .tce-bg-gradient2 {
+  background-image: linear-gradient(-60deg, #7a2323 0%, #a35c13 100%);
+}
+
+.dark .tce-bg-gradient3 {
+  background-image: linear-gradient(-225deg, #2d1a3d 0%, #3d2e5a 53%, #2d2540 100%);
+}
+
+.dark .tce-bg-gradient4 {
+  background-image: linear-gradient(to right, #0d4d23 0%, #0e5c1a 0%, #3a5d4d 100%);
 }
 
 // 

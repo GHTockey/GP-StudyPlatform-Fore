@@ -7,7 +7,7 @@ import type { AxiosProgressEvent } from "axios";
 
 export class MyUtils {
    // 消息通知
-   static alert(text: string, type?: "success" | "error" | "warning" | "info", time: number = 3000) {
+   static alert(text: string, type?: "success" | "error" | "warning" | "info", time: number = 2000) {
       // 虚拟dom
       // let alertEl = h('div', { class: 'alert alert-info w-auto fixed top-28 left-1/2 -translate-x-1/2 shadow-lg' }, '6666666666666')
       let alertEl = h(Alert, {

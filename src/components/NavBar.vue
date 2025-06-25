@@ -458,7 +458,7 @@ function logout() {
 }
 // 主题切换事件
 function themeChange(e: Event) {
-   centerConsoleShow.value = false; // 关闭中控台
+   // centerConsoleShow.value = false; // 关闭中控台
    let checkEl = e.target as HTMLInputElement;
    // console.log(checkEl.checked);
    // localStorage.setItem("isDark", String(checkEl.checked))
@@ -601,10 +601,6 @@ watch(centerConsoleShow, () => {
       }, 0);
    }
 })
-
-// watch(isDark, () => {
-//    console.log('isDark watch', isDark.value);
-// })
 </script>
 
 <style lang="less" scoped>

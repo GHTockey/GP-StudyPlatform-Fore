@@ -17,6 +17,7 @@ const router = createRouter({
             { path: 'edit/:id', name: '编辑词集', component: () => import("@/views/Vocabulary/AddPage.vue") },
             { path: 'selectMode/:vid', name: '选择模式', component: () => import("@/views/Vocabulary/SelectModePage.vue") },
             { path: 'writeMode/:vid', name: '书写模式', component: () => import("@/views/Vocabulary/WriteModePage.vue") },
+            { path: 'fullscreenMode/:vid', name: '全屏模式', component: () => import("@/views/Vocabulary/FullScreen.vue") },
           ]
         },
         // 用户
