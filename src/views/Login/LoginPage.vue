@@ -246,6 +246,9 @@ async function sendCode() {
         flags.value.sendCode = 'default';
       }
     }, 1000);
+  } else {
+    flags.value.sendCode = 'default';
+    MyUtils.alert(result.message, 'error')
   }
 }
 
