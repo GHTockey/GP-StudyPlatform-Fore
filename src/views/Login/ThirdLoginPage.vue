@@ -123,7 +123,8 @@ const bindUserForm = ref<User>({
    password: "",
    avatar: "",
    sex: "",
-   id: ""
+   id: "",
+   createTime: ""
 });
 // 第三方用户数据
 const oAuthUserData = ref({
@@ -191,7 +192,7 @@ async function bindLocalUserHandler() {
 // 获取第三方登录用户信息程序
 async function getOAuthUserDataHandler() {
    let result = await OtherAPI.getOAuthUserData(oAuthKey, oAuthType)
-   console.log(result.data);
+   console.log('授权用户信息', result.data);
    if (result.code == 20000) {
       if (oAuthType.toLocaleUpperCase() == "GITHUB") {
          let githubUser = result.data as GithubUser

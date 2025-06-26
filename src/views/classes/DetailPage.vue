@@ -218,7 +218,8 @@ const classes = ref<Classes>({
       username: "",
       avatar: "",
       email: "",
-      sex: ""
+      sex: "",
+      createTime: ""
    }
 })
 // 班级成员的词集列表
@@ -238,7 +239,8 @@ const editClasses = ref<Classes>({
       username: "",
       avatar: "",
       email: "",
-      sex: ""
+      sex: "",
+      createTime: ""
    }
 })
 // 当前选中的用户
@@ -247,7 +249,8 @@ const currentUser = ref<User>({
    username: "",
    avatar: "",
    email: "",
-   sex: ""
+   sex: "",
+   createTime: ""
 });
 // 组件 form 实例 (用于表单校验)
 const editClassesRef = ref<FormExpose | null>(null);

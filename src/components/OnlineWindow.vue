@@ -395,9 +395,9 @@ function onlineWindowInit(){
       getUnreadMsg()
       // 获取用户词集列表
       getUserAllVocListByUid()
-   } else {
+   } else {      
       // MyUtils.alert("请先登录") // 24.07.18 未登录跳转登录页；HR面试
-      router.push("/login")
+      // router.push("/login") // 这个会导致联合登录的第三方绑定页面进不去
    }
 }
 // 获取班级数据

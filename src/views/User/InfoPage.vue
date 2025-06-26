@@ -275,7 +275,8 @@ const editUserInfo = ref<User>({
    username: "",
    avatar: "",
    email: "",
-   sex: ""
+   sex: "",
+   createTime: ""
 });
 // editUserInfoForm 实例
 const editUserInfoFormEl = ref<FormExpose | null>(null);
