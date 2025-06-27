@@ -72,7 +72,8 @@
                      <input v-model="oAuthUserData.username" class="input input-bordered input-sm w-full" type="text">
                   </a-form-item>
                   <a-form-item label="密码" name="password" :rules="{ required: true, message: '请输入密码' }">
-                     <input v-model="oAuthUserData.password" class="input input-bordered input-sm w-full" type="password">
+                     <input v-model="oAuthUserData.password" class="input input-bordered input-sm w-full"
+                        type="password">
                   </a-form-item>
                   <a-form-item label="确认密码" name="passwordConfirm">
                      <input v-model="oAuthUserData.passwordConfirm" class="input input-bordered input-sm w-full"
@@ -83,6 +84,19 @@
                   </a-form-item>
                </a-form>
                <!-- <span>数据来自</span> -->
+
+               <Transition name="fade">
+                  <!-- 错误信息 -->
+                  <div role="alert" class="alert alert-error" v-show="errorMessage">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                           d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                     </svg>
+                     <span>{{ errorMessage }}</span>
+                  </div>
+               </Transition>
+
             </div>
             <div class="modal-action">
                <form method="dialog" class="flex gap-2">
@@ -139,7 +153,10 @@ const oAuthUserData = ref({
 const bindUserFormRef = ref<FormExpose | null>(null);
 // 注册表单实例
 const registerFormRef = ref<FormExpose | null>(null);
-
+// 错误信息
+const errorMessage = ref<string>("");
+// 错误信息定时器
+const errorMessageTimer = ref<number | null>(null);
 
 
 // 获取第三方登录用户信息
@@ -154,15 +171,28 @@ async function registerOAuthUserHandler() {
       await registerFormRef.value?.validate();
       let result = await UserAPI.oAuthRegisterLogin(oAuthUserData.value, oAuthKey, oAuthType)
       console.log(result);
-      // 注册成功  跳转
-      userStore.setUserInfo(result.data, result.other.token); // 保存用户信息
-      MyUtils.alert("注册成功", "success"); // 提示登录成功
-      // 初始化 socketStore 连接
-      useSocketStore().connect(result.data.id);
-      // 跳转到首页
-      router.push("/user");
+      if (result.code == 20000) {
+         // 注册成功  跳转
+         userStore.setUserInfo(result.data, result.other.token); // 保存用户信息
+         MyUtils.alert("注册成功", "success"); // 提示登录成功
+         // 初始化 socketStore 连接
+         useSocketStore().connect(result.data.id);
+         // 跳转到首页
+         router.push("/user");
+      } else {
+         // MyUtils.alert(result.message, "error")
+         errorMessage.value = result.message;
+         // 清除定时器
+         if (errorMessageTimer.value) {
+            clearTimeout(errorMessageTimer.value);
+         }
+         // 设置定时器
+         errorMessageTimer.value = setTimeout(() => {
+            errorMessage.value = "";
+         }, 3000)
+      }
    } catch (error) {
-
+      console.log(error);
    }
 }
 
@@ -256,4 +286,15 @@ const rules: Record<string, Rule[]> = {
       background-position: 0% 50%;
    }
 }
+
+.fade-enter-active,
+.fade-leave-active {
+   transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+   opacity: 0;
+}
+
 </style>
