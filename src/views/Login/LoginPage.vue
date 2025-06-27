@@ -1,9 +1,15 @@
 <template>
-  <div class="login-container h-[100%] grid place-items-center 
-              bg-gradient-to-tl from-[#89f7fe] to-[#66a6ff]">
+  <div class="login-container h-[100%] grid place-items-center relative overflow-hidden">
+    <!-- 背景层1 - 登录状态 -->
+    <div class="absolute inset-0 bg-gradient-to-tl from-[#89f7fe] to-[#66a6ff] transition-opacity duration-500 ease-in-out"
+         :class="isRegister ? 'opacity-0' : 'opacity-100'"></div>
+    <!-- 背景层2 - 注册状态 -->
+    <div class="absolute inset-0 bg-gradient-to-tl from-[#24e46e90] to-[#1aaba0] transition-opacity duration-500 ease-in-out"
+         :class="isRegister ? 'opacity-100' : 'opacity-0'"></div>
+    
     <!-- 登录框体 -->
     <div class="w-[730px] h-[500px] shadow-tce-shadow rounded-xl flex 
-              text-white relative overflow-hidden bg-slate-800">
+              text-white relative overflow-hidden bg-slate-800 z-10">
       <!-- 模糊背景 -->
       <div class="absolute w-full h-full bg-no-repeat
        bg-[length:500px] bg-[100px] blur-[70px]" :style="`background-image: url(src/assets/img/${imgName});`"></div>
