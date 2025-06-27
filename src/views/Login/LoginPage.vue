@@ -23,8 +23,8 @@
           <IconFont type="icon-logo" class="text-[100px]" />
         </span>
         <!-- <img :src="websiteStore.logoUrl" alt="logo" class="w-32 absolute top-8 left-1/2 -translate-x-1/2"> -->
-        <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来，{{ formState.username }}</p>
-        <p v-else class="font-bold text-2xl mt-16 w-[100%]">Hi！新朋友，{{ registerForm.username }}</p>
+        <p v-if="!isRegister" class="font-bold text-2xl w-[100%]">欢迎回来{{ formState.username ? ':':'' }} {{ formState.username }}</p>
+        <p v-else class="font-bold text-2xl mt-16 w-[100%]">Hi！新朋友{{ registerForm.username ? ':':'' }} {{ registerForm.username }}</p>
         <!-- 登录表单 -->
         <AForm :model="formState" v-if="!isRegister" class="w-[100%] mt-5" autocomplete="off" @finish="login">
           <AFormItem name="username" :rules="[{ message: '请输入您的用户名!', required: true }]">
