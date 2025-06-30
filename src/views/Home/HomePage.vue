@@ -48,85 +48,195 @@
       </div>
 
       <!-- 分割线 -->
-      <div class="divider divider-start font-bold">近期学习</div>
-      <!-- 近期学习的词集列表 h-[calc((200px*2)+10px)] overflow-y-auto -->
-      <div v-if="vocStudyList.length"
-         class="recent w-full transition-all h-[calc((200px+0.8rem)*4)] md:h-[calc((200px+0.8rem)*2)] min-[1600px]:h-[calc((200px+0.8rem)*1)]">
-         <a-row :gutter="[10, 10]">
-            <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(voc, i) in vocStudyList" :key="i">
-               <div class="cardT z-10 rounded-lg text-gray-200" @click="$router.push('/vocabulary/' + voc.id)">
-                  <p>{{ voc.title }}</p>
-                  <p>{{ voc.count }} 个词条</p>
-                  <!-- 右下角 时间 -->
-                  <span>{{ dayjs(voc.updateTime).format('YYYY-MM-DD') }}</span>
-                  <div class="userd">
-                     <!-- 头像 -->
-                     <div class="avatar">
-                        <div class="w-8 rounded-full">
-                           <img :src="voc.author?.avatar" />
+      <template v-if="userStore.userInfo">
+         <div class="divider divider-start font-bold">近期学习</div>
+         <!-- 近期学习的词集列表 h-[calc((200px*2)+10px)] overflow-y-auto -->
+         <div v-if="vocStudyList.length"
+            class="recent w-full transition-all h-[calc((200px+0.8rem)*4)] md:h-[calc((200px+0.8rem)*2)] min-[1600px]:h-[calc((200px+0.8rem)*1)]">
+            <a-row :gutter="[10, 10]">
+               <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(voc, i) in vocStudyList" :key="i">
+                  <div class="cardT z-10 rounded-lg text-gray-200" @click="$router.push('/vocabulary/' + voc.id)">
+                     <p>{{ voc.title }}</p>
+                     <p>{{ voc.count }} 个词条</p>
+                     <!-- 右下角 时间 -->
+                     <span>{{ dayjs(voc.updateTime).format('YYYY-MM-DD') }}</span>
+                     <div class="userd">
+                        <!-- 头像 -->
+                        <div class="avatar">
+                           <div class="w-8 rounded-full">
+                              <img :src="voc.author?.avatar" />
+                           </div>
                         </div>
+                        <!-- 用户名 -->
+                        <span class="font-bold">{{ voc.author?.username }}</span>
                      </div>
-                     <!-- 用户名 -->
-                     <span class="font-bold">{{ voc.author?.username }}</span>
                   </div>
-               </div>
-               <div class="absolute top-0 right-1 w-[calc(100%-10px)] h-full flex items-center rounded-lg overflow-hidden">
-                  <img :src="voc.cover" class="blur-[5px]">
-               </div>
-            </a-col>
-         </a-row>
-      </div>
-      <div v-else class="text-center text-gray-500 py-5">暂无数据</div>
+                  <div
+                     class="absolute top-0 right-1 w-[calc(100%-10px)] h-full flex items-center rounded-lg overflow-hidden">
+                     <img :src="voc.cover" class="blur-[5px]">
+                  </div>
+               </a-col>
+            </a-row>
+         </div>
+         <div v-else class="text-center text-gray-500 py-5">暂无数据</div>
+      </template>
 
       <!-- 热门词集和活跃者 -->
-      <div class="min-h-[200px] mt-5"> 
-         <div class="flex justify-between gap-2">
-            <div class="w-1/2">
-               <h2 class="font-bold">热门词集</h2>
-               <!-- 项 -->
-               <div v-if="mostStudyVocList.length" v-for="(voc, index) in mostStudyVocList" :key="index" @click="$router.push('/vocabulary/' + voc.id)"
-                  class="my-1 pl-4 bg-base-200 h-[80px] flex flex-wrap content-center rounded-lg relative hover:bg-base-300 cursor-pointer">
-                  <!-- 标题 -->
-                  <p class="font-bold w-full">{{ voc.title }}</p>
-                  <!-- 头像 -->
-                  <div class="flex gap-2 mt-2 items-center">
-                     <div class="avatar">
-                        <div class="size-5 rounded-full">
-                           <img :src="voc.author?.avatar" />
+      <div class="min-h-[200px] mt-8">
+         <div class="flex flex-col lg:flex-row justify-between gap-6">
+            <!-- 热门词集 -->
+            <div class="w-full lg:w-1/2">
+               <div class="flex items-center gap-2 mb-4">
+                  <IconFont type="icon-icon_huore" class="text-xl text-blue-500" />
+                  <h2
+                     class="text-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                     热门词集
+                  </h2>
+               </div>
+
+               <div v-if="mostStudyVocList.length" class="space-y-3">
+                  <div v-for="(voc, index) in mostStudyVocList" :key="index"
+                     @click="$router.push('/vocabulary/' + voc.id)"
+                     class="group relative bg-gradient-to-r from-base-200 to-base-100 hover:from-blue-50 hover:to-cyan-50 dark:hover:from-blue-900/20 dark:hover:to-cyan-900/20 p-4 rounded-xl border border-base-300 hover:border-blue-200 dark:hover:border-blue-800 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] overflow-hidden">
+
+                     <!-- 排名标识 -->
+                     <!-- <div class="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                        {{ index + 1 }}
+                     </div> -->
+
+                     <!-- 热门标识 (前三名) -->
+                     <!-- <div v-if="index < 3" class="absolute top-2 right-2">
+                        <div class="flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                           <IconFont type="icon-icon_huore" class="text-xs" />
+                           <span v-if="index === 0">🔥热</span>
+                           <span v-else-if="index === 1">💎优</span>
+                           <span v-else>⭐赞</span>
+                        </div>
+                     </div> -->
+
+                     <div class="flex items-center justify-between">
+                        
+                     <!-- 排名数字 -->
+                     <div class="flex-shrink-0 mr-3">
+                        <div
+                           class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                           {{ index + 1 }}
                         </div>
                      </div>
-                     <span class="text-sm">{{ voc.author?.username }}</span>
-                  </div>
-                  <!-- 数量 -->
-                  <div class="absolute top-1/2 -translate-y-1/2 right-5 text-center">
-                     <p class="text-2xl">{{ voc.stuNum }}</p>
-                     <p class="text-sm">用户学习</p>
+
+                        <div class="flex-1 min-w-0">
+                           <!-- 标题 -->
+                           <h3
+                              class="font-bold text-base text-base-content group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 truncate mb-2">
+                              {{ voc.title }}
+                           </h3>
+
+                           <!-- 作者信息 -->
+                           <div class="flex items-center gap-2">
+                              <div class="avatar">
+                                 <div class="w-6 h-6 rounded-full border-2 border-blue-200 dark:border-blue-800">
+                                    <img :src="voc.author?.avatar" class="rounded-full" />
+                                 </div>
+                              </div>
+                              <span
+                                 class="text-sm text-base-content/70 group-hover:text-blue-500 transition-colors duration-300">
+                                 {{ voc.author?.username }}
+                              </span>
+                           </div>
+                        </div>
+
+                        <!-- 学习数据 -->
+                        <div class="text-right ml-4">
+                           <div class="bg-gradient-to-r text-center from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                              <div class="text-2xl font-bold">{{ voc.stuNum }}</div>
+                              <div class="text-xs text-base-content/60">人学习</div>
+                           </div>
+                        </div>
+                     </div>
                   </div>
                </div>
-               <div v-else class="text-center text-gray-500 py-10">暂无数据</div>
+               <div v-else class="text-center text-gray-500 py-12 bg-base-200 rounded-xl">
+                  <IconFont type="icon-zanwushuju" class="text-4xl mb-2" />
+                  <p>暂无热门词集</p>
+               </div>
             </div>
-            <div class="w-1/2">
-               <h2 class="font-bold">学霸榜</h2>
-               <!-- 项 -->
-               <div v-if="mostStudyUserList.length" v-for="(user, i) in mostStudyUserList" :key="i" @click="$router.push('/user/' + user.id)"
-                  class="bg-base-200 my-1 rounded-lg h-[120px] sm:h-[80px] relative hover:bg-base-300 cursor-pointer pb-3 sm:pb-0">
-                  <div class="flex items-end sm:items-center h-full pl-3 gap-3">
-                     <!-- 头像 -->
-                     <div class="avatar">
-                        <div class="w-12 rounded-full">
-                           <img :src="user.avatar" />
+
+            <!-- 学霸榜 -->
+            <div class="w-full lg:w-1/2">
+               <div class="flex items-center gap-2 mb-4">
+                  <IconFont type="icon-paihangbang" class="text-xl text-blue-500" />
+                  <h2
+                     class="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                     学霸榜</h2>
+               </div>
+
+               <div v-if="mostStudyUserList.length" class="space-y-3">
+                  <div v-for="(user, i) in mostStudyUserList" :key="i" @click="$router.push('/user/' + user.id)"
+                     class="group relative bg-gradient-to-r from-base-200 to-base-100 hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 p-4 rounded-xl border border-base-300 hover:border-blue-200 dark:hover:border-blue-800 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] overflow-hidden">
+
+                     <!-- 排名背景效果 -->
+                     <div class="absolute inset-0 opacity-5">
+                        <div
+                           class="absolute right-0 top-0 text-8xl font-black text-blue-500 transform rotate-12 translate-x-4 -translate-y-4">
+                           {{ i + 1 }}
                         </div>
                      </div>
-                     <div>
-                        <p class="font-bold">{{ user.username }}</p>
-                        <p class="text-sm">学习了 {{ user.studyTotal }} 次词集</p>
+
+                     <!-- 排名奖牌 (前三名) -->
+                     <!-- <div v-if="i < 3" class="absolute -top-1 -right-1">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-lg">
+                           <span v-if="i === 0">🥇</span>
+                           <span v-else-if="i === 1">🥈</span>
+                           <span v-else>🥉</span>
+                        </div>
+                     </div> -->
+
+                     <div class="relative flex items-center justify-between">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                           <!-- 排名数字
+                           <div class="flex-shrink-0">
+                              <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                 {{ i + 1 }}
+                              </div>
+                           </div> -->
+
+                           <!-- 头像 -->
+                           <div class="avatar flex-shrink-0">
+                              <div
+                                 class="w-12 h-12 rounded-full border-3 border-blue-200 dark:border-blue-800 group-hover:border-blue-400 transition-colors duration-300">
+                                 <img :src="user.avatar" class="rounded-full" />
+                              </div>
+                           </div>
+
+                           <!-- 用户信息 -->
+                           <div class="flex-1 min-w-0">
+                              <h3
+                                 class="font-bold text-base text-base-content group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 truncate">
+                                 {{ user.username }}
+                              </h3>
+                              <div class="flex items-center gap-1 text-sm text-base-content/70">
+                                 <IconFont type="icon-xuexi" class="text-xs" />
+                                 <span>学习了 {{ user.studyTotal }} 次</span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <!-- 学霸标识 (前三名) -->
+                        <div v-if="i < 3" class="flex-shrink-0">
+                           <div
+                              class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                              <span v-if="i === 0">🥇优秀</span>
+                              <span v-else-if="i === 1">🥈杰出</span>
+                              <span v-else>🥉出色</span>
+                           </div>
+                        </div>
                      </div>
                   </div>
-                  <div class="absolute top-3 left-1/2 -translate-x-1/2 sm:-translate-x-0 sm:left-auto sm:top-1/2 sm:-translate-y-1/2 sm:right-5">
-                     <div>No.<span class="font-bold text-3xl">{{ i + 1 }}</span> </div>
-                  </div>
                </div>
-               <div v-else class="text-center text-gray-500 py-10">暂无数据</div>
+               <div v-else class="text-center text-gray-500 py-12 bg-base-200 rounded-xl">
+                  <IconFont type="icon-zanwushuju" class="text-4xl mb-2" />
+                  <p>暂无活跃用户</p>
+               </div>
             </div>
          </div>
       </div>
@@ -188,12 +298,18 @@ if (userStore.userInfo && userStore.userInfo.id) {
    // 获取用户学习的词集列表
    getUserRelevanceVocListByUid();
    // 获取学习数量最多的词集列表
-   getMostStudyVocList();
+   // getMostStudyVocList(); // 不登录也能看到
    // 获取学习数前5的用户列表
-   getMostStudyUserList();
+   // getMostStudyUserList(); // 不登录也能看到
    // 判断是否是普通用户
    isNormalUser.value = userStore.userInfo.roleList?.findIndex((item) => item.id == 1 || item.id == 2) == -1;
+} else {
+   console.log("未登录");
 }
+// 获取学习数量最多的词集列表
+getMostStudyVocList();
+// 获取学习数前5的用户列表
+getMostStudyUserList();
 
 // 后台管理按钮点击事件
 function adminBtnHandler() {
@@ -202,9 +318,9 @@ function adminBtnHandler() {
 }
 
 // 我的班级按钮点击事件
-function myClassBtnHandler(){
+function myClassBtnHandler() {
    // 检查是否加入了班级
-   if(userStore.userInfo?.classes){
+   if (userStore.userInfo?.classes) {
       // 跳转到班级页面
       router.push('/classes/' + userStore.userInfo?.classes.id)
    } else {
