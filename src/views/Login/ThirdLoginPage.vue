@@ -45,7 +45,10 @@
          </a-form>
          <!-- 按钮 -->
          <div class="grid place-content-center gap-2">
-            <button @click="bindLocalUserHandler" class="btn btn-primary text-white w-[350px]">绑定已有账号并登录</button>
+            <button @click="bindLocalUserHandler" :class="`btn btn-primary text-white w-[350px] ${bindLoading ? 'pointer-events-none' : ''}`">
+               <span v-if="bindLoading" class="loading loading-spinner loading-md"></span>
+               <span>{{ bindLoading ? '处理中' : '绑定已有账号并登录' }}</span>
+            </button>
             <button onclick="verifyModal.showModal()" class="btn btn-success text-white w-[350px]">使用你的 {{ oAuthType }}
                用户信息注册并登录</button>
          </div>
@@ -100,8 +103,11 @@
             </div>
             <div class="modal-action">
                <form method="dialog" class="flex gap-2">
-                  <button class="btn">取消</button>
-                  <button @click.prevent="registerOAuthUserHandler" class="btn btn-primary">确定</button>
+                  <button :class="`btn ${registerLoading ? 'btn-disabled' : ''}`">取消</button>
+                  <button @click.prevent="registerOAuthUserHandler" :class="`btn btn-primary ${registerLoading ? 'btn-disabled' : ''}`">
+                     <span v-if="registerLoading" class="loading loading-spinner loading-md"></span>
+                     <span>{{ registerLoading ? '处理中' : '确定' }}</span>
+                  </button>
                </form>
             </div>
          </div>
@@ -157,6 +163,10 @@ const registerFormRef = ref<FormExpose | null>(null);
 const errorMessage = ref<string>("");
 // 错误信息定时器
 const errorMessageTimer = ref<number | null>(null);
+// 确定绑定 loading
+const bindLoading = ref<boolean>(false);
+// 确定注册 loading
+const registerLoading = ref<boolean>(false);
 
 
 // 获取第三方登录用户信息
@@ -168,7 +178,8 @@ getOAuthUserDataHandler()
 // 执行注册
 async function registerOAuthUserHandler() {
    try {
-      await registerFormRef.value?.validate();
+      registerLoading.value = true;
+      await registerFormRef.value?.validate(); // 表单验证
       let result = await UserAPI.oAuthRegisterLogin(oAuthUserData.value, oAuthKey, oAuthType)
       console.log(result);
       if (result.code == 20000) {
@@ -193,12 +204,15 @@ async function registerOAuthUserHandler() {
       }
    } catch (error) {
       console.log(error);
+   } finally {
+      registerLoading.value = false;
    }
 }
 
 // 执行绑定
 async function bindLocalUserHandler() {
    try {
+      bindLoading.value = true;
       // 表单验证
       await bindUserFormRef.value?.validate();
       let result = await UserAPI.oAuthBind(bindUserForm.value, oAuthKey, oAuthType)
@@ -214,7 +228,9 @@ async function bindLocalUserHandler() {
       }
 
    } catch (error) {
-
+      console.log(error);
+   } finally {
+      bindLoading.value = false;
    }
 
 }
