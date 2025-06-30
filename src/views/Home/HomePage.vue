@@ -49,36 +49,94 @@
 
       <!-- 分割线 -->
       <template v-if="userStore.userInfo">
-         <div class="divider divider-start font-bold">近期学习</div>
-         <!-- 近期学习的词集列表 h-[calc((200px*2)+10px)] overflow-y-auto -->
-         <div v-if="vocStudyList.length"
-            class="recent w-full transition-all h-[calc((200px+0.8rem)*4)] md:h-[calc((200px+0.8rem)*2)] min-[1600px]:h-[calc((200px+0.8rem)*1)]">
-            <a-row :gutter="[10, 10]">
+         <div class="flex items-center gap-3 my-8">
+            <IconFont type="icon-xuexi" class="text-xl text-base-content" />
+            <h2 class="text-xl font-bold text-base-content">近期学习</h2>
+         </div>
+         
+         <!-- 近期学习的词集列表 -->
+         <div v-if="vocStudyList.length" class="recent-study-section mb-8">
+            <a-row :gutter="[16, 16]">
                <a-col :xs="24" :md="12" :xl="8" :xxl="6" v-for="(voc, i) in vocStudyList" :key="i">
-                  <div class="cardT z-10 rounded-lg text-gray-200" @click="$router.push('/vocabulary/' + voc.id)">
-                     <p>{{ voc.title }}</p>
-                     <p>{{ voc.count }} 个词条</p>
-                     <!-- 右下角 时间 -->
-                     <span>{{ dayjs(voc.updateTime).format('YYYY-MM-DD') }}</span>
-                     <div class="userd">
-                        <!-- 头像 -->
-                        <div class="avatar">
-                           <div class="w-8 rounded-full">
-                              <img :src="voc.author?.avatar" />
+                  <div class="group relative h-[200px] rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-base-300 dark:hover:border-base-600 transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl" 
+                       @click="$router.push('/vocabulary/' + voc.id)">
+                     
+                     <!-- 背景图片 -->
+                     <div class="absolute inset-0">
+                        <img :src="voc.cover" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-115" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 group-hover:from-black/60 group-hover:via-black/30 group-hover:to-black/10 transition-all duration-300"></div>
+                     </div>
+                     
+                     <!-- 内容层 -->
+                     <div class="relative z-10 h-full p-4 flex flex-col justify-between text-white">
+                        <!-- 顶部信息 -->
+                        <div>
+                           <div class="flex items-center justify-between mb-2">
+                              <!-- 学习进度标识 -->
+                              <div class="bg-white/20 backdrop-blur-sm border border-white/30 px-2 py-1 rounded-full group-hover:bg-white/30 group-hover:border-white/50 transition-all duration-300">
+                                 <span class="text-white/90 group-hover:text-white text-xs font-medium transition-colors duration-300">最近学习</span>
+                              </div>
+                              
+                              <!-- 词条数量 -->
+                              <div class="bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full group-hover:bg-black/40 transition-all duration-300">
+                                 <span class="text-white/90 group-hover:text-white text-xs transition-colors duration-300">{{ voc.count }} 词条</span>
+                              </div>
+                           </div>
+                           
+                           <!-- 标题 -->
+                           <h3 class="text-lg font-bold leading-tight mb-1 group-hover:text-white group-hover:scale-[1.02] transition-all duration-300 line-clamp-2">
+                              {{ voc.title }}
+                           </h3>
+                        </div>
+                        
+                        <!-- 底部信息 -->
+                        <div>
+                           <!-- 作者信息 -->
+                           <div class="flex items-center justify-between">
+                              <div class="flex items-center gap-2">
+                                 <div class="avatar">
+                                    <div class="w-8 h-8 rounded-full border-2 border-white/30 group-hover:border-white/50 overflow-hidden transition-all duration-300">
+                                       <img :src="voc.author?.avatar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                                    </div>
+                                 </div>
+                                 <span class="text-sm font-medium text-white/90 group-hover:text-white transition-colors duration-300">
+                                    {{ voc.author?.username }}
+                                 </span>
+                              </div>
+                              
+                              <!-- 学习时间 -->
+                              <div class="text-right">
+                                 <div class="text-xs text-white/70 group-hover:text-white/90 transition-colors duration-300">
+                                    {{ dayjs(voc.updateTime).format('MM-DD') }}
+                                 </div>
+                              </div>
                            </div>
                         </div>
-                        <!-- 用户名 -->
-                        <span class="font-bold">{{ voc.author?.username }}</span>
                      </div>
-                  </div>
-                  <div
-                     class="absolute top-0 right-1 w-[calc(100%-10px)] h-full flex items-center rounded-lg overflow-hidden">
-                     <img :src="voc.cover" class="blur-[5px]">
+                     
+                     <!-- 悬停装饰效果 -->
+                     <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150"></div>
+                     
+                     <!-- 边框光晕效果 -->
+                     <div class="absolute inset-0 rounded-xl border-2 border-white/0 group-hover:border-white/20 transition-all duration-300"></div>
                   </div>
                </a-col>
             </a-row>
          </div>
-         <div v-else class="text-center text-gray-500 py-5">暂无数据</div>
+         
+         <!-- 空状态 -->
+         <div v-else class="text-center py-16 bg-gradient-to-br from-base-200 to-base-100 rounded-xl border border-base-300">
+            <div class="flex flex-col items-center gap-4">
+               <div class="w-16 h-16 bg-gradient-to-br from-base-300 to-base-400 rounded-full flex items-center justify-center">
+                  <IconFont type="icon-xuexi" class="text-2xl text-base-content" />
+               </div>
+               <div>
+                  <h3 class="text-lg font-semibold text-base-content mb-1">还没有学习记录</h3>
+                  <p class="text-sm text-base-content/60">开始学习第一个词集吧！</p>
+               </div>
+            </div>
+         </div>
       </template>
 
       <!-- 热门词集和活跃者 -->
@@ -391,76 +449,13 @@ async function getMostStudyUserList() {
 
 <style lang="less" scoped>
 .home-container {
-   .recent {
-      padding: 10px 0;
-      // height: calc((200px * 2) + 30px);
-      // background-color: antiquewhite;
-      // overflow: hidden;
-
-
-      >div {
-         height: 200px;
-
-         >div {
-            height: 100%;
-            transition: all 0.3s ease 0s;
-
-            // border: 1px solid red;
-            >.cardT {
-               transition: all 0.3s ease 0s;
-               background-image: linear-gradient(120deg, #555555 20%, #89f6fe00 120%);
-               height: 100%;
-               position: relative;
-               // 悬浮小手
-               cursor: pointer;
-
-               // 悬浮阴影
-               &:hover {
-                  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-               }
-
-               >p {
-                  position: absolute;
-
-                  // 标题
-                  &:nth-child(1) {
-                     top: 10px;
-                     left: 10px;
-                     font-size: 20px;
-                     font-weight: 600;
-                  }
-
-                  // 词条数量
-                  &:nth-child(2) {
-                     top: 40px;
-                     left: 10px;
-                     font-size: 14px;
-                  }
-               }
-
-               // 日期
-               >span {
-                  position: absolute;
-                  bottom: 10px;
-                  right: 10px;
-                  font-size: 14px;
-               }
-
-               // 头像和昵称
-               >.userd {
-                  position: absolute;
-                  bottom: 10px;
-                  left: 10px;
-                  font-size: 14px;
-                  display: flex;
-                  align-items: center;
-
-                  >span:nth-child(2) {
-                     margin-left: 10px;
-                  }
-               }
-            }
-         }
+   // 近期学习区域
+   .recent-study-section {
+      .line-clamp-2 {
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow: hidden;
       }
    }
 }
