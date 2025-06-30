@@ -104,16 +104,16 @@
                 <IconFont type="icon-gitee-fill-round" class="text-2xl" />
               </button>
             </a-tooltip>
-            <a-tooltip placement="top" title="QQ 登录">
+            <!-- <a-tooltip placement="top" title="QQ 登录">
               <button class="btn">
                 <IconFont type="icon-QQ" class="text-2xl" />
               </button>
-            </a-tooltip>
-            <a-tooltip placement="top" title="微信登录">
+            </a-tooltip> -->
+            <!-- <a-tooltip placement="top" title="微信登录">
               <button class="btn">
                 <IconFont type="icon-weixin" class="text-2xl" />
               </button>
-            </a-tooltip>
+            </a-tooltip> -->
           </div>
         </template>
         <template v-else>
