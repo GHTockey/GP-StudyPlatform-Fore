@@ -219,12 +219,224 @@
       </div>
 
       <!-- 动态 -->
-      <div v-show="tab == 3" class="my-transition-all p-2 md:p-0">
-         <div class="divider divider-start font-semibold text-lg">动态</div>
-
-
-         <!-- 空数据状态 -->
-         <a-empty class="mt-20 text-gray-400" />
+      <div v-show="tab == 3" class="my-transition-all p-4 md:p-6">
+         <div class="divider divider-start font-semibold text-xl mb-6">
+            <IconFont type="icon-xingqiudiqiu" class="mr-2" />
+            动态
+         </div>
+         
+         <!-- 动态列表 -->
+         <div class="space-y-4">
+            <!-- 动态项1：创建词集 -->
+            <div class="bg-base-200 rounded-xl p-4 hover:bg-base-300 transition-all duration-300 
+                        border border-transparent hover:border-primary/20">
+               <div class="flex items-start gap-3">
+                  <!-- 头像 -->
+                  <div class="flex-shrink-0">
+                     <img :src="currentUserInfo?.avatar" alt="头像" 
+                        class="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                  </div>
+                  
+                  <!-- 内容 -->
+                  <div class="flex-1 min-w-0">
+                     <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-base-content">{{ currentUserInfo?.username }}</span>
+                        <span class="text-xs text-base-content/60">创建了词集</span>
+                        <span class="text-sm font-medium text-primary">《英语四级核心词汇》</span>
+                     </div>
+                     
+                     <p class="text-sm text-base-content/70 mb-3">
+                        整理了英语四级考试中最常出现的核心词汇，包含详细的释义和例句，帮助大家更好地备考。
+                     </p>
+                     
+                     <!-- 词集预览 -->
+                     <div class="bg-base-100 rounded-lg p-3 mb-3">
+                        <div class="flex items-center gap-3">
+                           <img src="https://picsum.photos/60/40" alt="词集封面" 
+                              class="w-15 h-10 rounded object-cover" />
+                           <div class="flex-1">
+                              <p class="text-sm font-medium">英语四级核心词汇</p>
+                              <p class="text-xs text-base-content/60">500个词条 · 2小时前</p>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="flex items-center gap-4 text-xs text-base-content/50">
+                        <span>2小时前</span>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-like" class="text-primary" />
+                           <span>12</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-comment" class="text-primary" />
+                           <span>3</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            
+            <!-- 动态项2：学习进度 -->
+            <div class="bg-base-200 rounded-xl p-4 hover:bg-base-300 transition-all duration-300 
+                        border border-transparent hover:border-primary/20">
+               <div class="flex items-start gap-3">
+                  <!-- 头像 -->
+                  <div class="flex-shrink-0">
+                     <img :src="currentUserInfo?.avatar" alt="头像" 
+                        class="w-12 h-12 rounded-full object-cover ring-2 ring-success/20" />
+                  </div>
+                  
+                  <!-- 内容 -->
+                  <div class="flex-1 min-w-0">
+                     <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-base-content">{{ currentUserInfo?.username }}</span>
+                        <span class="text-xs text-base-content/60">完成了学习</span>
+                        <span class="text-sm font-medium text-success">《日语N5基础词汇》</span>
+                     </div>
+                     
+                     <p class="text-sm text-base-content/70 mb-3">
+                        今天完成了日语N5基础词汇的学习，掌握了300个基础词汇，感觉收获满满！
+                     </p>
+                     
+                     <!-- 学习进度 -->
+                     <div class="bg-base-100 rounded-lg p-3 mb-3">
+                        <div class="flex items-center justify-between mb-2">
+                           <span class="text-sm font-medium">学习进度</span>
+                           <span class="text-xs text-success">100%</span>
+                        </div>
+                        <div class="w-full bg-base-300 rounded-full h-2">
+                           <div class="bg-success h-2 rounded-full transition-all duration-500" style="width: 100%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-base-content/60 mt-1">
+                           <span>300/300 词条</span>
+                           <span>连续学习 7 天</span>
+                        </div>
+                     </div>
+                     
+                     <div class="flex items-center gap-4 text-xs text-base-content/50">
+                        <span>5小时前</span>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-like" class="text-primary" />
+                           <span>8</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-comment" class="text-primary" />
+                           <span>1</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            
+            <!-- 动态项3：分享词集 -->
+            <div class="bg-base-200 rounded-xl p-4 hover:bg-base-300 transition-all duration-300 
+                        border border-transparent hover:border-primary/20">
+               <div class="flex items-start gap-3">
+                  <!-- 头像 -->
+                  <div class="flex-shrink-0">
+                     <img :src="currentUserInfo?.avatar" alt="头像" 
+                        class="w-12 h-12 rounded-full object-cover ring-2 ring-warning/20" />
+                  </div>
+                  
+                  <!-- 内容 -->
+                  <div class="flex-1 min-w-0">
+                     <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-base-content">{{ currentUserInfo?.username }}</span>
+                        <span class="text-xs text-base-content/60">分享了词集</span>
+                        <span class="text-sm font-medium text-warning">《编程术语大全》</span>
+                     </div>
+                     
+                     <p class="text-sm text-base-content/70 mb-3">
+                        整理了一份编程相关的专业术语词汇表，包含前端、后端、数据库等各个领域的常用术语，希望对大家有帮助！
+                     </p>
+                     
+                     <!-- 分享统计 -->
+                     <div class="bg-base-100 rounded-lg p-3 mb-3">
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                           <div>
+                              <p class="text-lg font-bold text-primary">1.2k</p>
+                              <p class="text-xs text-base-content/60">学习人数</p>
+                           </div>
+                           <div>
+                              <p class="text-lg font-bold text-success">4.8</p>
+                              <p class="text-xs text-base-content/60">评分</p>
+                           </div>
+                           <div>
+                              <p class="text-lg font-bold text-warning">156</p>
+                              <p class="text-xs text-base-content/60">收藏数</p>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="flex items-center gap-4 text-xs text-base-content/50">
+                        <span>1天前</span>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-like" class="text-primary" />
+                           <span>25</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-comment" class="text-primary" />
+                           <span>7</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            
+            <!-- 动态项4：获得成就 -->
+            <div class="bg-base-200 rounded-xl p-4 hover:bg-base-300 transition-all duration-300 
+                        border border-transparent hover:border-primary/20">
+               <div class="flex items-start gap-3">
+                  <!-- 头像 -->
+                  <div class="flex-shrink-0 relative">
+                     <img :src="currentUserInfo?.avatar" alt="头像" 
+                        class="w-12 h-12 rounded-full object-cover ring-2 ring-accent" />
+                     <div class="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
+                        <IconFont type="icon-trophy" class="text-accent-content text-xs" />
+                     </div>
+                  </div>
+                  
+                  <!-- 内容 -->
+                  <div class="flex-1 min-w-0">
+                     <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-base-content">{{ currentUserInfo?.username }}</span>
+                        <span class="text-xs text-base-content/60">获得了成就</span>
+                        <span class="text-sm font-medium text-accent">词汇达人</span>
+                     </div>
+                     
+                     <p class="text-sm text-base-content/70 mb-3">
+                        恭喜！你已经学习了超过1000个词汇，获得了"词汇达人"成就，继续加油！
+                     </p>
+                     
+                     <!-- 成就徽章 -->
+                     <div class="bg-gradient-to-r from-accent/10 to-accent/5 rounded-lg p-3 mb-3 
+                                border border-accent/20">
+                        <div class="flex items-center gap-3">
+                           <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                              <IconFont type="icon-trophy" class="text-accent-content text-xl" />
+                           </div>
+                           <div>
+                              <p class="text-sm font-bold text-accent">词汇达人</p>
+                              <p class="text-xs text-base-content/60">学习1000+词汇解锁</p>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="flex items-center gap-4 text-xs text-base-content/50">
+                        <span>2天前</span>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-like" class="text-primary" />
+                           <span>18</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                           <IconFont type="icon-comment" class="text-primary" />
+                           <span>5</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
    </div>
 
