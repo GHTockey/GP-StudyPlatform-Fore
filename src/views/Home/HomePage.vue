@@ -23,6 +23,11 @@
          </div>
       </a-carousel>
 
+      <!-- 新的轮播图布局排版 -->
+      <div>
+         
+      </div>
+
       <!-- 快捷入口 -->
       <div class="flex gap-3 my-10 flex-wrap justify-center sm:justify-start">
          <!-- 个人中心 -->
@@ -50,7 +55,7 @@
       <!-- 分割线 -->
       <template v-if="userStore.userInfo">
          <div class="flex items-center gap-3 my-8">
-            <IconFont type="icon-xuexi" class="text-xl text-base-content" />
+            <IconFont type="icon-Recently" class="text-2xl text-base-content" />
             <h2 class="text-xl font-bold text-base-content">近期学习</h2>
          </div>
          
@@ -129,7 +134,7 @@
          <div v-else class="text-center py-16 bg-gradient-to-br from-base-200 to-base-100 rounded-xl border border-base-300">
             <div class="flex flex-col items-center gap-4">
                <div class="w-16 h-16 bg-gradient-to-br from-base-300 to-base-400 rounded-full flex items-center justify-center">
-                  <IconFont type="icon-xuexi" class="text-2xl text-base-content" />
+                  <IconFont type="icon-xuexi" class="text-3xl text-gray-500" />
                </div>
                <div>
                   <h3 class="text-lg font-semibold text-base-content mb-1">还没有学习记录</h3>
@@ -140,7 +145,7 @@
       </template>
 
       <!-- 热门词集和活跃者 -->
-      <div class="min-h-[200px] mt-8">
+      <div class="min-h-[200px] mt-8 pb-10">
          <div class="flex flex-col lg:flex-row justify-between gap-6">
             <!-- 热门词集 -->
             <div class="w-full lg:w-1/2">
@@ -213,8 +218,8 @@
                      </div>
                   </div>
                </div>
-               <div v-else class="text-center text-gray-500 py-12 bg-base-200 rounded-xl">
-                  <IconFont type="icon-zanwushuju" class="text-4xl mb-2" />
+               <div v-else class="text-center text-gray-400 py-12 bg-base-200 rounded-xl">
+                  <IconFont type="icon-zanwushuju" class="text-7xl mb-2" />
                   <p>暂无热门词集</p>
                </div>
             </div>
@@ -291,8 +296,8 @@
                      </div>
                   </div>
                </div>
-               <div v-else class="text-center text-gray-500 py-12 bg-base-200 rounded-xl">
-                  <IconFont type="icon-zanwushuju" class="text-4xl mb-2" />
+               <div v-else class="text-center text-gray-400 py-12 bg-base-200 rounded-xl">
+                  <IconFont type="icon-zanwushuju" class="text-7xl mb-2" />
                   <p>暂无活跃用户</p>
                </div>
             </div>

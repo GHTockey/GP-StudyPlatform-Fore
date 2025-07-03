@@ -73,57 +73,111 @@
       </div>
 
       <!-- 发布的词集 -->
-      <div v-show="tab == 1" class="my-transition-all p-2 md:p-0">
-         <div class="divider divider-start font-semibold text-lg">发布的词集</div>
+      <div v-show="tab == 1" class="my-transition-all p-4 md:p-6">
+         <div class="divider divider-start font-semibold text-xl mb-6">
+            <IconFont type="icon-xuexiku" />
+            发布的词集
+         </div>
+         
          <!-- 骨架屏 -->
-         <div v-if="vocabularyListLoading" v-for=" item  in  3 " :key="item"
-            class="skeleton bg-base-200 w-full h-[100px] mb-2"></div>
+         <div v-if="vocabularyListLoading" class="space-y-4">
+            <div v-for="item in 3" :key="item" 
+               class="skeleton bg-base-200 w-full h-[140px] rounded-xl"></div>
+         </div>
+         
          <!-- 词集列表 -->
-         <div v-for=" item in vocabularyList" :key="item.id" @click="$router.push(`/vocabulary/${item.id}`)" class="bg-base-200 hover:bg-base-300
-                        mb-2 cursor-pointer rounded-2xl p-5 h-[100px] ml-5
-                        relative flex  justify-between items-center transition-all">
-            <!-- 封面 -->
-            <img :src="item.cover" alt="封面" class="absolute top-1/2 -translate-y-1/2 w-[120px] h-[80%]
-             left-[-20px] rounded-lg border-[5px] border-base-100 shadow-lg shadow-base-300" />
-            <!-- 标题/描述 -->
-            <div class="ml-24 sm:w-[230px] sm:static sm:pl-0
-               absolute left-2 top-3 w-[calc(100%-10rem)] pl-2">
-               <!-- 标题 -->
-               <p class="text-lg font-[600] truncate text-ellipsis">{{ item.title }}</p>
-               <!-- 描述 -->
-               <p class="text-xs h-3/4 truncate text-ellipsis">{{ item.desc }}</p>
-            </div>
-            <!-- 中间内容 -->
-            <div class="text-gray-500 text-sm sm:static sm:pl-0 sm:ml-0 sm:gap-3 sm:w-auto
-               absolute left-2 bottom-3 w-[calc(100%-6rem)] pl-2 ml-24 flex gap-5">
-               <!-- 数量 -->
-               <p>
-                  <IconFont type="icon-icon-test" /> {{ item.count }}
-               </p>
-               <!-- 时间 -->
-               <p>
-                  <IconFont type="icon-shijian" /> {{ item.createTime.slice(0, 10) }}
-               </p>
-            </div>
-            <!-- 结尾操作 -->
-            <div class="gap-2 flex items-center sm:static sm:w-auto sm:flex-nowrap
-               absolute right-2 flex-wrap w-8">
-
-               <template v-if="isSelf">
+         <div v-else-if="vocabularyList?.length" class="space-y-3">
+            <div v-for="item in vocabularyList" :key="item.id" 
+               @click="$router.push(`/vocabulary/${item.id}`)" 
+               class="group cursor-pointer rounded-xl p-4 
+                      relative flex items-center gap-4 transition-all duration-300 
+                      hover:shadow-lg hover:scale-[1.02] border border-transparent 
+                      bg-gradient-to-r from-base-200 via-base-100 to-base-200
+                      hover:from-primary/5 hover:via-primary/10 hover:to-primary/5
+                      hover:border-primary/20 overflow-hidden">
+               
+               <!-- 背景装饰图片 -->
+               <div class="absolute right-0 top-0 w-48 h-48 opacity-10 group-hover:opacity-20 
+                          transition-all duration-500 transform rotate-12 translate-x-8 -translate-y-8">
+                  <img :src="item.cover" alt="背景装饰" 
+                     class="w-full h-full object-cover rounded-lg blur-sm" />
+               </div>
+               
+               <!-- 封面 -->
+               <div class="relative flex-shrink-0">
+                  <img :src="item.cover" alt="封面" 
+                     class="w-16 h-16 sm:w-36 sm:h-20 rounded-lg object-cover 
+                            shadow-md group-hover:shadow-lg transition-shadow duration-300" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+               </div>
+               
+               <!-- 内容区域 -->
+               <div class="flex-1 min-w-0">
+                  <!-- 标题 -->
+                  <h3 class="text-base font-semibold text-base-content mb-1 
+                             transition-colors duration-300 
+                             truncate">{{ item.title }}</h3>
+                  
+                  <!-- 描述 -->
+                  <p class="text-xs text-base-content/70 mb-2 line-clamp-1 
+                           group-hover:text-base-content/80 transition-colors duration-300">
+                     {{ item.desc || '暂无描述' }}
+                  </p>
+                  
+                  <!-- 统计信息 -->
+                  <div class="flex items-center gap-3 text-xs text-base-content/60">
+                     <div class="flex items-center gap-1">
+                        <IconFont type="icon-icon-test" />
+                        <span>{{ item.count }} 个词条</span>
+                     </div>
+                     <div class="flex items-center gap-1">
+                        <IconFont type="icon-shijian" />
+                        <span>{{ item.createTime.slice(0, 10) }}</span>
+                     </div>
+                  </div>
+               </div>
+               
+               <!-- 操作按钮 -->
+               <div v-if="isSelf" class="flex-shrink-0 flex gap-1 opacity-0 group-hover:opacity-100 
+                                      transition-opacity duration-300 relative z-10">
                   <!-- 编辑 -->
-                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-info"
-                     @click.stop="$router.push(`/vocabulary/edit/${item.id}`)">
+                  <button class="btn btn-xs btn-info btn-outline" 
+                     @click.stop="$router.push(`/vocabulary/edit/${item.id}`)"
+                     title="编辑词集">
                      <IconFont type="icon-xiugai" />
                   </button>
+                  
                   <!-- 删除 -->
-                  <button class="btn btn-xs w-full sm:w-auto sm:btn-sm btn-error" @click.stop="delVocabulary(item.id)">
+                  <button class="btn btn-xs btn-error btn-outline" 
+                     @click.stop="delVocabulary(item.id)"
+                     title="删除词集">
                      <IconFont type="icon-shanchu" />
                   </button>
-               </template>
+               </div>
+               
+               <!-- 悬停指示器 -->
+               <div class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 
+                          transition-opacity duration-300 relative z-10">
+                  <IconFont type="icon-arrow-right" class="text-primary" />
+               </div>
             </div>
          </div>
+         
          <!-- 空数据状态 -->
-         <a-empty v-if="!vocabularyList?.length && vocabularyListLoading == false" class="mt-20 text-gray-400" />
+         <div v-else class="flex flex-col items-center justify-center py-16">
+            <a-empty class="text-base-content/40" 
+               description="还没有发布任何词集">
+               <template #image>
+                  <div class="w-24 h-24 bg-base-300 rounded-full flex items-center justify-center mb-4">
+                     <IconFont type="icon-xuexiku" class="text-4xl text-base-content/30" />
+                  </div>
+               </template>
+            </a-empty>
+            <button v-if="isSelf" class="btn btn-primary mt-4" @click="$router.push('/vocabulary/create')">
+               <IconFont type="icon-add" class="mr-2" />
+               创建第一个词集
+            </button>
+         </div>
       </div>
 
       <!-- 学习的词集 -->
