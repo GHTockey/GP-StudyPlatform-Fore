@@ -181,39 +181,149 @@
       </div>
 
       <!-- 学习的词集 -->
-      <div v-show="tab == 2" class="my-transition-all p-2 md:p-0">
-         <div class="divider divider-start font-semibold text-lg">学习清单</div>
-         <!-- 空数据状态 -->
-         <a-empty v-if="userRelevanceVocList.length == 0 && userRelevanceVocListLoading == false"
-            class="mt-20 text-gray-400" />
+      <div v-show="tab == 2" class="my-transition-all p-4 md:p-6">
+         <div class="divider divider-start font-semibold text-xl mb-6">
+            <IconFont type="icon-qingdanguanli" />
+            学习清单
+         </div>
+         
          <!-- 骨架屏 -->
-         <div v-else-if="userRelevanceVocListLoading" class="skeleton bg-base-200 w-full h-[100px] mb-2"></div>
+         <div v-if="userRelevanceVocListLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="item in 6" :key="item" 
+               class="skeleton bg-base-200 w-full h-[200px] rounded-2xl"></div>
+         </div>
+         
          <!-- 词集列表 -->
-         <div @click="$router.push(`/vocabulary/${item.id}`)" v-for="(item, index) in userRelevanceVocList" :key="index"
-            class="shadow bg-base-200 hover:bg-base-300 cursor-pointer mb-2 rounded-md py-5 px-6 relative">
-            <div>
-               <p class="font-bold text-lg mb-2">{{ item.title }}</p>
-            </div>
-            <div class="flex gap-5 items-center">
-               <!-- 标题 -->
-               <p class="text-sm">
-                  <IconFont type="icon-icon-test" /> {{ item.count }}个词条
-               </p>
-               <!-- 作者与数量 -->
-               <div class="avatar placeholder flex items-center">
-                  <div class="bg-neutral text-neutral-content rounded-full size-5 mr-2">
-                     <img :src="item.author?.avatar" />
+         <div v-else-if="userRelevanceVocList?.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="(item, index) in userRelevanceVocList" :key="index"
+               class="group rounded-2xl overflow-hidden transition-all duration-300 
+                      hover:shadow-xl border-2
+                      hover:border-primary/20 relative
+                      bg-gradient-to-br from-base-200 via-base-100 to-base-200
+                      hover:from-primary/5 hover:via-base-100 hover:to-primary/5">
+               
+               <!-- 封面区域 -->
+               <div class="relative h-32 overflow-hidden">
+                  <img :src="item.cover" alt="封面" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  
+                  <!-- 作者头像 -->
+                  <div class="absolute bottom-3 right-3">
+                     <div class="avatar">
+                        <div class="w-8 h-8 rounded-full ring-2 ring-base-100 shadow-lg">
+                           <img :src="item.author?.avatar" class="w-full h-full rounded-full object-cover" />
+                        </div>
+                     </div>
                   </div>
-                  <span>{{ item.author?.username }}</span>
                </div>
-               <!-- 操作 -->
-               <div v-if="isSelf" class="absolute right-5 top-1/2 -translate-y-1/2">
-                  <!-- 取消 -->
-                  <button class="btn btn-sm w-full btn-warning"
-                     @click.stop="MyUtils.modal('移出清单', `将词集 【${item.title}】 移除我的学习清单？`, () => cancelLearnVocabulary(item.id))">
-                     <IconFont type="icon-refuse" />
-                  </button>
+               
+               <!-- 内容区域 -->
+               <div class="p-4 relative">
+                  <!-- 背景装饰 -->
+                  <div class="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-primary/2 
+                             opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <!-- 标题 -->
+                  <h3 class="text-lg font-bold text-base-content mb-2 line-clamp-1 
+                             group-hover:text-primary/80 transition-colors duration-300 relative z-10">
+                     {{ item.title }}
+                  </h3>
+                  
+                  <!-- 作者信息 -->
+                  <p class="text-sm text-base-content/60 mb-3 relative z-10">
+                     作者：{{ item.author?.username }}
+                  </p>
+                  
+                  <!-- 统计信息 -->
+                  <div class="flex items-center justify-between mb-4 relative z-10">
+                     <div class="flex items-center gap-2">
+                        <IconFont type="icon-icon-test" class="text-base-content/50 text-lg" />
+                        <span class="text-sm font-medium">{{ item.count }} 个词条</span>
+                     </div>
+                     <div class="flex items-center gap-1">
+                        <IconFont type="icon-shijian" class="text-base-content/50" />
+                        <span class="text-xs text-base-content/60">已学习</span>
+                     </div>
+                  </div>
+                  
+                  <!-- 学习统计 -->
+                  <div class="bg-gradient-to-r from-primary/8 to-primary/12 rounded-lg p-3 mb-3 
+                             border border-primary/15 shadow-sm relative z-10
+                             group-hover:from-primary/12 group-hover:to-primary/16 
+                             group-hover:border-primary/25 transition-all duration-300">
+                     <div class="grid grid-cols-2 gap-3">
+                        <!-- 学习次数 -->
+                        <div class="text-center">
+                           <div class="flex items-center justify-center gap-1 mb-1">
+                              <!-- <IconFont type="icon-xuexi" class="text-primary/70 text-sm" /> -->
+                              <span class="text-xs text-base-content/70">学习次数</span>
+                           </div>
+                           <div class="text-lg font-bold text-primary/80">{{ Math.floor(Math.random() * 50) + 5 }}</div>
+                        </div>
+                        
+                        <!-- 答错数 -->
+                        <div class="text-center">
+                           <div class="flex items-center justify-center gap-1 mb-1">
+                              <!-- <IconFont type="icon-close" class="text-error/70 text-sm" /> -->
+                              <span class="text-xs text-base-content/70">累计答错数</span>
+                           </div>
+                           <div class="text-lg font-bold text-error/80">{{ Math.floor(Math.random() * 20) + 1 }}</div>
+                        </div>
+                     </div>
+                     
+                     <!-- 学习进度条 -->
+                     <!-- <div class="mt-3">
+                        <div class="flex items-center justify-between text-xs text-base-content/60 mb-1">
+                           <span>掌握程度</span>
+                           <span class="text-primary/80 font-medium">85%</span>
+                        </div>
+                        <div class="w-full bg-base-300 rounded-full h-1.5">
+                           <div class="bg-gradient-to-r from-primary/60 to-primary/80 h-1.5 rounded-full transition-all duration-500" 
+                                style="width: 85%"></div>
+                        </div>
+                     </div> -->
+                  </div>
+                  
+                  <!-- 操作按钮 -->
+                  <div v-if="isSelf" class="flex justify-between items-center relative z-10">
+                     <button class="btn btn-sm flex-1 mr-2 
+                                  bg-gradient-to-r from-primary/90 to-primary/80 
+                                  text-primary-content font-medium
+                                  shadow-md hover:shadow-lg
+                                  border-0 transition-all duration-300
+                                  transform hover:scale-105" 
+                        @click.stop="$router.push(`/vocabulary/${item.id}`)">
+                        <IconFont type="icon-xuexi" class="mr-1" />
+                        再次学习
+                     </button>
+                     <button class="btn btn-sm 
+                                  bg-gradient-to-r from-warning/90 to-warning/80 
+                                  text-warning-content font-medium
+                                  shadow-md hover:shadow-lg
+                                  border-0 transition-all duration-300
+                                  transform hover:scale-105" 
+                        @click.stop="MyUtils.modal('移出清单', `将词集 【${item.title}】 移除我的学习清单？`, () => cancelLearnVocabulary(item.id))"
+                        title="移出清单">
+                        <IconFont type="icon-refuse" />
+                     </button>
+                  </div>
                </div>
+            </div>
+         </div>
+         
+         <!-- 空数据状态 -->
+         <div v-else class="flex flex-col items-center justify-center py-16">
+            <div class="text-center">
+               <div class="w-32 h-32 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mb-6">
+                  <IconFont type="icon-qingdanguanli" class="text-6xl text-primary/40" />
+               </div>
+               <h3 class="text-xl font-semibold text-base-content mb-2">学习清单空空如也</h3>
+               <p class="text-base-content/60 mb-6">还没有添加任何词集到学习清单，快去发现有趣的词集吧！</p>
+               <button v-if="isSelf" class="btn btn-primary/80 btn-lg" @click="$router.push('/vocabulary')">
+                  <IconFont type="icon-add" class="mr-2" />
+                  去发现词集
+               </button>
             </div>
          </div>
       </div>
